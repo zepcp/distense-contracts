@@ -1,5 +1,4 @@
 // Distense is a decentralized, for-profit code cooperative
-// Anyone can contribute
 
 pragma solidity ^0.4.17;
 
@@ -21,13 +20,13 @@ contract HAVToken is Approvable {
   uint256 public etherRaised;
   uint256 public rate;
   bool public tradMkt;
-  bool saleOn;
+  bool saleActive;
 
-  mapping (address => uint256) public bals;
+  mapping (address => uint256) public balance;
 
   event LogSwapDIDForHAV(address indexed buyer, uint256 num);
   event LogHAVSale(address indexed buyer, uint256 value, uint256 amount);
-  event LogStatusChange(bool saleOn);
+  event LogStatusChange(bool saleActive);
 
   function HAVToken () {
 
@@ -37,7 +36,7 @@ contract HAVToken is Approvable {
     maxEther = maxEther * 1 ether;
     rate = 200;
     etherRaised = 0;
-    saleOn = false;
+    saleActive = false;
     require(rate > 0);
   }
 
@@ -51,7 +50,7 @@ contract HAVToken is Approvable {
   }
 
   function buyHAVTokens(address _recip) payable {
-    require(_recip != 0x0);
+    require(_recip != address(0));
     require(approvePurchase());
 
     uint256 numWei = msg.value;
@@ -67,7 +66,7 @@ contract HAVToken is Approvable {
   }
 
   function approvePurchase() internal view returns (bool) {
-    return msg.value > 0 && saleOn;
+    return msg.value > 0 && saleActive;
   }
 
   function tradMkt(bool _tradMkt) onlyOwner public returns (bool) {
@@ -79,8 +78,8 @@ contract HAVToken is Approvable {
   }
 
   function pauseSale() onlyOwner public returns (bool) {
-    saleOn = !saleOn;
-    LogStatusChange(saleOn);
+    saleActive = !saleOn;
+    LogStatusChange(saleActive);
     return true;
   }
 

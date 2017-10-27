@@ -1,5 +1,5 @@
 # distense-contracts
-
+[![codecov](https://codecov.io/gh/Distense/contracts/branch/master/graph/badge.svg)](https://codecov.io/gh/Distense/contracts)
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
 > Distense Ethereum Smart Contracts

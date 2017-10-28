@@ -4,7 +4,7 @@
   "description": "Distense Ethereum smart contracts and tests",
   "main": "",
   "scripts": {
-    "test": "truffle test"
+    "test": "./node_modules/.bin/run-with-testrpc 'truffle test || exit 0'"
   },
   "repository": {
     "type": "git",

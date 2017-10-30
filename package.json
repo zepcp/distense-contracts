@@ -27,5 +27,10 @@
     "mocha": "^4.0.1",
     "run-with-testrpc": "^0.2.1",
     "solidity-coverage": "^0.2.7"
+  },
+  "dependencies": {
+    "faker": "^4.1.0",
+    "ipfs": "^0.26.0",
+    "truffle-contract": "^3.0.0"
   }
 }

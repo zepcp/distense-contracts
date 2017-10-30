@@ -5,7 +5,7 @@ const PullRequests = artifacts.require('./PullRequests.sol')
 const Tasks = artifacts.require('./Tasks.sol')
 const SafeMath = artifacts.require('./SafeMath.sol')
 const SafeMathMock = artifacts.require('./SafeMathMock')
-const mockData = require('./mockData.js')
+const mockData = require('./mockData')
 
 module.exports = deployer => {
   deployer
@@ -23,10 +23,6 @@ module.exports = deployer => {
       console.log(`Issuing mock DID to accounts[0]`)
       return didToken.issueDID(web3.eth.accounts[0], 4000)
     })
-    // .then(didToken => {
-    //   console.log(`Issuing mock DID to accounts[1]`)
-    //   return didToken.issueDID(web3.eth.accounts[1], 5000)
-    // })
     .then(() => {
       return deployer.deploy(Distense, DIDToken.address)
     })
@@ -36,17 +32,12 @@ module.exports = deployer => {
     .then(() => {
       return deployer.deploy(PullRequests, Tasks.address)
     })
-    .then(() => {
-      return deployer.deploy(PullRequests, Tasks.address)
-    })
-    .then(() => {
-      return deployer.deploy(GitTool)
-    })
     .then(async () => {
+      // Not production/mainnet
       if (web3.version.network !== 1) {
-        // const tasks = await Tasks.deployed()
-        // const pullRequests = await PullRequests.deployed()
-        // await mockData(tasks, pullRequests)
+        const tasks = await Tasks.deployed()
+        const pullRequests = await PullRequests.deployed()
+        await mockData(tasks, pullRequests)
       }
     })
     .catch(err => {

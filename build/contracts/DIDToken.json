@@ -1675,7 +1675,58 @@
     "name": "SourceUnit",
     "src": "0:907:0"
   },
-  "networks": {},
+  "networks": {
+    "9000": {
+      "events": {
+        "0x3433529aaca741f54b3397d6ef2d588bb92ecd0d87c4c41db2f379bfe5c168f4": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "numDID",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogIssueDID",
+          "type": "event"
+        }
+      },
+      "links": {
+        "SafeMath": "0x2dbadb04564a1f1721b2178705f6e4ed379e8659"
+      },
+      "address": "0x2a6649814a3047dda6e06ca768373a335cd17fa4"
+    },
+    "1509398645178": {
+      "events": {
+        "0x3433529aaca741f54b3397d6ef2d588bb92ecd0d87c4c41db2f379bfe5c168f4": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "numDID",
+              "type": "uint256"
+            }
+          ],
+          "name": "LogIssueDID",
+          "type": "event"
+        }
+      },
+      "links": {
+        "SafeMath": "0x055d5d6362e4f3f838c6bef9de68c364edd03706"
+      },
+      "address": "0xef9c80c1f77a1e2343cb15fc734904e018b18b5d"
+    }
+  },
   "schemaVersion": "1.0.0",
-  "updatedAt": "2017-10-27T15:34:30.622Z"
+  "updatedAt": "2017-10-30T21:38:00.671Z"
 }

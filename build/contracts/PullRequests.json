@@ -4123,7 +4123,18 @@
     "name": "SourceUnit",
     "src": "0:3112:4"
   },
-  "networks": {},
+  "networks": {
+    "9000": {
+      "events": {},
+      "links": {},
+      "address": "0xa52d3c4cd4d943d8a847d01647ad12e0f2626050"
+    },
+    "1509398645178": {
+      "events": {},
+      "links": {},
+      "address": "0x1a715eb724d2b85962c0e61e33ae9dea762fb91c"
+    }
+  },
   "schemaVersion": "1.0.0",
-  "updatedAt": "2017-10-27T15:34:30.625Z"
+  "updatedAt": "2017-10-30T21:38:00.681Z"
 }

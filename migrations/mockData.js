@@ -1,4 +1,5 @@
 module.exports = async function(tasksInstance, pullRequestsInstance) {
+  console.log(`Beginning insert of dummy data`);
   const tasksArtifacts = require('../build/contracts/Tasks.json')
   const pullRequestsArtifacts = require('../build/contracts/PullRequests.json')
   const contract = require('truffle-contract')
@@ -8,10 +9,6 @@ module.exports = async function(tasksInstance, pullRequestsInstance) {
   const faker = require('faker')
   const web3Utils = require('web3-utils')
   const IPFS = require('ipfs')
-
-  // const wrtc = require('wrtc')
-  // const WStar = require('libp2p-webrtc-star')
-  // const wstar = new WStar({ wrtc: wrtc })
 
   const ipfsNode = new IPFS({
     repo: 'distense/' + String(Math.random()),
@@ -49,7 +46,7 @@ module.exports = async function(tasksInstance, pullRequestsInstance) {
 
     console.log(`Inserting mock data because not on Mainnet/Network 1`)
 
-    for (let i = 0; i <= 20; i++) {
+    for (let i = 0; i <= 8; i++) {
       try {
         console.log(`Inserting mock: ${i}`)
         const task = {
@@ -92,4 +89,6 @@ module.exports = async function(tasksInstance, pullRequestsInstance) {
   async function submitPullRequest(pr) {
     await pullRequestsInstance.submitPullRequest(pr.bytes32, pr.taskId)
   }
+
+  return true
 }

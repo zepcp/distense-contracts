@@ -32,8 +32,12 @@ contract('Tasks', function(accounts) {
 
   it("should let those who don't own DID to add tasks", async function() {
     let addError
+
     try {
-      //contract throws error here
+
+      const userBalance = await didToken.balances.call(accounts[1])
+      assert.equal(userBalance, 0, `user's DID balance should be 0 here`)
+
       await tasks.addTask(
         '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9',
         {
@@ -43,13 +47,15 @@ contract('Tasks', function(accounts) {
     } catch (error) {
       addError = error
     }
-    assert.notEqual(addError, undefined, 'Error must be thrown')
+    assert.notEqual(addError, undefined, 'Error must be thrown when user with no DID addTasks()s')
 
-    numTasks = await tasks.getNumTasks.call()
-    assert.equal(numTasks, 0, 'numTasks should 0')
+    const numTasks = await tasks.getNumTasks.call()
+    assert.equal(numTasks, 0, 'numTasks should still be 0')
   })
 
   it('should correctly determineReward()s', async function() {
+    let determineReward
+
     await didToken.issueDID(accounts[0], 101)
     await didToken.issueDID(accounts[1], 101)
     const task = {
@@ -75,11 +81,11 @@ contract('Tasks', function(accounts) {
 
       reward = await tasks.determineReward(task.taskId)
     } catch (error) {
-      let determineReward = error
+      determineReward = error
+      console.log(`${determineReward}`);
     }
-
-    // assert.isOk(await tasks.haveReachedProposalApprovalThreshold.call(task.taskId), 'haveReachedProposalApprovalThreshold')
     assert.equal(reward, 100, 'Reward should equal average of two votes')
+
   })
 
   it('should not add tasks with ipfsHashes that are empty strings', async function() {
@@ -120,62 +126,4 @@ contract('Tasks', function(accounts) {
     assert.equal(addTaskLog.length, 1, 'should be 1 event')
   })
 
-  it("should not fire event 'LogRewardVote' when voteOnReward is called by someone who doesn't own enough DID", async function() {
-    let LogRewardVoteEventListener = tasks.LogRewardVote()
-    didToken.issueDID(accounts[1], 1235)
-
-    const voteArgs = {
-      taskId:
-        '0x956761ab87f7b984dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9',
-      reward: 1236 // one more than 1235 issued to this account above
-    }
-
-    let addError
-    try {
-      //contract should throw error here
-      await tasks.addTask(voteArgs.taskId)
-      const taskExists = await tasks.taskExists.call(voteArgs.taskId)
-      assert.equal(taskExists, true)
-
-      await tasks.voteOnReward(voteArgs.taskId, voteArgs.reward, {
-        from: accounts[1]
-      })
-    } catch (error) {
-      addError = error
-    }
-    assert.notEqual(addError, undefined, 'Error must be thrown')
-    const numTasks = await tasks.getNumTasks.call()
-    assert.equal(
-      numTasks,
-      0,
-      'No task should be added when empty string passed'
-    )
-  })
-
-  // it("should fire event 'LogRewardDetermined'", async function() {
-  //   let LogRewardDeterminedEventListener = tasks.LogRewardDetermined()
-  //
-  //   const voteArgs = {
-  //     taskId:
-  //       '0x956761ab87f7b984dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9',
-  //     reward: 1234
-  //   }
-  //
-  //   didToken.issueDID(accounts[1], 1235)
-  //   await tasks.determineReward(voteArgs.taskId, voteArgs.reward, {
-  //     from: accounts[1]
-  //   })
-  //
-  //   let addTaskLog = await new Promise((resolve, reject) =>
-  //     LogRewardDeterminedEventListener .get(
-  //       (error, log) => (error ? reject(error) : resolve(log))
-  //     )
-  //   )
-  //
-  //   let eventArgs = addTaskLog[0].args
-  //   assert.equal(eventArgs.taskId, voteArgs.taskId)
-  //   assert.equal(eventArgs.reward, voteArgs.reward)
-  //   assert.equal(addTaskLog.length, 1, 'should be 1 event')
-  //
-  // })
 })

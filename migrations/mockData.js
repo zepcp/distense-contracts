@@ -46,7 +46,7 @@ module.exports = async function(tasksInstance, pullRequestsInstance) {
 
     console.log(`Inserting mock data because not on Mainnet/Network 1`)
 
-    for (let i = 0; i <= 8; i++) {
+    for (let i = 0; i <= 10; i++) {
       try {
         console.log(`Inserting mock: ${i}`)
         const task = {

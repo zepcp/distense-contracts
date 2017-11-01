@@ -87,22 +87,26 @@ contract Distense {
      return parameters[_title].value; 
   }
 
-  function voteOnParameter(bytes32 _title, uint256 _newValue) public votingIntervalReached(msg.sender, _title) returns
+  function voteOnParameter(bytes32 _title, uint256 _voteValue )
+    public
+    voteWithinRange(_title, _voteValue )
+    votingIntervalReached(msg.sender, _title)
+  returns
     (uint256) {
 
     DIDToken didToken = DIDToken(DIDTokenAddress);
     uint256 votersDIDPercent = didToken.percentDID(msg.sender);
     require (votersDIDPercent > 0);
 
-    Parameter storage parameter = parameters[_title];
-    require (_newValue != parameter.value);
+    uint256 currentValue = getParameterValue(_title);
+    require(_voteValue != currentValue);
 
-    uint value = (_newValue * votersDIDPercent) / 100;
-    
-    parameter.value += value;
-    parameter.votes[msg.sender].lastVoted = now;
-    LogParameterValueUpdate(_title, parameter.value);
-    return parameter.value;
+    uint updatedValue = (_voteValue * votersDIDPercent) / 100;
+
+    updateParameterValue(_title, updatedValue);
+    updateLastVotedOnParameter(_title, msg.sender);
+    LogParameterValueUpdate(_title, updatedValue);
+    return updatedValue;
   }
   
   function getParameterByTitle(bytes32 _title) public view returns (bytes32, uint256) {
@@ -114,11 +118,30 @@ contract Distense {
     return parameterTitles.length;
   }
 
+  function updateParameterValue(bytes32 _title, uint256 _newValue) internal returns (uint256) {
+    Parameter storage parameter = parameters[_title];
+    parameter.value = _newValue;
+    return parameter.value;
+  }
+
+  function updateLastVotedOnParameter(bytes32 _title, address voter) internal returns (bool) {
+    Parameter storage parameter = parameters[_title];
+    parameter.votes[voter].lastVoted = now;
+  }
+
   modifier votingIntervalReached(address _voter, bytes32 _title) {
     Parameter storage parameter = parameters[_title];
     uint256 lastVotedOnParameter = parameter.votes[_voter].lastVoted;
     if (lastVotedOnParameter > 0)
       require(now >= lastVotedOnParameter + votingInterval);
+    _;
+  }
+
+  modifier voteWithinRange(bytes32 _title, uint256 _newValue) {
+    Parameter storage parameter = parameters[_title];
+    uint256 currentValue = parameter.value;
+    require(_newValue >= 0);
+    require(_newValue <= 2 * currentValue);
     _;
   }
 

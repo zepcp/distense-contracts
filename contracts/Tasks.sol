@@ -35,7 +35,7 @@ contract Tasks {
     DistenseAddress = _DistenseAddress;
   }
 
-  function addTask(bytes32 _taskId) public returns (bool) {
+  function addTask(bytes32 _taskId) public hasDID(msg.sender) returns (bool) {
     require(_taskId[0] != 0);
     tasks[_taskId].createdBy = msg.sender;
     tasks[_taskId].reward = 0;
@@ -139,12 +139,11 @@ contract Tasks {
     _;
   }
 
-//  modifier hasRequiredNumDID(address voter, uint256 num) {
-//    didToken = DIDToken(DIDTokenAddress);
-//    uint256 balance = didToken.balances(voter);
-//    require(balance > num);
-//    _;
-//  }
+  modifier hasDID(address voter) {
+    didToken = DIDToken(DIDTokenAddress);
+    require(didToken.balances(voter) > 0);
+    _;
+  }
 
   modifier rewardWithinParameterLimit(uint256 _reward) {
     uint256 maxReward = distense.getParameterValue(distense.maxRewardParameterTitle());

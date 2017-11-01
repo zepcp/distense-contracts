@@ -12,7 +12,7 @@ contract('Distense contract', function(accounts) {
 
   const pullRequestPctDIDParameter = {
     title: 'pullRequestPctDIDRequired',
-    value: 1 // Hard coded in constructor function in contract
+    value: 10 // Hard coded in constructor function in contract
   }
 
   const votingIntervalParameter = {
@@ -29,7 +29,7 @@ contract('Distense contract', function(accounts) {
       convertBytes32ToString(param[0]),
       pullRequestPctDIDParameter.title
     )
-    assert.equal(param[1], pullRequestPctDIDParameter.value)
+    assert.equal(param[1].toNumber(), pullRequestPctDIDParameter.value)
   })
 
   it('should set the proposalPctDIDApprovalParameter correctly', async function() {
@@ -38,14 +38,15 @@ contract('Distense contract', function(accounts) {
     )
 
     assert.equal(
-      convertBytes32ToString(param[0]),
+      convertBytes32ToString(param[0].toString()),
       proposalPctDIDApprovalParameter.title
     )
     assert.equal(param[1], proposalPctDIDApprovalParameter.value)
   })
 
   it('should set the initial attributes correctly', async function() {
-    assert.equal(await distense.getNumParameters.call(), 3)
+    const numParameters = await distense.getNumParameters.call()
+    assert.equal(numParameters, 4)
   })
 
   it('should correctly throw errors for proposalPctDIDApproval votes with values equal to the current value', async function() {

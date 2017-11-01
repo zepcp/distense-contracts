@@ -18,7 +18,7 @@ contract PullRequests is Approvable {
   Tasks tasks;
   address public TasksAddress;
 
-  uint256 constant public numDIDToApprove = 50;
+  uint256 constant public numDIDRequiredToApprovePRs = 100;
 
   struct PullRequest {
     address createdBy;
@@ -36,6 +36,7 @@ contract PullRequests is Approvable {
 
   mapping (bytes32 => PullRequest) pullRequests;
 
+  event LogInt(uint256 someInt);
   event LogPullRequestApproval(bytes32 _prId, bytes32 indexed taskId);
   event LogPullRequestVote(bytes32 indexed _prId, uint256 pctDIDApproved);
 
@@ -63,18 +64,19 @@ contract PullRequests is Approvable {
     return pullRequestIds.length;
   }
 
-  function voteOnApproval(bytes32 _prId, bool _approve) hasntVotedThisWay(_prId, msg.sender, _approve) enoughDIDToApprove(msg.sender) external
+  function voteOnApproval(bytes32 _prId, bool _approve) /*hasntVotedThisWay(_prId, msg.sender, _approve)*/ enoughDIDToApprove(msg
+.sender)
+  external
   returns (uint256) {
-    PullRequest storage _pr = pullRequests[_prId];
-
-    uint256 pctDIDOwned = didToken.percentDID(msg.sender);
-    _pr.votes[msg.sender].approves = _approve;
+//    PullRequest storage _pr = pullRequests[_prId];
+//
+//    uint256 pctDIDOwned = didToken.percentDID(msg.sender);
+//    _pr.votes[msg.sender].approves = _approve;
 
 //    if (!_approve) {
 //      pctDIDOwned += -pctDIDOwned;
 //    }
-//    LogUint256(pctDIDOwned);
-    _pr.pctDIDApproved += pctDIDOwned;
+//    _pr.pctDIDApproved += pctDIDOwned;
     return 100;
 //    uint256 approvalValue = distense.getParameterValue(distense.pullRequestPctDIDRequiredParameterTitle());
 //    if (_pr.pctDIDApproved > approvalValue) {
@@ -100,7 +102,7 @@ contract PullRequests is Approvable {
 
   modifier enoughDIDToApprove(address voter) {
     uint256 didOwned = didToken.balances(voter);
-    require(didOwned >= numDIDToApprove);
+    require(didOwned >= numDIDRequiredToApprovePRs);
     _;
   }
 

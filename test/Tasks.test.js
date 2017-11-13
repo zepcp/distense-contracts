@@ -53,40 +53,59 @@ contract('Tasks', function(accounts) {
     assert.equal(numTasks, 0, 'numTasks should still be 0')
   })
 
+
   it('should correctly determineReward()s', async function() {
     let determineReward
 
-    await didToken.issueDID(accounts[0], 101)
-    await didToken.issueDID(accounts[1], 101)
+    await didToken.issueDID(accounts[0], 150)
+    await didToken.issueDID(accounts[1], 150)
+    await didToken.issueDID(accounts[2], 900)
+
     const task = {
       taskId:
         '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
     }
 
-    let reward
+    let reward1
+    let reward2
+    let taskExists1
+    let voted1
+    let voted2
+    let voted3
     try {
-      //contract throws error here
       await tasks.addTask(task.taskId)
-      assert.equal(await tasks.taskExists(task.taskId), true)
+      taskExists1 = await tasks.taskExists(task.taskId)
 
-      const voted1 = await tasks.voteOnReward.call(task.taskId, 100, {
+      voted1 = await tasks.voteOnReward.call(task.taskId, 100, {
         from: accounts[0]
       })
 
-      assert.equal(voted1, true, 'Should have returned true')
-      const voted2 = await tasks.voteOnReward(task.taskId, 100, {
+      voted2 = await tasks.voteOnReward.call(task.taskId, 100, {
         from: accounts[1]
       })
-      assert.equal(voted2, true, 'Should have returned true')
 
-      reward = await tasks.determineReward(task.taskId)
+      reward1 = await tasks.determineReward.call(task.taskId)
+
+      //  accounts[2] now owns 75%
+      voted3 = await tasks.voteOnReward.call(task.taskId, 800, {
+        from: accounts[2]
+      })
+
+      reward2 = await tasks.determineReward.call(task.taskId)
+
     } catch (error) {
       determineReward = error
       console.log(`${determineReward}`);
     }
-    assert.equal(reward, 100, 'Reward should equal average of two votes')
 
+    assert.equal(taskExists1, true)
+    assert.equal(voted1, true, 'voted1 should be true')
+    assert.equal(voted2, true, 'voted2 should be true')
+    assert.equal(reward1.toNumber(), 100, 'Reward should equal average of two votes')
+    assert.equal(voted3, true, 'voted3 should be true')
+    assert.equal(reward2.toNumber(), 625, 'Reward should equal weighted average of three votes')
   })
+
 
   it('should not add tasks with ipfsHashes that are empty strings', async function() {
     let addError
@@ -107,6 +126,8 @@ contract('Tasks', function(accounts) {
   })
 
   /* EVENTS */
+
+
   it("should fire event 'LogAddTask' when addTask is called", async function() {
     let LogAddTaskEventListener = tasks.LogAddTask()
 

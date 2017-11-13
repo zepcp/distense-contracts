@@ -1,5 +1,7 @@
 module.exports = async function(tasksInstance, pullRequestsInstance) {
-  console.log(`Beginning insert of dummy data`);
+  console.log(`
+  
+  Beginning insert of dummy data`);
   const tasksArtifacts = require('../build/contracts/Tasks.json')
   const pullRequestsArtifacts = require('../build/contracts/PullRequests.json')
   const contract = require('truffle-contract')
@@ -48,7 +50,7 @@ module.exports = async function(tasksInstance, pullRequestsInstance) {
 
     for (let i = 0; i <= 10; i++) {
       try {
-        console.log(`Inserting mock: ${i}`)
+        // console.log(`Inserting mock: ${i}`)
         const task = {
           bytes32: web3Utils.randomHex(66).toString(),
           title: faker.hacker.phrase(),

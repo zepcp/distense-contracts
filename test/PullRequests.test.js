@@ -83,7 +83,6 @@ contract('PullRequests', function(accounts) {
     }
   })
 
-  //
   it('enoughDIDToApprove modifier should work', async function() {
     // let anError
     //

@@ -28,6 +28,7 @@ contract Tasks {
   event LogAddTask(bytes32 taskId);
   event LogRewardVote(bytes32 taskId, uint256 reward, uint256 pctDIDVoted);
   event LogVoterBalance(uint256 voterBalance);
+  event LogUInt256(uint256 someInt);
   event LogRewardDetermined(bytes32 indexed taskId, uint256 sum);
 
   function Tasks(address _DIDTokenAddress, address _DistenseAddress) public {
@@ -59,9 +60,8 @@ contract Tasks {
 
   // Make sure voter hasn't voted and the reward for this task isn't set
   function voteOnReward(bytes32 _taskId, uint256 _reward)
-//    TODO not sure we want this here: hasRequiredNumDID(msg.sender, _reward)
-    voterNotVotedOnTask(_taskId)
-    rewardWithinParameterLimit(_reward)
+//    voterNotVotedOnTask(_taskId)
+//    rewardWithinParameterLimit(_reward)
   external returns (bool) {
     require(!haveReachedProposalApprovalThreshold(_taskId));
 
@@ -86,27 +86,30 @@ contract Tasks {
   }
 
   function determineReward(bytes32  _taskId) public returns (uint256) {
-    require(!haveReachedProposalApprovalThreshold(_taskId));
+//    require(!haveReachedProposalApprovalThreshold(_taskId));
 
-    Task storage _task = tasks[_taskId];
-
-    uint256 _numDIDVoted = numDIDVotedOnTask(_taskId);
-    uint256 _sum = 0;
-    address _voter;
-
-    //    TODO what should we limit this to?
-    for (uint8 i = 0; i <= 100; i++) {
-      _voter = _task.rewardVoters[i];
-      uint rewardVote = _task.rewardVotes[_voter] * 100;
-      uint voterDIDBalance = didToken.balances(_voter) * 100;
-      uint totalDIDVoted = _numDIDVoted * 100;
-      _sum += rewardVote * (voterDIDBalance / totalDIDVoted);
-    }
-
-    _task.reward = _sum;
-    _task.rewardPaid = false;
-    LogRewardDetermined(_taskId, _sum);
-    return _sum;
+    uint something = 100;
+    LogUInt256(something);
+//    Task storage _task = tasks[_taskId];
+//
+//    uint256 _numDIDVoted = numDIDVotedOnTask(_taskId);
+//    uint256 _sum = 0;
+//    address _voter;
+//
+//    for (uint8 i = 0; i <= 255; i++) {
+//      _voter = _task.rewardVoters[i];
+//      uint rewardVote = _task.rewardVotes[_voter] * 100;
+//      didToken = DIDToken(DIDTokenAddress);
+//      uint256 voterDIDBalance = didToken.balances(_voter) * 100;
+//      LogUInt256(voterDIDBalance);
+//      uint totalDIDVoted = _numDIDVoted * 100;
+//      _sum += rewardVote * (voterDIDBalance / totalDIDVoted);
+//    }
+//
+//    _task.reward = _sum;
+//    _task.rewardPaid = false;
+//    LogRewardDetermined(_taskId, _sum);
+    return 100;
   }
 
   function numDIDVotedOnTask(bytes32 _taskId) public view returns (uint256) {

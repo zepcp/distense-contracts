@@ -5,6 +5,11 @@ module.exports = {
       port: 8545,
       network_id: '*'
     },
+    ganache: {
+      host: '127.0.0.1',
+      port: 7545,
+      network_id: 5777,
+    },
     distnet: {
       host: '165.227.28.206',
       port: 9000,

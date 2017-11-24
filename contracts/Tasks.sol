@@ -88,8 +88,6 @@ contract Tasks {
   function determineReward(bytes32  _taskId) public returns (uint256) {
 //    require(!haveReachedProposalApprovalThreshold(_taskId));
 
-    uint something = 100;
-    LogUInt256(something);
 //    Task storage _task = tasks[_taskId];
 //
 //    uint256 _numDIDVoted = numDIDVotedOnTask(_taskId);

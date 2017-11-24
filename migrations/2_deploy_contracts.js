@@ -24,7 +24,9 @@ module.exports = deployer => {
       if (web3.version.network !== 1) {
         const initialDID = 5000
         console.log(`Issuing ${initialDID} mock DID to accounts[0]`)
-        return didToken.issueDID(web3.eth.accounts[0], initialDID)
+        const issuedDID = didToken.issueDID.call(web3.eth.accounts[0], initialDID)
+        console.log(`${web3.eth.accounts[0]}`);
+        if (issuedDID) console.log(`issued DID to web3.eth.accounts[0]`)
       }
     })
     .then(() => {
@@ -36,14 +38,14 @@ module.exports = deployer => {
     .then(() => {
       return deployer.deploy(PullRequests, Tasks.address)
     })
-    .then(async () => {
-      // If not in production/ on mainnet insert a bunch of fake news
-      if (web3.version.network !== 1) {
-        const tasks = await Tasks.deployed()
-        const pullRequests = await PullRequests.deployed()
-        await mockData(tasks, pullRequests)
-      }
-    })
+    // .then(async () => {
+    //   If not in production/ on mainnet insert a bunch of fake news
+      // if (web3.version.network !== 1) {
+      //   const tasks = await Tasks.deployed()
+      //   await mockData(tasks)
+      // }
+      // return true
+    // })
     .catch(err => {
       console.log(`error: ${err}`)
     })

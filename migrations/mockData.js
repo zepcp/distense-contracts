@@ -1,7 +1,5 @@
-module.exports = async function(tasksInstance, pullRequestsInstance) {
-  console.log(`
-  
-  Beginning insert of dummy data`);
+module.exports = async function(tasksInstance) {
+  console.log(`Beginning insert of dummy data`)
   const tasksArtifacts = require('../build/contracts/Tasks.json')
   const pullRequestsArtifacts = require('../build/contracts/PullRequests.json')
   const contract = require('truffle-contract')
@@ -13,7 +11,7 @@ module.exports = async function(tasksInstance, pullRequestsInstance) {
   const IPFS = require('ipfs')
 
   const ipfsNode = new IPFS({
-    repo: 'distense/' + String(Math.random()),
+    repo: String(Math.random()),
     init: true,
     start: true
   })
@@ -49,8 +47,9 @@ module.exports = async function(tasksInstance, pullRequestsInstance) {
     console.log(`Inserting mock data because not on Mainnet/Network 1`)
 
     for (let i = 0; i <= 10; i++) {
+
       try {
-        // console.log(`Inserting mock: ${i}`)
+        console.log(`Inserting mock: ${i}`)
         const task = {
           bytes32: web3Utils.randomHex(66).toString(),
           title: faker.hacker.phrase(),
@@ -62,11 +61,10 @@ module.exports = async function(tasksInstance, pullRequestsInstance) {
         }
         await addTask(task)
 
-        const pr = {
-          bytes32: web3Utils.randomHex(64).toString(),
-          taskId: task.bytes32
-        }
-        await submitPullRequest(pr)
+        // const pr = {
+        //   bytes32: web3Utils.randomHex(64).toString(),
+        //   taskId: task.bytes32
+        // }
       } catch (error) {
         console.log(`error inserting mock data: ${error}`)
       }
@@ -74,8 +72,9 @@ module.exports = async function(tasksInstance, pullRequestsInstance) {
     return true
   }
 
-  ipfsNode.on('ready', () => {
-    addTasks()
+  ipfsNode.on('ready', async () => {
+    console.log(`ipfs ready`)
+    await addTasks()
   })
 
   async function addTask(task) {
@@ -85,11 +84,7 @@ module.exports = async function(tasksInstance, pullRequestsInstance) {
     })
 
     task._id = cid.toBaseEncodedString() // Get real IPFS hash 'zdpu...'
-    await tasksInstance.addTask(task.bytes32)
-  }
-
-  async function submitPullRequest(pr) {
-    await pullRequestsInstance.submitPullRequest(pr.bytes32, pr.taskId)
+    return await tasksInstance.addTask(task.bytes32)
   }
 
   return true

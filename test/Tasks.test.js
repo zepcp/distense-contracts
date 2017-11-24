@@ -95,7 +95,6 @@ contract('Tasks', function(accounts) {
 
     } catch (error) {
       determineReward = error
-      console.log(`${determineReward}`);
     }
 
     assert.equal(taskExists1, true)

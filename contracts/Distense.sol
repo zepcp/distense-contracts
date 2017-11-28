@@ -47,8 +47,7 @@ contract Distense {
 
   function Distense(address _DIDTokenAddress) public {
 
-    DIDTokenAddress = _DIDTokenAddress;
-
+    DIDToken didToken = DIDToken(_DIDTokenAddress);
 
     // Launch Distense with some votable parameters that can be later updated by contributors
     proposalPctDIDApprovalParameter = Parameter({
@@ -78,8 +77,6 @@ contract Distense {
     });
     parameters[maxRewardParameterTitle] = maxRewardParameter;
     parameterTitles.push(maxRewardParameterTitle);
-
-    assert(parameterTitles.length == 4);
 
   }
   

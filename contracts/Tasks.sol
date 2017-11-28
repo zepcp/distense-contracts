@@ -1,26 +1,25 @@
 pragma solidity ^0.4.17;
 
 import './DIDToken.sol';
+import './Debuggable.sol';
 import './Distense.sol';
 import './lib/SafeMath.sol';
 
-contract Tasks {
+contract Tasks is Debuggable {
   using SafeMath for uint256;
 
   address public DIDTokenAddress;
   address public DistenseAddress;
-  DIDToken didToken;
-  Distense distense;
 
   bytes32[] public taskIds;
 
   struct Task {
-  address createdBy;
-  uint256 reward;
-  address[] rewardVoters;
-  bool rewardPaid;
-  uint256 pctDIDVoted;
-  mapping (address => uint256) rewardVotes;
+    address createdBy;
+    uint256 reward;
+    address[] rewardVoters;
+    bool rewardPaid;
+    uint256 pctDIDVoted;
+    mapping (address => uint256) rewardVotes;
   }
 
   mapping (bytes32 => Task) tasks;
@@ -28,7 +27,6 @@ contract Tasks {
   event LogAddTask(bytes32 taskId);
   event LogRewardVote(bytes32 taskId, uint256 reward, uint256 pctDIDVoted);
   event LogVoterBalance(uint256 voterBalance);
-  event LogUInt256(uint256 someInt);
   event LogRewardDetermined(bytes32 indexed taskId, uint256 sum);
 
   function Tasks(address _DIDTokenAddress, address _DistenseAddress) public {
@@ -63,24 +61,25 @@ contract Tasks {
 //    voterNotVotedOnTask(_taskId)
 //    rewardWithinParameterLimit(_reward)
   external returns (bool) {
-    require(!haveReachedProposalApprovalThreshold(_taskId));
-
-    LogRewardVote(_taskId, _reward, _pctDIDVoted);
+//    require(!reachedProposalApprovalThreshold(_taskId));
     Task storage _task = tasks[_taskId];
     _task.rewardVotes[msg.sender] = _reward;
     _task.rewardVoters.push(msg.sender);
-
+//    LogString('_task.rewardVoters.length');
+//    LogUInt256(_task.rewardVoters.length);
     uint256 _pctDIDVoted = percentDIDVoted(_taskId);
     _task.pctDIDVoted = _pctDIDVoted;
-
-    //  If DID threshold has been reached go ahead and determine the reward for the task
-    //    TODO  this function could hopefully be structured better;
-    //    the below will consume quite a bit of gas
-    //    if enoughDIDVoted, making the person who calls this the unlucky one who turns enoughDIDVoted to be true
-    bool enoughDIDVoted = haveReachedProposalApprovalThreshold(_taskId);
-    if (enoughDIDVoted || _task.rewardVoters.length == 100) {
-      determineReward(_taskId);
-    }
+//
+//////  If DID threshold has been reached go ahead and determine the reward for the task
+//////  TODO see how much gas this consumes and determine if quite unfair to unlucky caller
+    bool enoughDIDVoted = reachedProposalApprovalThreshold(_taskId);
+    LogString('enoughDIDVoted');
+    LogBool(enoughDIDVoted);
+//    if (enoughDIDVoted || _task.rewardVoters.length == 100) {
+//      uint256 determinedReward = determineReward(_taskId);
+//      LogString('determinedReward');
+//      LogUInt256(determinedReward );
+//    }
     LogRewardVote(_taskId, _reward, _pctDIDVoted);
     return true;
   }
@@ -88,47 +87,70 @@ contract Tasks {
   function determineReward(bytes32  _taskId) public returns (uint256) {
 //    require(!haveReachedProposalApprovalThreshold(_taskId));
 
-//    Task storage _task = tasks[_taskId];
-//
-//    uint256 _numDIDVoted = numDIDVotedOnTask(_taskId);
-//    uint256 _sum = 0;
-//    address _voter;
-//
-//    for (uint8 i = 0; i <= 255; i++) {
-//      _voter = _task.rewardVoters[i];
+    Task storage _task = tasks[_taskId];
+
+    uint256 _numDIDVoted = numDIDVotedOnTask(_taskId);
+    LogString('_numDIDVoted');
+    LogUInt256(_numDIDVoted);
+    uint256 _sum = 0;
+    address _voter;
+
+    LogString('_task.rewardVoters.length');
+    LogUInt256(_task.rewardVoters.length);
+    for (uint8 i = 0; i <= 20; i++) {
+      _voter = _task.rewardVoters[i];
 //      uint rewardVote = _task.rewardVotes[_voter] * 100;
-//      didToken = DIDToken(DIDTokenAddress);
+//      LogString('rewardVote');
+//      LogUInt256(rewardVote);
+//      DIDToken didToken = DIDToken(DIDTokenAddress);
 //      uint256 voterDIDBalance = didToken.balances(_voter) * 100;
+//      LogString('voterDIDBalance');
 //      LogUInt256(voterDIDBalance);
 //      uint totalDIDVoted = _numDIDVoted * 100;
 //      _sum += rewardVote * (voterDIDBalance / totalDIDVoted);
-//    }
-//
+    }
+
+//    LogUInt256(_sum);
 //    _task.reward = _sum;
 //    _task.rewardPaid = false;
 //    LogRewardDetermined(_taskId, _sum);
-    return 100;
+    return _sum;
   }
 
   function numDIDVotedOnTask(bytes32 _taskId) public view returns (uint256) {
-    Task memory _task = tasks[_taskId];
+    Task storage _task = tasks[_taskId];
     uint256 _numDIDVoted = 0;
 
+    uint256 numRewardVoters = _task.rewardVoters.length;
+//    LogString('numRewardVoters');
+//    LogUInt256(numRewardVoters);
     for (uint16 i = 0; i < _task.rewardVoters.length; i++) {
-      _numDIDVoted += didToken.balances(_task.rewardVoters[i]);
+      DIDToken didToken = DIDToken(DIDTokenAddress);
+      uint256 didBalance = didToken.balances(_task.rewardVoters[i]);
+      _numDIDVoted += didBalance;
     }
-
+    LogString('_numDIDVoted');
+    LogUInt256(_numDIDVoted);
     return _numDIDVoted;
   }
 
-  function haveReachedProposalApprovalThreshold(bytes32 _taskId) public view returns (bool) {
-    uint256 threshold = distense.getParameterValue(distense.proposalPctDIDApprovalTitle());
+  function reachedProposalApprovalThreshold(bytes32 _taskId) public view returns (bool) {
+    Distense distense = Distense(DistenseAddress);
+    bytes32 title = distense.proposalPctDIDApprovalTitle();
+    LogString('title');
+    LogBytes32(title);
+    uint256 threshold = distense.getParameterValue(title);
+    LogString('ProposalApprovalThreshold');
+    LogUInt256(threshold);
     return percentDIDVoted(_taskId) >= threshold;
   }
 
   function percentDIDVoted(bytes32 _taskId) public view returns (uint256) {
+    DIDToken didToken = DIDToken(DIDTokenAddress);
     uint256 totalSupply = didToken.totalSupply();
-    return SafeMath.percent(numDIDVotedOnTask(_taskId), totalSupply, 3);
+    uint256 numDIDVoted = numDIDVotedOnTask(_taskId);
+    uint256 pctDIDVoted = SafeMath.percent(numDIDVoted, totalSupply, 3);
+    return pctDIDVoted;
   }
 
   function getTaskReward(bytes32 _taskId) public view returns (uint256) {
@@ -141,12 +163,14 @@ contract Tasks {
   }
 
   modifier hasDID(address voter) {
-    didToken = DIDToken(DIDTokenAddress);
-    require(didToken.balances(voter) > 0);
+    DIDToken didToken = DIDToken(DIDTokenAddress);
+    uint256 numDID = didToken.balances(voter);
+    require(numDID > 0);
     _;
   }
 
   modifier rewardWithinParameterLimit(uint256 _reward) {
+    Distense distense = Distense(DistenseAddress);
     uint256 maxReward = distense.getParameterValue(distense.maxRewardParameterTitle());
     require(_reward <= maxReward);
     _;

@@ -24,9 +24,7 @@ module.exports = deployer => {
       if (web3.version.network !== 1) {
         const initialDID = 5000
         console.log(`Issuing ${initialDID} mock DID to accounts[0]`)
-        const issuedDID = didToken.issueDID.call(web3.eth.accounts[0], initialDID)
-        console.log(`${web3.eth.accounts[0]}`);
-        if (issuedDID) console.log(`issued DID to web3.eth.accounts[0]`)
+        const balance = didToken.issueDID.call(web3.eth.accounts[0], initialDID)
       }
     })
     .then(() => {

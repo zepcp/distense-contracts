@@ -103,23 +103,15 @@ contract('Tasks', function (accounts) {
         '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
     }
 
-    let reward1
-    let reward2
-    let taskExists
-
     await tasks.addTask(task.taskId)
-    taskExists = await tasks.taskExists(task.taskId)
+    const taskExists = await tasks.taskExists(task.taskId)
     assert.equal(taskExists, true, 'task should exist')
 
-    await tasks.voteOnReward(task.taskId, 99, {
-      from: accounts[0]
-    })
-
+    //  Make sure vote is less than DID owned
     const voted = await tasks.voteOnReward.call(task.taskId, 99, {
       from: accounts[1]
     })
     assert.equal(voted, true, 'voteOnReward should return true')
-    // assert.equal(true, false, 'DISREGARD THIS ERROR it is only there cause the debug/log events to print')
   })
 
   it('should correctly determine the percentDIDVoted', async function  () {
@@ -145,8 +137,9 @@ contract('Tasks', function (accounts) {
     const voted = await tasks.voteOnReward(task.taskId, 100, {
       from: accounts[0]
     })
-    assert.equal(true, false, 'DISREGARD THIS ERROR it is only there cause the debug/log events to print')
     // assert.equal(voted, true, 'should have returned true from voteOnReward')
+    // assert.equal(true, false, 'DISREGARD THIS ERROR it is only there cause the debug/log events to print')
+
 
     // percentDIDVoted = await tasks.percentDIDVoted.call(task.taskId)
     // assert.equal(percentDIDVoted.toNumber(), 333, 'percentDIDVoted should be 333 here')

@@ -12,10 +12,10 @@ module.exports = {
       network_id: 5777,
     },
     distnet: {
-      host: '165.227.28.206',
+      host: '165.227.180.132',
       port: 9000,
       network_id: 9000,
-      from: '0xa16d8dd51010744954ec49c6f75a761ea60095d4',
+      from: '0x014EB296Ef422dEbb71E43cB9c447306C536F05d',
       gas: 4650000
     },
     coverage: {

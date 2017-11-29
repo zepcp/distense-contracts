@@ -134,30 +134,28 @@ contract('Tasks', function (accounts) {
     taskExists = await tasks.taskExists(task.taskId)
     assert.equal(taskExists, true, `task doesn't exist`)
 
-    const voted = await tasks.voteOnReward(task.taskId, 100, {
+    await tasks.voteOnReward(task.taskId, 99, {
       from: accounts[0]
     })
     // assert.equal(voted, true, 'should have returned true from voteOnReward')
-    // assert.equal(true, false, 'DISREGARD THIS ERROR it is only there cause the debug/log events to print')
 
-
-    // percentDIDVoted = await tasks.percentDIDVoted.call(task.taskId)
-    // assert.equal(percentDIDVoted.toNumber(), 333, 'percentDIDVoted should be 333 here')
+    percentDIDVoted = await tasks.percentDIDVoted.call(task.taskId)
+    assert.equal(percentDIDVoted.toNumber(), 333, 'percentDIDVoted should be 333 here')
 
     // assert.equal(true, false, 'DISREGARD THIS ERROR it is only there cause the debug/log events to print')
-    // await didToken.issueDID(accounts[3], 300)
-    // await tasks.voteOnReward(task.taskId, 100, {
-    //   from: accounts[3]
-    // })
-    // percentDIDVoted = await tasks.percentDIDVoted(task.taskId)
-    // assert.equal(percentDIDVoted.toNumber(), 667, 'percentDIDVoted should be 667')
-    //
-    // await didToken.issueDID(accounts[4], 300)
-    // await tasks.voteOnReward(task.taskId, 100, {
-    //   from: accounts[4]
-    // })
-    // percentDIDVoted = await tasks.percentDIDVoted(task.taskId)
-    // assert.equal(percentDIDVoted.toNumber(), 778, 'percentDIDVoted should be 778')
+    await didToken.issueDID(accounts[3], 300)
+    await tasks.voteOnReward(task.taskId, 100, {
+      from: accounts[3]
+    })
+    percentDIDVoted = await tasks.percentDIDVoted.call(task.taskId)
+    assert.equal(percentDIDVoted.toNumber(), 667, 'percentDIDVoted should be 667')
+
+    await didToken.issueDID(accounts[4], 300)
+    await tasks.voteOnReward(task.taskId, 100, {
+      from: accounts[4]
+    })
+    percentDIDVoted = await tasks.percentDIDVoted.call(task.taskId)
+    assert.equal(percentDIDVoted.toNumber(), 778, 'percentDIDVoted should be 778')
   })
 
 

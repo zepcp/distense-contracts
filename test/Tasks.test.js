@@ -3,6 +3,7 @@ const Tasks = artifacts.require('Tasks')
 const DIDToken = artifacts.require('DIDToken')
 const Distense = artifacts.require('Distense')
 const assertJump = require('./helpers/assertJump')
+const proposalPctDIDRequiredValue = require('./Distense.test')
 
 contract('Tasks', function (accounts) {
   beforeEach(async function () {
@@ -66,7 +67,7 @@ contract('Tasks', function (accounts) {
   // });
 
 
-  it('should correctly return the number of DID owned by the first 50 voters on a task reward', async function  () {
+  it('should correctly return the number of DID owned by the first 50 voters on a task reward', async function () {
 
     await didToken.issueDID(accounts[0], 100)
     await didToken.issueDID(accounts[1], 200)
@@ -111,10 +112,38 @@ contract('Tasks', function (accounts) {
     const voted = await tasks.voteOnReward.call(task.taskId, 99, {
       from: accounts[1]
     })
+
+    //  If you work on this, leaving this here will cause logs/events to throw for debugging
+    await tasks.voteOnReward(task.taskId, 99, {
+      from: accounts[0]
+    })
     assert.equal(voted, true, 'voteOnReward should return true')
+
+    // un comment this to get the second voteOnReward to log Events
+    // assert.equal(true, false,
+    // 'DISREGARD THIS ERROR it is only there cause the
+    // debug/log
+    // events to print')
   })
 
-  it('should correctly determine the percentDIDVoted', async function  () {
+  it.only('should correctly determine reachedProposalApprovalThreshold()', async function () {
+
+    const shouldBeFalse = await tasks.reachedProposalApprovalThreshold(task.taskId)
+    assert.equal(shouldBeFalse, false, 'initially reachedProposalApprovalThreshold should be false because no one has voted yet')
+
+    const title = await distense.proposalPctDIDApprovalTitle()
+    const paramThreshold = await distense.getParameterValue(title)
+    assert.equal(paramThreshold.toNumber(), 25, 'param threshold should be 25')
+
+    await didToken.issueDID(accounts[0], 100)
+    const voted = await tasks.voteOnReward.call(task.taskId, 99, {
+      from: accounts[0]
+    })
+    assert.equal(voted, true, 'voteOnReward should return true')
+
+  })
+
+  it('should correctly determine the percentDIDVoted', async function () {
 
     let determineReward
     await didToken.issueDID(accounts[0], 100)
@@ -159,17 +188,7 @@ contract('Tasks', function (accounts) {
   })
 
 
-
-  // it/*.only*/('should correctly determineRewards', async function () {
-  //
-  //   // var events = tasks.allEvents();
-  //   //
-  //   // events.watch(function(error, event){
-  //   //   if (error) console.log(`error: ${error}`);
-  //   //     else console.log(event.args)
-  //   // });
-  //   //
-  //   // let logEventListener = tasks.LogUInt256()
+  // it.only('should correctly determineRewards', async function () {
   //
   //   let determineReward
   //
@@ -185,50 +204,21 @@ contract('Tasks', function (accounts) {
   //   let reward1
   //   let reward2
   //   let taskExists1
-  //   let voted1
   //   let voted2
   //   let voted3
   //
-  //   try {
-  //     await tasks.addTask(task.taskId)
-  //     taskExists1 = await tasks.taskExists(task.taskId)
+  //   await tasks.addTask(task.taskId)
+  //   taskExists = await tasks.taskExists(task.taskId)
+  //   assert.equal(taskExists, true, `task doesn't exist`)
   //
-  //     voted1 = await tasks.voteOnReward.call(task.taskId, 100, {
-  //       from: accounts[0]
-  //     })
+  //   await tasks.voteOnReward.call(task.taskId, 100, {
+  //     from: accounts[0]
+  //   })
   //
-  //     voted2 = await tasks.voteOnReward.call(task.taskId, 100, {
-  //       from: accounts[1]
-  //     })
-  //
-  //     reward1 = await tasks.determineReward.call(task.taskId)
-  //
-  //     //  accounts[2] now owns 75% of total DID
-  //     voted3 = await tasks.voteOnReward.call(task.taskId, 800, {
-  //       from: accounts[2]
-  //     })
-  //
-  //     reward2 = await tasks.determineReward.call(task.taskId)
-  //
-  //   } catch (error) {
-  //     determineReward = error
-  //   }
-  //
-  //   // let loggedUInt = await logEventListener.get()
-  //
-  //   // let eventArgs = loggedUInt[0].args
-  //   // console.log(`first int: ${eventArgs.someInt}`)
-  //   // const secInt = loggedUInt[1].args
-  //   // console.log(`second int: ${secInt.someInt}`)
-  //
-  //   assert.equal(taskExists1, true)
-  //   assert.equal(voted1, true, 'voted1 should be true')
-  //   assert.equal(voted2, true, 'voted2 should be true')
+  //   reward1 = await tasks.determineReward.call(task.taskId)
   //   assert.equal(reward1.toNumber(), 100, 'Reward should equal average of two votes')
-  //   assert.equal(voted3, true, 'voted3 should be true')
-  //   assert.equal(reward2.toNumber(), 625, 'Reward should equal weighted average of three votes')
+  //
   // })
-
 
 
   it('should not add tasks with ipfsHashes that are empty strings', async function () {

@@ -119,27 +119,49 @@ contract('Tasks', function (accounts) {
     })
     assert.equal(voted, true, 'voteOnReward should return true')
 
-    // un comment this to get the second voteOnReward to log Events
+    // uncomment this to get the second voteOnReward to log Events
     // assert.equal(true, false,
     // 'DISREGARD THIS ERROR it is only there cause the
     // debug/log
     // events to print')
   })
 
-  it.only('should correctly determine reachedProposalApprovalThreshold()', async function () {
+  it.only('should correctly determine reachedProposalApprovalThreshold', async function () {
 
-    const shouldBeFalse = await tasks.reachedProposalApprovalThreshold(task.taskId)
-    assert.equal(shouldBeFalse, false, 'initially reachedProposalApprovalThreshold should be false because no one has voted yet')
+    const task = {
+      taskId:
+        '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
+    }
 
-    const title = await distense.proposalPctDIDApprovalTitle()
-    const paramThreshold = await distense.getParameterValue(title)
-    assert.equal(paramThreshold.toNumber(), 25, 'param threshold should be 25')
+    const added = await tasks.addTask(task.taskId)
+    console.log(`added: ${added}`)
+    assert(added, true, 'should have added a task here')
 
-    await didToken.issueDID(accounts[0], 100)
-    const voted = await tasks.voteOnReward.call(task.taskId, 99, {
-      from: accounts[0]
-    })
-    assert.equal(voted, true, 'voteOnReward should return true')
+    // const reached = await tasks.reachedProposalApprovalThreshold.call(task.taskId)
+    // assert.equal(reached, true, 'should have reached')
+
+    // const shouldBeFalse = await tasks.reachedProposalApprovalThreshold.call(task.taskId)
+    // assert.equal(shouldBeFalse, false, 'initially reachedProposalApprovalThreshold should be false -> no one has voted yet')
+    //
+    // const title = await distense.proposalPctDIDApprovalTitle()
+    // const paramThreshold = await distense.getParameterValue(title)
+    // assert.equal(paramThreshold.toNumber(), 250, 'param threshold should be 250')
+    //
+    // await didToken.issueDID(accounts[0], 100)
+
+    // //  Make sure reward vote is for less than numDID owned by voter
+    // const voted = await tasks.voteOnReward.call(task.taskId, 99, {
+    //   from: accounts[0]
+    // })
+    // assert.equal(voted, true, 'voteOnReward should return true')
+    //
+    // const shouldBeTrue = await tasks.reachedProposalApprovalThreshold.call(task.taskId)
+    // assert.equal(shouldBeTrue, true, 'now   should have reachedProposalApprovalThreshold')
+
+    // await tasks.voteOnReward(task.taskId, 99, {
+    //   from: accounts[0]
+    // })
+    // assert.equal(true, false, 'DISREGARD THIS ERROR it is only there cause the debug/log events to print')
 
   })
 
@@ -185,6 +207,7 @@ contract('Tasks', function (accounts) {
     })
     percentDIDVoted = await tasks.percentDIDVoted.call(task.taskId)
     assert.equal(percentDIDVoted.toNumber(), 778, 'percentDIDVoted should be 778')
+
   })
 
 
@@ -221,7 +244,8 @@ contract('Tasks', function (accounts) {
   // })
 
 
-  it('should not add tasks with ipfsHashes that are empty strings', async function () {
+  it('should not add tasks with empty bytes32', async function () {
+
     let addError
     try {
       //contract throws error here
@@ -229,7 +253,7 @@ contract('Tasks', function (accounts) {
     } catch (error) {
       addError = error
     }
-    assert.notEqual(addError, undefined, 'Error must be thrown')
+    assert.notEqual(addError, undefined, 'Error should be thrown when inserting empty bytes32')
 
     const numTasks = await tasks.getNumTasks.call()
     assert.equal(

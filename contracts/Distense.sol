@@ -47,19 +47,21 @@ contract Distense {
 
   function Distense(address _DIDTokenAddress) public {
 
-    DIDToken didToken = DIDToken(_DIDTokenAddress);
-
     // Launch Distense with some votable parameters that can be later updated by contributors
     proposalPctDIDApprovalParameter = Parameter({
       title: proposalPctDIDApprovalTitle,
-      value: 25
+    //     Every hard-coded int in Solidity is a decimal to one decimal place
+    //     So this is 25.0
+      value: 250
     });
     parameters[proposalPctDIDApprovalTitle] = proposalPctDIDApprovalParameter;
     parameterTitles.push(proposalPctDIDApprovalTitle);
 
     pullRequestPctDIDParameter = Parameter({
       title: pullRequestPctDIDRequiredParameterTitle,
-      value: 10
+    //     Every hard-coded int in Solidity is a decimal to one decimal place
+    //     So this is 10.0
+      value: 100
     });
     parameters[pullRequestPctDIDRequiredParameterTitle] = pullRequestPctDIDParameter;
     parameterTitles.push(pullRequestPctDIDRequiredParameterTitle);
@@ -73,7 +75,9 @@ contract Distense {
 
     maxRewardParameter = Parameter({
       title: maxRewardParameterTitle,
-      value: 1000
+    //     Every hard-coded int in Solidity is a decimal to one decimal place
+    //     So this is 1000.0
+      value: 10000
     });
     parameters[maxRewardParameterTitle] = maxRewardParameter;
     parameterTitles.push(maxRewardParameterTitle);

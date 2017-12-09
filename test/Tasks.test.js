@@ -126,7 +126,7 @@ contract('Tasks', function (accounts) {
     // events to print')
   })
 
-  it.only('should correctly determine reachedProposalApprovalThreshold', async function () {
+  it('should correctly determine reachedProposalApprovalThreshold', async function () {
 
     const task = {
       taskId:

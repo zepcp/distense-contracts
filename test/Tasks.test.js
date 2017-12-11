@@ -6,6 +6,7 @@ const assertJump = require('./helpers/assertJump')
 const proposalPctDIDRequiredValue = require('./Distense.test')
 
 contract('Tasks', function (accounts) {
+
   beforeEach(async function () {
     didToken = await DIDToken.new()
     distense = await Distense.new(didToken.address)
@@ -26,6 +27,7 @@ contract('Tasks', function (accounts) {
     // assert.equal(await tasks.getNumTasks(), 0, 'Initial numTasks should be 0')
   })
 
+
   it('should let those who own DID add tasks', async function () {
     await didToken.issueDID(accounts[0], 1234)
     //  addTask from default accounts[0]
@@ -36,7 +38,8 @@ contract('Tasks', function (accounts) {
     assert.equal(numTasks, 1, 'numTasks should be 1')
   })
 
-  it('should let those who don\'t own DID to add tasks', async function () {
+
+  it(`shouldn't let those who don\'t own DID to add tasks`, async function () {
     let addError
 
     try {
@@ -57,40 +60,6 @@ contract('Tasks', function (accounts) {
 
     const numTasks = await tasks.getNumTasks.call()
     assert.equal(numTasks, 0, 'numTasks should still be 0')
-  })
-
-  // var events = tasks.allEvents();
-  //
-  // events.watch(function (error, event) {
-  //   if (error) console.log(`error: ${error}`)
-  //   else console.log(web3.fromHexString(event.args))
-  // });
-
-
-  it('should correctly return the number of DID owned by the first 50 voters on a task reward', async function () {
-
-    await didToken.issueDID(accounts[0], 100)
-    await didToken.issueDID(accounts[1], 200)
-
-    let taskExists
-    await tasks.addTask(task.taskId)
-    taskExists = await tasks.taskExists(task.taskId)
-    assert.equal(taskExists, true, 'task should exist')
-
-    await tasks.voteOnReward(task.taskId, 50, {
-      from: accounts[0]
-    })
-
-    let numDIDVoted
-    numDIDVoted = await tasks.numDIDVotedOnTask.call(task.taskId)
-
-    assert.equal(numDIDVoted, 100, '100 DID have voted here')
-    await tasks.voteOnReward(task.taskId, 99, {
-      from: accounts[1]
-    })
-
-    numDIDVoted = await tasks.numDIDVotedOnTask.call(task.taskId)
-    assert.equal(numDIDVoted, 300, '300 DID have voted here')
   })
 
 
@@ -119,14 +88,13 @@ contract('Tasks', function (accounts) {
     })
     assert.equal(voted, true, 'voteOnReward should return true')
 
-    // uncomment this to get the second voteOnReward to log Events
-    // assert.equal(true, false,
-    // 'DISREGARD THIS ERROR it is only there cause the
-    // debug/log
-    // events to print')
   })
 
+
   it('should correctly determine reachedProposalApprovalThreshold', async function () {
+
+    //  User must have DID to addTask()
+    await didToken.issueDID(accounts[0], 100)
 
     const task = {
       taskId:
@@ -134,79 +102,7 @@ contract('Tasks', function (accounts) {
     }
 
     const added = await tasks.addTask(task.taskId)
-    console.log(`added: ${added}`)
     assert(added, true, 'should have added a task here')
-
-    // const reached = await tasks.reachedProposalApprovalThreshold.call(task.taskId)
-    // assert.equal(reached, true, 'should have reached')
-
-    // const shouldBeFalse = await tasks.reachedProposalApprovalThreshold.call(task.taskId)
-    // assert.equal(shouldBeFalse, false, 'initially reachedProposalApprovalThreshold should be false -> no one has voted yet')
-    //
-    // const title = await distense.proposalPctDIDApprovalTitle()
-    // const paramThreshold = await distense.getParameterValue(title)
-    // assert.equal(paramThreshold.toNumber(), 250, 'param threshold should be 250')
-    //
-    // await didToken.issueDID(accounts[0], 100)
-
-    // //  Make sure reward vote is for less than numDID owned by voter
-    // const voted = await tasks.voteOnReward.call(task.taskId, 99, {
-    //   from: accounts[0]
-    // })
-    // assert.equal(voted, true, 'voteOnReward should return true')
-    //
-    // const shouldBeTrue = await tasks.reachedProposalApprovalThreshold.call(task.taskId)
-    // assert.equal(shouldBeTrue, true, 'now   should have reachedProposalApprovalThreshold')
-
-    // await tasks.voteOnReward(task.taskId, 99, {
-    //   from: accounts[0]
-    // })
-    // assert.equal(true, false, 'DISREGARD THIS ERROR it is only there cause the debug/log events to print')
-
-  })
-
-  it('should correctly determine the percentDIDVoted', async function () {
-
-    let determineReward
-    await didToken.issueDID(accounts[0], 100)
-    await didToken.issueDID(accounts[1], 200)
-
-    const task = {
-      taskId:
-        '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
-    }
-
-    let reward1
-    let reward2
-    let taskExists
-    let percentDIDVoted
-
-    await tasks.addTask(task.taskId)
-    taskExists = await tasks.taskExists(task.taskId)
-    assert.equal(taskExists, true, `task doesn't exist`)
-
-    await tasks.voteOnReward(task.taskId, 99, {
-      from: accounts[0]
-    })
-    // assert.equal(voted, true, 'should have returned true from voteOnReward')
-
-    percentDIDVoted = await tasks.percentDIDVoted.call(task.taskId)
-    assert.equal(percentDIDVoted.toNumber(), 333, 'percentDIDVoted should be 333 here')
-
-    // assert.equal(true, false, 'DISREGARD THIS ERROR it is only there cause the debug/log events to print')
-    await didToken.issueDID(accounts[3], 300)
-    await tasks.voteOnReward(task.taskId, 100, {
-      from: accounts[3]
-    })
-    percentDIDVoted = await tasks.percentDIDVoted.call(task.taskId)
-    assert.equal(percentDIDVoted.toNumber(), 667, 'percentDIDVoted should be 667')
-
-    await didToken.issueDID(accounts[4], 300)
-    await tasks.voteOnReward(task.taskId, 100, {
-      from: accounts[4]
-    })
-    percentDIDVoted = await tasks.percentDIDVoted.call(task.taskId)
-    assert.equal(percentDIDVoted.toNumber(), 778, 'percentDIDVoted should be 778')
 
   })
 
@@ -263,9 +159,8 @@ contract('Tasks', function (accounts) {
     )
   })
 
+
   /* EVENTS */
-
-
   it('should fire event \'LogAddTask\' when addTask is called', async function () {
     let LogAddTaskEventListener = tasks.LogAddTask()
 

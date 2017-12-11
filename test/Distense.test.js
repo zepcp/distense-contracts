@@ -7,12 +7,14 @@ const assertJump = require('./helpers/assertJump')
 contract('Distense contract', function(accounts) {
   const proposalPctDIDApprovalParameter = {
     title: 'proposalPctDIDRequired',
-    value: 25 // Hard coded in constructor function in contract
+    value: 250 // Hard coded in constructor function in contract
   }
 
   const pullRequestPctDIDParameter = {
     title: 'pullRequestPctDIDRequired',
-    value: 10 // Hard coded in constructor function in contract
+    // Hard coded in constructor function in contract
+    //  Added 0 because Solidity's awesome
+    value: 100
   }
 
   const votingIntervalParameter = {
@@ -81,7 +83,7 @@ contract('Distense contract', function(accounts) {
     assert.notEqual(equalValueError, undefined, 'Error must be thrown')
   })
 
-  it("should disallow voting for those who DON'T own DID ;)", async function() {
+  it("should disallow voting for those who don't own DID", async function() {
     let equalValueError
     try {
       await distense.voteOnParameter(pullRequestPctDIDParameter.title, 122, {
@@ -104,29 +106,29 @@ contract('Distense contract', function(accounts) {
     distense = await Distense.new(didToken.address)
   })
 
-  it('should allow those who own DID to vote on parameters', async function() {
-    let contractError
 
-    try {
-      const userBalance = await didToken.balances.call(accounts[0])
-      assert(userBalance > 0, 'Test should fail because user has no DID')
-
-      await distense.voteOnParameter.call(
-        pullRequestPctDIDParameter.title,
-        pullRequestPctDIDParameter.value + 1
-      )
-    } catch (error) {
-      contractError = error
-    }
-
-    assert.equal(
-      contractError,
-      undefined,
-      'accept parameter votes from those who do own DID'
-    )
-  })
-
+  // it('should allow those who own DID to vote on parameters', async function() {
+  //   let contractError
   //
+  //   try {
+  //     const userBalance = await didToken.balances.call(accounts[0])
+  //     assert(userBalance > 0, 'Test should fail because user has no DID')
+  //
+  //     await distense.voteOnParameter.call(
+  //       pullRequestPctDIDParameter.title,
+  //       pullRequestPctDIDParameter.value + 1
+  //     )
+  //   } catch (error) {
+  //     contractError = error
+  //   }
+  //
+  //   assert.equal(
+  //     contractError,
+  //     undefined,
+  //     'accept parameter votes from those who do own DID'
+  //   )
+  // })
+
 
   // it('should correctly calculate new ProposalApprovalPCTDID values', async function() {
   //   //  Voter has 100% so this should simply double the value

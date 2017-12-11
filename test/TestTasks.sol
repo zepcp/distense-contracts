@@ -3,37 +3,25 @@ pragma solidity ^0.4.17;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
+import "../contracts/DIDToken.sol";
 import "../contracts/Tasks.sol";
 
 
-contract TestTasks {
-
-  string taskId = '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9';
-  bytes32 id = stringToBytes32(taskId);
+contract TestTasks is Debuggable {
 
   Tasks tasks = new Tasks(
     DeployedAddresses.DIDToken(),
     DeployedAddresses.Distense()
   );
 
-  uint numTasks = tasks.getNumTasks();
+  DIDToken didToken = new DIDToken();
+
+  bytes32 id = 0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9;
 
   function testGetNumTasks() public {
 
+    uint256 numTasks = tasks.getNumTasks();
     Assert.equal(numTasks, 0, 'Should be a big fat 0 here');
-
-  }
-
-
-  bool inserted = tasks.addTask(id);
-
-
-  function testAddTask() public {
-
-    Assert.equal(inserted, true, 'Should have inserted');
-
-    uint numTasks = tasks.getNumTasks();
-    Assert.equal(numTasks, 1, 'Should be 1 now');
 
   }
 
@@ -49,24 +37,5 @@ contract TestTasks {
 
   }
 
-
-  function testTaskExists()  public {
-
-    bool exists = tasks.taskExists(id);
-    Assert.equal(exists, true, 'inserted task should exist');
-
-  }
-
-
-  function stringToBytes32(string source) public pure returns (bytes32 result) {
-    bytes memory tempEmptyStringTest = bytes(source);
-    if (tempEmptyStringTest.length == 0) {
-      return 0x0;
-    }
-
-    assembly {
-    result := mload(add(source, 32))
-    }
-  }
 }
 

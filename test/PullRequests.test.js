@@ -117,13 +117,14 @@ contract('PullRequests', function(accounts) {
 
     let aNewError
     try {
+      const numDIDRequired = await pullRequests.numDIDRequiredToApprovePRs.call()
       assert.equal(
-        await pullRequests.numDIDRequiredToApprovePRs.call(),
+        numDIDRequired,
         100,
         'Beginning number of numDIDToApprove should be accurate'
       )
-      await didToken.issueDID(accounts[0], 101)
-      const numDIDOwned = await didToken.balances.call(accounts[0])
+
+      const numDIDOwned = await didToken.issueDID.call(accounts[0], 101)
       assert.equal(
         numDIDOwned,
         101,
@@ -131,6 +132,7 @@ contract('PullRequests', function(accounts) {
       )
 
       await pullRequests.voteOnApproval(pullRequestTwo.id, false, {from: accounts[0]})
+    
     } catch (error) {
       aNewError = error.message
     }

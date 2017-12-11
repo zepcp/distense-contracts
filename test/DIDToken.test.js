@@ -23,28 +23,6 @@ contract('DIDToken', function(accounts) {
     assert.equal(newSupply.toNumber(), 112345197)
   })
 
-  // it("should fire event 'LogIssueDID' when issueDID is called", async function() {
-  //   let issueDIDEventListener = didToken.LogIssueDID()
-  //
-  //   let issuedDID = await didToken.totalSupply.call()
-  //   assert.equal(issuedDID, 0, 'Beginning DID totalSupply should be 0')
-  //   await didToken.issueDID(accounts[0], 1234)
-  //
-  //   issuedDID = await didToken.totalSupply.call()
-  //   assert.equal(issuedDID, 1234, 'totalSupply DID should now be 1234')
-  //
-  //   let issueDIDLog = await new Promise((resolve, reject) =>
-  //     issueDIDEventListener.get(
-  //       (error, log) => (error ? reject(error) : resolve(log))
-  //     )
-  //   )
-  //
-  //   console.log(`${issueDIDLog}`);
-  //   let eventArgs = issueDIDLog[0].args
-  //   assert.equal(eventArgs.to, accounts[0])
-  //   assert.equal(eventArgs.numDID, 1234)
-  //   assert.equal(issueDIDLog.length, 1, 'should be 1 event')
-  // })
 
   it('should disallow issueDID from an empty address', async function() {
     let addError
@@ -94,15 +72,15 @@ contract('DIDToken', function(accounts) {
   it('should correctly calculate the percentDID someone owns', async function() {
     assert.equal(await didToken.totalSupply(), 0)
     await didToken.issueDID(accounts[0], 200)
-    let percentDID = await didToken.percentDID(accounts[0])
-    assert.equal(percentDID.toString(), 100)
+    let percentDID = await didToken.pctDIDOwned(accounts[0])
+    assert.equal(percentDID.toString(), 1000)
 
     await didToken.issueDID(accounts[1], 100)
-    percentDID = await didToken.percentDID(accounts[1])
-    assert.equal(percentDID.toString(), 33)
+    percentDID = await didToken.pctDIDOwned(accounts[1])
+    assert.equal(percentDID.toString(), 333)
 
     await didToken.issueDID(accounts[1], 100)
-    percentDID = await didToken.percentDID(accounts[1])
-    assert.equal(percentDID.toString(), 50)
+    percentDID = await didToken.pctDIDOwned(accounts[1])
+    assert.equal(percentDID.toString(), 500)
   })
 })

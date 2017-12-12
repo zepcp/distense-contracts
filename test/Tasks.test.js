@@ -63,7 +63,7 @@ contract('Tasks', function (accounts) {
   })
 
 
-  it('should return true for voteOnReward', async function () {
+  it('should return true for voteOnReward when the voter hasDID', async function () {
 
     await didToken.issueDID(accounts[0], 100)
     await didToken.issueDID(accounts[1], 100)
@@ -78,15 +78,71 @@ contract('Tasks', function (accounts) {
     assert.equal(taskExists, true, 'task should exist')
 
     //  Make sure vote is less than DID owned
-    const voted = await tasks.voteOnReward.call(task.taskId, 99, {
+    let voted = await tasks.voteOnReward.call(task.taskId, 99, {
       from: accounts[1]
     })
 
-    //  If you work on this, leaving this here will cause logs/events to throw for debugging
-    await tasks.voteOnReward(task.taskId, 99, {
+     // leaving this here will cause logs/events to throw for debugging
+    // await tasks.voteOnReward(task.taskId, 99, {
+    //   from: accounts[0]
+    // })
+    assert.equal(voted, true, 'voteOnReward should return true')
+
+  })
+
+
+  it('should return false when someone tries to vote twice: voteOnReward when voter hasDID', async function () {
+
+    await didToken.issueDID(accounts[0], 100)
+
+    const task = {
+      taskId:
+        '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
+    }
+
+    await tasks.addTask(task.taskId)
+    const taskExists = await tasks.taskExists(task.taskId)
+    assert.equal(taskExists, true, 'task should exist')
+
+    //  Make sure vote is less than DID owned
+    let voted = await tasks.voteOnReward.call(task.taskId, 99, {
       from: accounts[0]
     })
-    assert.equal(voted, true, 'voteOnReward should return true')
+
+    assert.equal(voted, true, `voteOnReward should return true when user has DID and hasnt voted`)
+
+    voted = await tasks.voteOnReward.call(task.taskId, 99, {
+      from: accounts[0]
+    })
+    assert.equal(voted, false, 'Voting twice is prohibited')
+
+  })
+
+
+  it.only('should return false when someone tries to vote on a task for too much DID (above their DID owned)', async function () {
+
+    await didToken.issueDID(accounts[0], 100)
+
+    const task = {
+      taskId:
+        '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
+    }
+
+    await tasks.addTask(task.taskId)
+    const taskExists = await tasks.taskExists(task.taskId)
+    assert.equal(taskExists, true, 'task should exist')
+
+    //  Voter only has 100 and 101 is more than 100, so... this should fail
+    let voted = await tasks.voteOnReward.call(task.taskId, 101, {
+      from: accounts[0]
+    })
+
+    assert.equal(voted, false, `voteOnReward should return true when user has DID and hasnt voted`)
+
+    voted = await tasks.voteOnReward.call(task.taskId, 99, {
+      from: accounts[0]
+    })
+    assert.equal(voted, false, 'Voting twice is prohibited')
 
   })
 
@@ -161,7 +217,8 @@ contract('Tasks', function (accounts) {
 
 
   /* EVENTS */
-  it('should fire event \'LogAddTask\' when addTask is called', async function () {
+  it(`should fire event LogAddTask when addTask is called`, async function () {
+
     let LogAddTaskEventListener = tasks.LogAddTask()
 
     await didToken.issueDID(accounts[0], 1)

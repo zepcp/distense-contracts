@@ -38,7 +38,7 @@ contract Tasks is Debuggable {
   }
 
 
-  function addTask(bytes32 _taskId) public /*hasDID(msg.sender)*/ returns (bool) {
+  function addTask(bytes32 _taskId) public hasDID(msg.sender) returns (bool) {
     require(_taskId[0] != 0);
     tasks[_taskId].createdBy = msg.sender;
     tasks[_taskId].reward = 0;
@@ -71,50 +71,54 @@ contract Tasks is Debuggable {
 
 
   // Make sure voter hasn't voted and the reward for this task isn't set
-  function voteOnReward(bytes32 _taskId, uint256 _reward)
-//        voterNotVotedOnTask(_taskId)
-//        rewardWithinParameterLimit(_reward)
-        hasDID(msg.sender)
-  external returns (bool) {
-//  require(!reachedProposalApprovalThreshold(_taskId));
+  function voteOnReward(bytes32 _taskId, uint256 _reward) external returns (bool) {
 
     Task storage _task = tasks[_taskId];
+
+    DIDToken didToken = DIDToken(DIDTokenAddress);
+    uint256 balance = didToken.balances(msg.sender);
+    uint256 tentativePctDIDVoted = didToken.pctDIDOwned(msg.sender);
+
+    Distense distense = Distense(DistenseAddress);
+
+//    Please excuse the following.
+//    The stack was too deep so using fewer local vars here instead of in modifiers
+//    These if checks are essentially modifiers:
+
+    if (
+
+//    This checks to see if enough DID owners have voted on this task.  If they have, let's continue and not allow this vote.
+      _task.pctDIDVoted >= distense.getParameterValue(distense.proposalPctDIDApprovalTitle()) ||
+
+//    Has the voter already voted on this task?
+      tasks[_taskId].rewardVotes[msg.sender] < 1 ||
+
+//    Does the voter own at least as many DID as the reward their voting for?
+//    This ensures new contributors don't have too much sway over the issuance of new DID.
+      balance < _reward ||
+
+//    Require the reward to be less than th emaximum reward parameter,
+//    which basically is a hard, floating limit on the number of DID that can be issued for any single task
+      _reward < distense.getParameterValue(distense.maxRewardParameterTitle())
+    ) return false;
+
     _task.rewardVotes[msg.sender] = _reward;
     _task.rewardVoters.push(msg.sender);
-
-//    DIDToken didToken = DIDToken(DIDTokenAddress);
-//    _task.pctDIDVoted += didToken.pctDIDOwned(msg.sender);
+    _task.pctDIDVoted = _task.pctDIDVoted + tentativePctDIDVoted;
 
     return true;
   }
+
 
   function getTaskReward(bytes32 _taskId) public view returns (uint256) {
     return tasks[_taskId].reward;
   }
 
-  modifier voterNotVotedOnTask(bytes32 _taskId) {
-    require(tasks[_taskId].rewardVotes[msg.sender] == 0);
-    _;
-  }
 
   modifier hasDID(address voter) {
     DIDToken didToken = DIDToken(DIDTokenAddress);
     uint256 balance = didToken.balances(msg.sender);
     require(balance > 0);
-    _;
-  }
-
-  modifier rewardWithinParameterLimit(uint256 _reward) {
-    Distense distense = Distense(DistenseAddress);
-    uint256 maxReward = distense.getParameterValue(distense.maxRewardParameterTitle());
-    require(_reward <= maxReward);
-    _;
-  }
-
-  modifier reachedProposalApprovalThreshold(uint256 pctDIDVoted) {
-    Distense distense = Distense(DistenseAddress);
-    uint256 threshold = distense.getParameterValue(distense.proposalPctDIDApprovalTitle());
-    require(pctDIDVoted >= threshold);
     _;
   }
 

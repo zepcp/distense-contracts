@@ -84,22 +84,21 @@ contract Tasks is Debuggable {
 //    Please excuse the following.
 //    The stack was too deep so using fewer local vars here instead of in modifiers
 //    These if checks are essentially modifiers:
-
     if (
 
 //    This checks to see if enough DID owners have voted on this task.  If they have, let's continue and not allow this vote.
       _task.pctDIDVoted >= distense.getParameterValue(distense.proposalPctDIDApprovalTitle()) ||
 
 //    Has the voter already voted on this task?
-      tasks[_taskId].rewardVotes[msg.sender] < 1 ||
+      tasks[_taskId].rewardVotes[msg.sender] > 0 ||
 
 //    Does the voter own at least as many DID as the reward their voting for?
 //    This ensures new contributors don't have too much sway over the issuance of new DID.
       balance < _reward ||
 
-//    Require the reward to be less than th emaximum reward parameter,
+//    Require the reward to be less than or equal to the maximum reward parameter,
 //    which basically is a hard, floating limit on the number of DID that can be issued for any single task
-      _reward < distense.getParameterValue(distense.maxRewardParameterTitle())
+      _reward >= distense.getParameterValue(distense.maxRewardParameterTitle())
     ) return false;
 
     _task.rewardVotes[msg.sender] = _reward;

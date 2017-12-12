@@ -119,7 +119,7 @@ contract('Tasks', function (accounts) {
   })
 
 
-  it.only('should return false when someone tries to vote on a task for too much DID (above their DID owned)', async function () {
+  it('should return false when someone tries to vote on a task for too much DID (above their DID owned)', async function () {
 
     await didToken.issueDID(accounts[0], 100)
 
@@ -143,6 +143,39 @@ contract('Tasks', function (accounts) {
       from: accounts[0]
     })
     assert.equal(voted, false, 'Voting twice is prohibited')
+
+  })
+
+  it.only('should prevent votes over the maxRewardParameter value of maximum DID per task reward', async function () {
+
+    const maxRewardParameterTitle = await distense.maxRewardParameterTitle.call()
+    const maxDIDRewardValue = await distense.getParameterValue.call(maxRewardParameterTitle)
+
+    const votersNumDID = maxDIDRewardValue + 1  // Voter now owns at least as much DID as the max reward parameter
+
+    await didToken.issueDID(accounts[0], 10000000)
+
+    const task = {
+      taskId:
+        '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
+    }
+
+    await tasks.addTask(task.taskId)
+    const taskExists = await tasks.taskExists(task.taskId)
+    assert.equal(taskExists, true, 'task should exist')
+
+    //  Voter only has 100 and 101 is more than 100, so... this should fail
+    let voted = await tasks.voteOnReward.call(task.taskId, maxDIDRewardValue + 1, {
+      from: accounts[0]
+    })
+
+    assert.equal(voted, false, `voteOnReward should return false when user votes over maxRewardParameter`)
+
+    voted = await tasks.voteOnReward.call(task.taskId, /*maxDIDRewardValue - */1, {
+      from: accounts[0]
+    })
+
+    assert.equal(voted, true, `Voter voted for less than the maxDIDRewardValue so true`)
 
   })
 

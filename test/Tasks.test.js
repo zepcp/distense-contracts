@@ -91,30 +91,37 @@ contract('Tasks', function (accounts) {
   })
 
 
-  it('should return false when someone tries to vote twice: voteOnReward when voter hasDID', async function () {
+  it('should return false when someone tries to vote twice', async function () {
 
-    await didToken.issueDID(accounts[0], 100)
+    const maxRewardParameterTitle = await distense.maxRewardParameterTitle.call()
+    const maxDIDRewardValue = await distense.getParameterValue.call(maxRewardParameterTitle)
+
+    await didToken.issueDID(accounts[0], 10000)
+    await didToken.issueDID(accounts[1], 10000)
 
     const task = {
       taskId:
-        '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
+        '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75'
     }
 
     await tasks.addTask(task.taskId)
-    const taskExists = await tasks.taskExists(task.taskId)
-    assert.equal(taskExists, true, 'task should exist')
+
+    let testTask = await tasks.getTaskById.call(task.taskId)
 
     //  Make sure vote is less than DID owned
-    let voted = await tasks.voteOnReward.call(task.taskId, 99, {
+    let voted = await tasks.voteOnReward.call(task.taskId, maxDIDRewardValue - 1, {
       from: accounts[0]
     })
 
-    assert.equal(voted, true, `voteOnReward should return true when user has DID and hasnt voted`)
+    testTask = await tasks.getTaskById(task.taskId)
 
-    voted = await tasks.voteOnReward.call(task.taskId, 99, {
+    assert.equal(voted, true, `voteOnReward should return true when user has DID and hasn't voted`)
+
+    let votedFalse = await tasks.voteOnReward.call(task.taskId, 1, {
       from: accounts[0]
     })
-    assert.equal(voted, false, 'Voting twice is prohibited')
+
+    assert.equal(votedFalse, false, 'Voting twice should return false')
 
   })
 
@@ -146,7 +153,7 @@ contract('Tasks', function (accounts) {
 
   })
 
-  it.only('should prevent votes over the maxRewardParameter value of maximum DID per task reward', async function () {
+  it('should prevent votes over the maxRewardParameter value of maximum DID per task reward', async function () {
 
     const maxRewardParameterTitle = await distense.maxRewardParameterTitle.call()
     const maxDIDRewardValue = await distense.getParameterValue.call(maxRewardParameterTitle)

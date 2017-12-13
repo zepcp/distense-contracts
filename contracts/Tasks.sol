@@ -18,7 +18,6 @@ contract Tasks is Debuggable {
   struct Task {
     address createdBy;
     uint256 reward;
-    address[] rewardVoters;
     bool rewardPaid;
     uint256 pctDIDVoted;
     mapping (address => uint256) rewardVotes;
@@ -48,17 +47,15 @@ contract Tasks is Debuggable {
   }
 
 
-  function getTaskById(bytes32 _taskId) public view returns (address, uint256, uint256, bool, uint256 pctDIDVoted) {
+  function getTaskById(bytes32 _taskId) public view returns (address, uint256, bool, uint256) {
     Task memory task = tasks[_taskId];
     return (
       task.createdBy,
       task.reward,
-      task.rewardVoters.length,
       task.rewardPaid,
       task.pctDIDVoted
     );
   }
-
 
   function taskExists(bytes32 _taskId) public view returns (bool) {
     return tasks[_taskId].createdBy != 0;
@@ -70,40 +67,39 @@ contract Tasks is Debuggable {
   }
 
 
-  // Make sure voter hasn't voted and the reward for this task isn't set
-  function voteOnReward(bytes32 _taskId, uint256 _reward) external returns (bool) {
-
-    Task storage _task = tasks[_taskId];
+  function voteOnReward(bytes32 _taskId, uint256 _reward) public returns (bool) {
 
     DIDToken didToken = DIDToken(DIDTokenAddress);
     uint256 balance = didToken.balances(msg.sender);
-    uint256 tentativePctDIDVoted = didToken.pctDIDOwned(msg.sender);
-
     Distense distense = Distense(DistenseAddress);
+
 
 //    Please excuse the following.
 //    The stack was too deep so using fewer local vars here instead of in modifiers
 //    These if checks are essentially modifiers:
+
     if (
 
-//    This checks to see if enough DID owners have voted on this task.  If they have, let's continue and not allow this vote.
-      _task.pctDIDVoted >= distense.getParameterValue(distense.proposalPctDIDApprovalTitle()) ||
+//    This checks to see if enough DID owners haven't voted on this task.  If they have, let's continue and not allow this vote.
+      tasks[_taskId].pctDIDVoted >= distense.getParameterValue(distense.proposalPctDIDApprovalTitle()) ||
 
 //    Has the voter already voted on this task?
-      tasks[_taskId].rewardVotes[msg.sender] > 0 ||
+      tasks[_taskId].rewardVotes[msg.sender] != 0 ||
 
 //    Does the voter own at least as many DID as the reward their voting for?
 //    This ensures new contributors don't have too much sway over the issuance of new DID.
       balance < _reward ||
+
+      _reward < 1 ||
 
 //    Require the reward to be less than or equal to the maximum reward parameter,
 //    which basically is a hard, floating limit on the number of DID that can be issued for any single task
       _reward >= distense.getParameterValue(distense.maxRewardParameterTitle())
     ) return false;
 
-    _task.rewardVotes[msg.sender] = _reward;
-    _task.rewardVoters.push(msg.sender);
-    _task.pctDIDVoted = _task.pctDIDVoted + tentativePctDIDVoted;
+    tasks[_taskId].rewardVotes[msg.sender] = _reward;
+    tasks[_taskId].pctDIDVoted = tasks[_taskId].pctDIDVoted + didToken.pctDIDOwned(msg.sender);
+    assert(tasks[_taskId].pctDIDVoted > 0);
 
     return true;
   }

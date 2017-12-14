@@ -66,25 +66,22 @@ contract('Tasks', function (accounts) {
   })
 
 
-  it('should return true for voteOnReward when the voter hasDID', async function () {
+  it.only('should return true or otherwise modifty the task with voteOnReward() when the voter hasDID', async function () {
 
     await didToken.issueDID(accounts[0], 100)
     await didToken.issueDID(accounts[1], 100)
 
     await tasks.addTask(task.taskId)
-    const taskExists = await tasks.taskExists(task.taskId)
+    const taskExists = await tasks.taskExists.call(task.taskId)
     assert.equal(taskExists, true, 'task should exist')
 
     //  Make sure vote is less than DID owned
-    let voted = await tasks.voteOnReward.call(task.taskId, 99, {
+    await tasks.voteOnReward(task.taskId, 99, {
       from: accounts[1]
     })
 
-    // leaving this here will cause logs/events to throw for debugging
-    // await tasks.voteOnReward(task.taskId, 99, {
-    //   from: accounts[0]
-    // })
-    assert.equal(voted, true, 'voteOnReward should return true')
+    const taskDiffThanInitial = await tasks.getTaskById.call(task.taskId)
+    assert.isAbove(taskDiffThanInitial[3].toNumber(), 0, 'task pctDIDVoted should be greater than 0')
 
   })
 
@@ -242,7 +239,8 @@ contract('Tasks', function (accounts) {
 
   })
 
-  it('should return false when someone votes 0 for a task reward', async function () {
+
+  it('should reject or return false when someone votes 0 for a task reward', async function () {
 
     await didToken.issueDID(accounts[0], 100)
 

@@ -61,6 +61,7 @@ contract Tasks is Debuggable {
     );
   }
 
+
   function taskExists(bytes32 _taskId) public view returns (bool) {
     return tasks[_taskId].createdBy != 0;
   }
@@ -69,6 +70,7 @@ contract Tasks is Debuggable {
   function getNumTasks() public view returns (uint) {
     return taskIds.length;
   }
+
 
   function voteOnReward(bytes32 _taskId, uint256 _reward) public returns (bool) {
 

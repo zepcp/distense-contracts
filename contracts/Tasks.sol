@@ -13,6 +13,7 @@ contract Tasks is Debuggable {
 
   address public DIDTokenAddress;
   address public DistenseAddress;
+
   bytes32[] public taskIds;
 
   struct Task {
@@ -39,21 +40,24 @@ contract Tasks is Debuggable {
 
   function addTask(bytes32 _taskId) public hasDID(msg.sender) returns (bool) {
     require(_taskId[0] != 0);
+
     tasks[_taskId].createdBy = msg.sender;
     tasks[_taskId].reward = 0;
+    tasks[_taskId].rewardPaid = false;
+
     taskIds.push(_taskId);
     LogAddTask(_taskId);
+
     return true;
   }
 
 
   function getTaskById(bytes32 _taskId) public view returns (address, uint256, bool, uint256) {
-    Task memory task = tasks[_taskId];
     return (
-      task.createdBy,
-      task.reward,
-      task.rewardPaid,
-      task.pctDIDVoted
+      tasks[_taskId].createdBy,
+      tasks[_taskId].reward,
+      tasks[_taskId].rewardPaid,
+      tasks[_taskId].pctDIDVoted
     );
   }
 
@@ -66,18 +70,15 @@ contract Tasks is Debuggable {
     return taskIds.length;
   }
 
-
   function voteOnReward(bytes32 _taskId, uint256 _reward) public returns (bool) {
 
     DIDToken didToken = DIDToken(DIDTokenAddress);
     uint256 balance = didToken.balances(msg.sender);
     Distense distense = Distense(DistenseAddress);
 
-
 //    Please excuse the following.
 //    The stack was too deep so using fewer local vars here instead of in modifiers
 //    These if checks are essentially modifiers:
-
     if (
 
 //    This checks to see if enough DID owners haven't voted on this task.  If they have, let's continue and not allow this vote.
@@ -90,6 +91,7 @@ contract Tasks is Debuggable {
 //    This ensures new contributors don't have too much sway over the issuance of new DID.
       balance < _reward ||
 
+//    Don't let the voter vote for 0 reward which will have no effect on the reward and will cost the gas
       _reward < 1 ||
 
 //    Require the reward to be less than or equal to the maximum reward parameter,
@@ -99,10 +101,9 @@ contract Tasks is Debuggable {
 
     tasks[_taskId].rewardVotes[msg.sender] = _reward;
     tasks[_taskId].pctDIDVoted = tasks[_taskId].pctDIDVoted + didToken.pctDIDOwned(msg.sender);
-    assert(tasks[_taskId].pctDIDVoted > 0);
-
     return true;
-  }
+
+}
 
 
   function getTaskReward(bytes32 _taskId) public view returns (uint256) {

@@ -17,13 +17,13 @@ contract Distense {
   //  Titles are what uniquely define parameters, so query by titles when iterating with client
   bytes32[] public parameterTitles;
   struct Parameter {
-    bytes32 title;
-    uint256 value;
-    mapping (address => Vote) votes;
+  bytes32 title;
+  uint256 value;
+  mapping (address => Vote) votes;
   }
   struct Vote {
-    address voter;
-    uint256 lastVoted;
+  address voter;
+  uint256 lastVoted;
   }
 
   mapping (bytes32 => Parameter) public parameters;
@@ -49,54 +49,54 @@ contract Distense {
 
     // Launch Distense with some votable parameters that can be later updated by contributors
     proposalPctDIDApprovalParameter = Parameter({
-      title: proposalPctDIDApprovalTitle,
+    title: proposalPctDIDApprovalTitle,
     //     Every hard-coded int in Solidity is a decimal to one decimal place
     //     So this is 25.0
-      value: 250
+    value: 250
     });
     parameters[proposalPctDIDApprovalTitle] = proposalPctDIDApprovalParameter;
     parameterTitles.push(proposalPctDIDApprovalTitle);
 
     pullRequestPctDIDParameter = Parameter({
-      title: pullRequestPctDIDRequiredParameterTitle,
+    title: pullRequestPctDIDRequiredParameterTitle,
     //     Every hard-coded int in Solidity is a decimal to one decimal place
     //     So this is 10.0
-      value: 100
+    value: 100
     });
     parameters[pullRequestPctDIDRequiredParameterTitle] = pullRequestPctDIDParameter;
     parameterTitles.push(pullRequestPctDIDRequiredParameterTitle);
-    
+
     votingIntervalParameter = Parameter({
-      title: votingIntervalParameterTitle,
-      value: 15 days  // 15 * 86400 = 1.296e+6
+    title: votingIntervalParameterTitle,
+    value: 15 days  // 15 * 86400 = 1.296e+6
     });
     parameters[votingIntervalParameterTitle] = votingIntervalParameter;
     parameterTitles.push(votingIntervalParameterTitle);
 
     maxRewardParameter = Parameter({
-      title: maxRewardParameterTitle,
+    title: maxRewardParameterTitle,
     //     Every hard-coded int in Solidity is a decimal to one decimal place
     //     So this is 1000.0
-      value: 10000
+    value: 1000
     });
     parameters[maxRewardParameterTitle] = maxRewardParameter;
     parameterTitles.push(maxRewardParameterTitle);
 
   }
-  
+
   function getParameterValue(bytes32 _title) public view returns (uint256) {
-     return parameters[_title].value; 
+    return parameters[_title].value;
   }
 
   function voteOnParameter(bytes32 _title, uint256 _voteValue )
-    public
-    voteWithinRange(_title, _voteValue )
-    votingIntervalReached(msg.sender, _title)
+  public
+  voteWithinRange(_title, _voteValue )
+  votingIntervalReached(msg.sender, _title)
   returns
-    (uint256) {
+  (uint256) {
 
     DIDToken didToken = DIDToken(DIDTokenAddress);
-    uint256 votersDIDPercent = didToken.percentDID(msg.sender);
+    uint256 votersDIDPercent = didToken.pctDIDOwned(msg.sender);
     require (votersDIDPercent > 0);
 
     uint256 currentValue = getParameterValue(_title);
@@ -109,7 +109,7 @@ contract Distense {
     LogParameterValueUpdate(_title, updatedValue);
     return updatedValue;
   }
-  
+
   function getParameterByTitle(bytes32 _title) public view returns (bytes32, uint256) {
     Parameter memory param = parameters[_title];
     return (param.title, param.value);
@@ -134,7 +134,7 @@ contract Distense {
     Parameter storage parameter = parameters[_title];
     uint256 lastVotedOnParameter = parameter.votes[_voter].lastVoted;
     if (lastVotedOnParameter > 0)
-      require(now >= lastVotedOnParameter + votingInterval);
+    require(now >= lastVotedOnParameter + votingInterval);
     _;
   }
 

@@ -5,6 +5,8 @@ const Distense = artifacts.require('Distense')
 const assertJump = require('./helpers/assertJump')
 const proposalPctDIDRequiredValue = require('./Distense.test')
 
+
+
 contract('Tasks', function (accounts) {
 
   beforeEach(async function () {
@@ -17,6 +19,7 @@ contract('Tasks', function (accounts) {
     taskId:
       '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
   }
+
 
   it('should set the initial external addresses correctly', async function () {
     const didAddress = await tasks.DIDTokenAddress.call()
@@ -32,7 +35,7 @@ contract('Tasks', function (accounts) {
     await didToken.issueDID(accounts[0], 1234)
     //  addTask from default accounts[0]
     await tasks.addTask(
-      '0x956761ab87f7b984dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
+      task.taskId
     )
     let numTasks = await tasks.getNumTasks.call()
     assert.equal(numTasks, 1, 'numTasks should be 1')
@@ -68,11 +71,6 @@ contract('Tasks', function (accounts) {
     await didToken.issueDID(accounts[0], 100)
     await didToken.issueDID(accounts[1], 100)
 
-    const task = {
-      taskId:
-        '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
-    }
-
     await tasks.addTask(task.taskId)
     const taskExists = await tasks.taskExists(task.taskId)
     assert.equal(taskExists, true, 'task should exist')
@@ -82,7 +80,7 @@ contract('Tasks', function (accounts) {
       from: accounts[1]
     })
 
-     // leaving this here will cause logs/events to throw for debugging
+    // leaving this here will cause logs/events to throw for debugging
     // await tasks.voteOnReward(task.taskId, 99, {
     //   from: accounts[0]
     // })
@@ -97,61 +95,49 @@ contract('Tasks', function (accounts) {
     const maxDIDRewardValue = await distense.getParameterValue.call(maxRewardParameterTitle)
 
     await didToken.issueDID(accounts[0], 10000)
-    await didToken.issueDID(accounts[1], 10000)
-
-    const task = {
-      taskId:
-        '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75'
-    }
 
     await tasks.addTask(task.taskId)
 
-    let testTask = await tasks.getTaskById.call(task.taskId)
-
     //  Make sure vote is less than DID owned
-    let voted = await tasks.voteOnReward.call(task.taskId, maxDIDRewardValue - 1, {
+    const voted = await tasks.voteOnReward(task.taskId, maxDIDRewardValue - 1, {
       from: accounts[0]
     })
 
-    testTask = await tasks.getTaskById(task.taskId)
+    const testTask = await tasks.getTaskById.call(task.taskId)
 
-    assert.equal(voted, true, `voteOnReward should return true when user has DID and hasn't voted`)
-
-    let votedFalse = await tasks.voteOnReward.call(task.taskId, 1, {
-      from: accounts[0]
-    })
-
-    assert.equal(votedFalse, false, 'Voting twice should return false')
+    assert.equal(testTask[3].toNumber(), 1000, 'task.pctDIDVoted should equal the pctDIDVoted by the first voter')
 
   })
 
 
   it('should return false when someone tries to vote on a task for too much DID (above their DID owned)', async function () {
 
-    await didToken.issueDID(accounts[0], 100)
+    const maxRewardParameterTitle = await distense.maxRewardParameterTitle.call()
+    const maxDIDRewardValue = await distense.getParameterValue.call(maxRewardParameterTitle)
 
-    const task = {
-      taskId:
-        '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
-    }
+    const didOwnedByVoter = 50
+    await didToken.issueDID(accounts[0], didOwnedByVoter)
+
+    assert.isBelow(didOwnedByVoter, maxDIDRewardValue, 'Make sure voter will not accidentally trip a the higher than maxDIDReward parameter value')
 
     await tasks.addTask(task.taskId)
     const taskExists = await tasks.taskExists(task.taskId)
     assert.equal(taskExists, true, 'task should exist')
 
-    //  Voter only has 100 and 101 is more than 100, so... this should fail
-    let voted = await tasks.voteOnReward.call(task.taskId, 101, {
+    //  Voter is voting for more than the DID they have
+    let voted = await tasks.voteOnReward.call(task.taskId, didOwnedByVoter + 1, {
       from: accounts[0]
     })
+    assert.equal(voted, false, `Reject votes for rewards greater than the number of DID someone owns`)
 
-    assert.equal(voted, false, `voteOnReward should return true when user has DID and hasnt voted`)
-
-    voted = await tasks.voteOnReward.call(task.taskId, 99, {
+    // Voter is now voting for how much DID they own minus 1
+    voted = await tasks.voteOnReward.call(task.taskId, didOwnedByVoter - 1, {
       from: accounts[0]
     })
-    assert.equal(voted, false, 'Voting twice is prohibited')
+    assert.equal(voted, true, `Accept votes for rewards less than the number of DID someone owns`)
 
   })
+
 
   it('should prevent votes over the maxRewardParameter value of maximum DID per task reward', async function () {
 
@@ -162,10 +148,6 @@ contract('Tasks', function (accounts) {
 
     await didToken.issueDID(accounts[0], 10000000)
 
-    const task = {
-      taskId:
-        '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
-    }
 
     await tasks.addTask(task.taskId)
     const taskExists = await tasks.taskExists(task.taskId)
@@ -192,48 +174,10 @@ contract('Tasks', function (accounts) {
     //  User must have DID to addTask()
     await didToken.issueDID(accounts[0], 100)
 
-    const task = {
-      taskId:
-        '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
-    }
-
     const added = await tasks.addTask(task.taskId)
     assert(added, true, 'should have added a task here')
 
   })
-
-
-  // it.only('should correctly determineRewards', async function () {
-  //
-  //   let determineReward
-  //
-  //   await didToken.issueDID(accounts[0], 150)
-  //   await didToken.issueDID(accounts[1], 150)
-  //   await didToken.issueDID(accounts[2], 900)
-  //
-  //   const task = {
-  //     taskId:
-  //       '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
-  //   }
-  //
-  //   let reward1
-  //   let reward2
-  //   let taskExists1
-  //   let voted2
-  //   let voted3
-  //
-  //   await tasks.addTask(task.taskId)
-  //   taskExists = await tasks.taskExists(task.taskId)
-  //   assert.equal(taskExists, true, `task doesn't exist`)
-  //
-  //   await tasks.voteOnReward.call(task.taskId, 100, {
-  //     from: accounts[0]
-  //   })
-  //
-  //   reward1 = await tasks.determineReward.call(task.taskId)
-  //   assert.equal(reward1.toNumber(), 100, 'Reward should equal average of two votes')
-  //
-  // })
 
 
   it('should not add tasks with empty bytes32', async function () {
@@ -262,9 +206,8 @@ contract('Tasks', function (accounts) {
     let LogAddTaskEventListener = tasks.LogAddTask()
 
     await didToken.issueDID(accounts[0], 1)
-    const taskId =
-      '0x956761ab87f7b984dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
-    await tasks.addTask(taskId)
+
+    await tasks.addTask(task.taskId)
 
     let addTaskLog = await new Promise((resolve, reject) =>
       LogAddTaskEventListener.get(
@@ -273,8 +216,47 @@ contract('Tasks', function (accounts) {
     )
 
     let eventArgs = addTaskLog[0].args
-    assert.equal(eventArgs.taskId, taskId)
+    assert.equal(eventArgs.taskId, task.taskId)
     assert.equal(addTaskLog.length, 1, 'should be 1 event')
+  })
+
+
+  it('should increase the pctDIDVoted on a task correctly', async function () {
+
+    const maxDIDRewardValue = await distense.getParameterValue.call(
+      await distense.maxRewardParameterTitle.call()
+    )
+
+    await didToken.issueDID(accounts[0], 9000)
+    await didToken.issueDID(accounts[1], 1000)
+
+    await tasks.addTask(task.taskId)
+
+    await tasks.voteOnReward(task.taskId, 1, {
+      from: accounts[1]
+    })
+
+    const testTask = await tasks.getTaskById.call(task.taskId)
+
+    assert.equal(testTask[3].toNumber(), 100, `sadf`)
+
+  })
+
+  it('should return false when someone votes 0 for a task reward', async function () {
+
+    await didToken.issueDID(accounts[0], 100)
+
+    await tasks.addTask(task.taskId)
+
+    //  Make sure vote is less than DID owned
+    await tasks.voteOnReward(task.taskId, 0, {
+      from: accounts[0]
+    })
+
+    const testTask = await tasks.getTaskById.call(task.taskId)
+
+    assert.equal(testTask[3].toNumber(), 0, 'task.pctDIDVoted should equal 0 still -- vote shoult have rejected')
+
   })
 
 })

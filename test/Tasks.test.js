@@ -66,7 +66,7 @@ contract('Tasks', function (accounts) {
   })
 
 
-  it.only('should return true or otherwise modifty the task with voteOnReward() when the voter hasDID', async function () {
+  it('should return true or otherwise modifty the task with voteOnReward() when the voter hasDID', async function () {
 
     await didToken.issueDID(accounts[0], 100)
     await didToken.issueDID(accounts[1], 100)
@@ -107,7 +107,7 @@ contract('Tasks', function (accounts) {
   })
 
 
-  it('should return false when someone tries to vote on a task for too much DID (above their DID owned)', async function () {
+  it('should return false when someone tries to vote on a task for for a reward that is greater than the number of DID they own', async function () {
 
     const maxRewardParameterTitle = await distense.maxRewardParameterTitle.call()
     const maxDIDRewardValue = await distense.getParameterValue.call(maxRewardParameterTitle)
@@ -254,6 +254,39 @@ contract('Tasks', function (accounts) {
     const testTask = await tasks.getTaskById.call(task.taskId)
 
     assert.equal(testTask[3].toNumber(), 0, 'task.pctDIDVoted should equal 0 still -- vote shoult have rejected')
+
+  })
+
+
+  it('should return false when someone tries to vote twice', async function () {
+
+    const maxRewardParameterTitle = await distense.maxRewardParameterTitle.call()
+    const maxDIDRewardValue = await distense.getParameterValue.call(maxRewardParameterTitle)
+
+    await didToken.issueDID(accounts[0], 10000)
+
+    await tasks.addTask(task.taskId)
+
+    //  Make sure vote is less than DID owned
+    const voted = await tasks.voteOnReward(task.taskId, maxDIDRewardValue - 1, {
+      from: accounts[0]
+    })
+
+    const testTask = await tasks.getTaskById.call(task.taskId)
+
+    assert.equal(testTask[3].toNumber(), 1000, 'task.pctDIDVoted should equal the pctDIDVoted by the first voter')
+
+  })
+
+  it('should setTaskRewardPaid correctly', async function () {
+
+    await tasks.addTask(task.taskId)
+
+    //  This is from accounts[0] which is approved
+    await tasks.setTaskRewardPaid(task.taskId)
+
+    const testTask = await tasks.getTaskById.call(task.taskId)
+    assert.equal(testTask[2], true, 'task reward should now be market as true')
 
   })
 

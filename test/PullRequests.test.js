@@ -84,55 +84,33 @@ contract('PullRequests', function(accounts) {
   })
 
   it('enoughDIDToApprove modifier should work', async function() {
-    // let anError
-    //
-    // try {
-    //   assert.equal(
-    //     await pullRequests.numDIDRequiredToApprovePRs.call(),
-    //     100,
-    //     'Beginning number of numDIDToApprove should be accurate'
-    //   )
-    //   await didToken.issueDID(accounts[0], 49)
-    //   const numDIDOwned = await didToken.balances.call(accounts[0])
-    //   console.log(`numDIDOwned: ${numDIDOwned}`);
-    //   assert.equal(
-    //     numDIDOwned,
-    //     49,
-    //     'User balance should be 49 or less than threshold here'
-    //   )
-    //
-    //   await pullRequests.voteOnApproval(pullRequest.id, true)
-    //   // await pullRequests.voteOnApproval(pullRequest.id, true, {from: accounts[1]})
-    // } catch (error) {
-    //   anError = error
-    // }
-    //
-    // assert.notEqual(
-    //   anError,
-    //   undefined,
-    //   'error should be thrown if someone with not enough DID approval votes'
-    // )
-
-    // NEXT SUBTEST
 
     let aNewError
     try {
+
       const numDIDRequired = await pullRequests.numDIDRequiredToApprovePRs.call()
       assert.equal(
         numDIDRequired,
         100,
-        'Beginning number of numDIDToApprove should be accurate'
+        'beginning number of numDIDToApprove should be accurate'
       )
 
-      const numDIDOwned = await didToken.issueDID.call(accounts[0], 101)
+      await didToken.issueDID(accounts[0], numDIDRequired - 1)
       assert.equal(
-        numDIDOwned,
-        101,
-        'User balance should be 100 or less than threshold here'
+        didToken.balances.call(accounts[0]),
+        numDIDRequired - 1,
+        'balance should be 100 or less than threshold here'
+      )
+
+      await didToken.issueDID(accounts[0], 20000)
+      assert.isAbove(
+        didToken.balances.call(accounts[0]),
+        numDIDRequired,
+        `balance should be greater than the threshold we're testing here`
       )
 
       await pullRequests.voteOnApproval(pullRequestTwo.id, false, {from: accounts[0]})
-    
+
     } catch (error) {
       aNewError = error.message
     }

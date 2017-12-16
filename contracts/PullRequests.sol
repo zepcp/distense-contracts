@@ -68,23 +68,22 @@ contract PullRequests is Approvable {
 .sender)
   external
   returns (uint256) {
-//    PullRequest storage _pr = pullRequests[_prId];
-//
-//    uint256 pctDIDOwned = didToken.percentDID(msg.sender);
-//    _pr.votes[msg.sender].approves = _approve;
+    PullRequest storage _pr = pullRequests[_prId];
 
-//    if (!_approve) {
-//      pctDIDOwned += -pctDIDOwned;
-//    }
-//    _pr.pctDIDApproved += pctDIDOwned;
-    return 100;
-//    uint256 approvalValue = distense.getParameterValue(distense.pullRequestPctDIDRequiredParameterTitle());
-//    if (_pr.pctDIDApproved > approvalValue) {
-//      approvePullRequest(_pr.taskId, _prId, _pr.createdBy);
-//    }
-//
-//    LogPullRequestVote(_prId, _pr.pctDIDApproved);
-//    return _pr.pctDIDApproved;
+    uint256 pctDIDOwned = didToken.pctDIDOwned(msg.sender);
+    _pr.votes[msg.sender].approves = _approve;
+
+    if (!_approve) {
+      pctDIDOwned += -pctDIDOwned;
+    }
+    _pr.pctDIDApproved += pctDIDOwned;
+    uint256 approvalValue = distense.getParameterValue(distense.pullRequestPctDIDRequiredParameterTitle());
+    if (_pr.pctDIDApproved > approvalValue) {
+      approvePullRequest(_pr.taskId, _prId, _pr.createdBy);
+    }
+
+    LogPullRequestVote(_prId, _pr.pctDIDApproved);
+    return _pr.pctDIDApproved;
   }
 
   function approvePullRequest(bytes32 _taskId, bytes32 _prId, address contributor) internal returns (bool) {

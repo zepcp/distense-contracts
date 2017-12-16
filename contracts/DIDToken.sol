@@ -4,9 +4,11 @@ import './lib/Approvable.sol';
 import './lib/SafeMath.sol';
 import './lib/AddressUtils.sol';
 import './lib/Token.sol';
+import './Debuggable.sol';
 
 
-contract DIDToken is Token, Approvable {
+contract DIDToken is Token, Approvable, Debuggable {
+
   using AddressUtils for address;
   using SafeMath for uint256;
 
@@ -28,9 +30,9 @@ contract DIDToken is Token, Approvable {
     return balances[_recipient];
   }
   
-  function percentDID(address person) external view returns (uint256) {
+  function pctDIDOwned(address person) external view returns (uint256) {
     uint owned = balances[person];
-    return SafeMath.percent(owned, totalSupply, 2);
+    return SafeMath.percent(owned, totalSupply, 3);
   }
 
 }

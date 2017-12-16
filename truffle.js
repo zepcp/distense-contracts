@@ -4,7 +4,7 @@ module.exports = {
       host: 'localhost',
       port: 8545,
       network_id: '*',
-      gas: 4600000,
+//    gas: 4712088
     },
     ganache: {
       host: '127.0.0.1',
@@ -15,7 +15,7 @@ module.exports = {
       host: '165.227.180.132',
       port: 9000,
       network_id: 9000,
-      from: '0x014EB296Ef422dEbb71E43cB9c447306C536F05d',
+      from: '0x014eb296ef422debb71e43cb9c447306c536f05d',
       gas: 4650000
     },
     coverage: {
@@ -27,6 +27,7 @@ module.exports = {
     }
   },
 mocha: {
-	slow: 200
+  slow: 200,
+  useColors: true
 }
 }

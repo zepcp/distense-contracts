@@ -3,6 +3,7 @@ pragma solidity ^0.4.0;
 
 contract Debuggable {
 
+  event LogAddress(address someAddress);
   event LogBool(bool boolean);
   event LogBytes(bytes someBytes);
   event LogBytes32(bytes32 aBytes32);

@@ -28,10 +28,9 @@ contract TestTasks is Debuggable {
 
   function testGetTaskByIdAndDefaultTask()  public {
 
-    var (by, reward, voters, paid, pct) = tasks.getTaskById(id);
+    var (by, reward, paid, pct) = tasks.getTaskById(id);
 
     Assert.equal(reward, 0, 'reward initially 0');
-    Assert.equal(voters, 0, 'no voters yet');
     Assert.equal(paid, false, 'not paid yet');
     Assert.equal(0, reward, 'pctDIDVoted should be 0');
 

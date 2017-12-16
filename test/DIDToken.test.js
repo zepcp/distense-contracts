@@ -2,9 +2,11 @@ const web3 = global.web3
 const DIDToken = artifacts.require('DIDToken')
 
 contract('DIDToken', function(accounts) {
+
   beforeEach(async function() {
     didToken = await DIDToken.new()
   })
+
 
   it('should set the initial attributes correctly', async function() {
     assert.equal(await didToken.totalSupply(), 0)
@@ -13,7 +15,9 @@ contract('DIDToken', function(accounts) {
     assert.equal(await didToken.decimals(), 18)
   })
 
+
   it('should issueDID correctly', async function() {
+
     await didToken.issueDID(accounts[0], 4321)
     let newSupply = await didToken.totalSupply()
     assert.equal(newSupply, 4321)
@@ -21,6 +25,7 @@ contract('DIDToken', function(accounts) {
     await didToken.issueDID(accounts[0], 112340876)
     newSupply = await didToken.totalSupply()
     assert.equal(newSupply.toNumber(), 112345197)
+  
   })
 
 
@@ -37,6 +42,7 @@ contract('DIDToken', function(accounts) {
     assert.notEqual(addError, undefined, 'Error must be thrown')
   })
 
+
   it('should allow issueDID from owner', async function() {
     let addError
     try {
@@ -50,6 +56,7 @@ contract('DIDToken', function(accounts) {
     assert.equal(addError, undefined, 'Error must not be thrown')
     assert.equal(await didToken.balances.call(accounts[5]), 9100)
   })
+
 
   it('should disallow an issueDID call for === 0', async function() {
     let addError

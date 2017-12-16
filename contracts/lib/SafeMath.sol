@@ -40,19 +40,19 @@ library SafeMath {
     return _quotient;
   }
 
-  function max64(uint64 a, uint64 b) internal constant returns (uint64) {
+  function max64(uint64 a, uint64 b) internal pure returns (uint64) {
     return a >= b ? a : b;
   }
 
-  function min64(uint64 a, uint64 b) internal constant returns (uint64) {
+  function min64(uint64 a, uint64 b) internal pure returns (uint64) {
     return a < b ? a : b;
   }
 
-  function max256(uint256 a, uint256 b) internal constant returns (uint256) {
+  function max256(uint256 a, uint256 b) internal pure returns (uint256) {
     return a >= b ? a : b;
   }
 
-  function min256(uint256 a, uint256 b) internal constant returns (uint256) {
+  function min256(uint256 a, uint256 b) internal pure returns (uint256) {
     return a < b ? a : b;
   }
 

@@ -7,7 +7,7 @@ import './Distense.sol';
 import './lib/SafeMath.sol';
 
 
-contract Tasks is Debuggable {
+contract Tasks is Approvable {
 
   using SafeMath for uint256;
 
@@ -28,7 +28,6 @@ contract Tasks is Debuggable {
 
   event LogAddTask(bytes32 taskId);
   event LogRewardVote(bytes32 taskId, uint256 reward, uint256 pctDIDVoted);
-  event LogVoterBalance(uint256 voterBalance);
   event LogRewardDetermined(bytes32 indexed taskId, uint256 sum);
 
 
@@ -103,13 +102,21 @@ contract Tasks is Debuggable {
 
     tasks[_taskId].rewardVotes[msg.sender] = _reward;
     tasks[_taskId].pctDIDVoted = tasks[_taskId].pctDIDVoted + didToken.pctDIDOwned(msg.sender);
+
+    LogRewardVote(_taskId, _reward, tasks[_taskId].pctDIDVoted);
+
     return true;
 
 }
 
-
   function getTaskReward(bytes32 _taskId) public view returns (uint256) {
     return tasks[_taskId].reward;
+  }
+
+
+  function setTaskRewardPaid(bytes32 _taskId) public /*onlyApproved*/ returns (bool) {
+    tasks[_taskId].rewardPaid = true;
+//    return true;
   }
 
 

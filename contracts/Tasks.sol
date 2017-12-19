@@ -83,7 +83,7 @@ contract Tasks is Approvable {
     if (
 
 //    This checks to see if enough DID owners haven't voted on this task.  If they have, let's continue and not allow this vote.
-      tasks[_taskId].pctDIDVoted >= distense.getParameterValueByTitle(distense.proposalPctDIDApprovalTitle()) ||
+      tasks[_taskId].pctDIDVoted >= distense.getParameterValueByTitle(distense.proposalPctDIDToApproveParameterTitle()) ||
 
 //    Has the voter already voted on this task?
       tasks[_taskId].rewardVotes[msg.sender] != 0 ||

@@ -89,7 +89,7 @@ contract('Tasks', function (accounts) {
   it('should return false when someone tries to vote twice', async function () {
 
     const maxRewardParameterTitle = await distense.maxRewardParameterTitle.call()
-    const maxDIDRewardValue = await distense.getParameterValue.call(maxRewardParameterTitle)
+    const maxDIDRewardValue = await distense.getParameterValueByTitle.call(maxRewardParameterTitle)
 
     await didToken.issueDID(accounts[0], 10000)
 
@@ -110,7 +110,7 @@ contract('Tasks', function (accounts) {
   it('should return false when someone tries to vote on a task for for a reward that is greater than the number of DID they own', async function () {
 
     const maxRewardParameterTitle = await distense.maxRewardParameterTitle.call()
-    const maxDIDRewardValue = await distense.getParameterValue.call(maxRewardParameterTitle)
+    const maxDIDRewardValue = await distense.getParameterValueByTitle.call(maxRewardParameterTitle)
 
     const didOwnedByVoter = 50
     await didToken.issueDID(accounts[0], didOwnedByVoter)
@@ -139,7 +139,7 @@ contract('Tasks', function (accounts) {
   it('should prevent votes over the maxRewardParameter value of maximum DID per task reward', async function () {
 
     const maxRewardParameterTitle = await distense.maxRewardParameterTitle.call()
-    const maxDIDRewardValue = await distense.getParameterValue.call(maxRewardParameterTitle)
+    const maxDIDRewardValue = await distense.getParameterValueByTitle.call(maxRewardParameterTitle)
 
     const votersNumDID = maxDIDRewardValue + 1  // Voter now owns at least as much DID as the max reward parameter
 
@@ -220,7 +220,7 @@ contract('Tasks', function (accounts) {
 
   it('should increase the pctDIDVoted on a task correctly', async function () {
 
-    const maxDIDRewardValue = await distense.getParameterValue.call(
+    const maxDIDRewardValue = await distense.getParameterValueByTitle.call(
       await distense.maxRewardParameterTitle.call()
     )
 
@@ -261,7 +261,7 @@ contract('Tasks', function (accounts) {
   it('should return false when someone tries to vote twice', async function () {
 
     const maxRewardParameterTitle = await distense.maxRewardParameterTitle.call()
-    const maxDIDRewardValue = await distense.getParameterValue.call(maxRewardParameterTitle)
+    const maxDIDRewardValue = await distense.getParameterValueByTitle.call(maxRewardParameterTitle)
 
     await didToken.issueDID(accounts[0], 10000)
 

@@ -5,13 +5,13 @@ const convertBytes32ToString = require('./helpers/utils')
 const assertJump = require('./helpers/assertJump')
 
 contract('Distense contract', function(accounts) {
-  const proposalPctDIDApprovalParameter = {
-    title: 'proposalPctDIDRequired',
+  const proposalPctDIDToApproveParameter = {
+    title: 'proposalPctDIDToApprove',
     value: 250 // Hard coded in constructor function in contract
   }
 
   const pullRequestPctDIDParameter = {
-    title: 'pullRequestPctDIDRequired',
+    title: 'pctDIDRequiredToMergePullRequest',
     // Hard coded in constructor function in contract
     //  Added 0 because Solidity's awesome
     value: 100
@@ -36,19 +36,19 @@ contract('Distense contract', function(accounts) {
 
   it('should set the proposalPctDIDApprovalParameter correctly', async function() {
     let param = await distense.getParameterByTitle(
-      proposalPctDIDApprovalParameter.title
+      proposalPctDIDToApproveParameter.title
     )
 
     assert.equal(
       convertBytes32ToString(param[0].toString()),
-      proposalPctDIDApprovalParameter.title
+      proposalPctDIDToApproveParameter.title
     )
-    assert.equal(param[1], proposalPctDIDApprovalParameter.value)
+    assert.equal(param[1], proposalPctDIDToApproveParameter.value)
   })
 
   it('should set the initial attributes correctly', async function() {
     const numParameters = await distense.getNumParameters.call()
-    assert.equal(numParameters, 4)
+    assert.equal(numParameters.toNumber(), 5)
   })
 
   it('should correctly throw errors for proposalPctDIDApproval votes with values equal to the current value', async function() {
@@ -58,8 +58,8 @@ contract('Distense contract', function(accounts) {
     const distense = await Distense.new(didToken.address)
     try {
       await distense.voteOnParameter(
-        proposalPctDIDApprovalParameter.title,
-        proposalPctDIDApprovalParameter.value
+        proposalPctDIDToApproveParameter.title,
+        proposalPctDIDToApproveParameter.value
       )
     } catch (error) {
       equalValueError = error
@@ -133,8 +133,8 @@ contract('Distense contract', function(accounts) {
   // it('should correctly calculate new ProposalApprovalPCTDID values', async function() {
   //   //  Voter has 100% so this should simply double the value
   //   const newValue = await distense.voteOnParameter.call(
-  //     proposalPctDIDApprovalParameter.title,
-  //     proposalPctDIDApprovalParameter.value * 2
+  //     proposalPctDIDToApproveParameter.title,
+  //     proposalPctDIDToApproveParameter.value * 2
   //   )
   //
   //   assert.equal(

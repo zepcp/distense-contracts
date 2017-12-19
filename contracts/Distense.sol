@@ -29,8 +29,8 @@ contract Distense {
 
   mapping (bytes32 => Parameter) public parameters;
 
-  Parameter public proposalPctDIDApprovalParameter;
-  bytes32 public proposalPctDIDApprovalTitle = 'proposalPctDIDRequired';
+  Parameter public proposalPctDIDToApproveParameter;
+  bytes32 public proposalPctDIDToApproveParameterTitle = 'proposalPctDIDToApprove';
 
 
   Parameter public pctDIDRequiredToMergePullRequest;
@@ -56,14 +56,14 @@ contract Distense {
 
 
     // Launch Distense with some votable parameters that can be later updated by contributors
-    proposalPctDIDApprovalParameter = Parameter({
-    title: proposalPctDIDApprovalTitle,
+    proposalPctDIDToApproveParameter = Parameter({
+    title: proposalPctDIDToApproveParameterTitle,
     //     Every hard-coded int in Solidity is a decimal to one decimal place
     //     So this is 25.0
     value: 250
     });
-    parameters[proposalPctDIDApprovalTitle] = proposalPctDIDApprovalParameter;
-    parameterTitles.push(proposalPctDIDApprovalTitle);
+    parameters[proposalPctDIDToApproveParameterTitle] = proposalPctDIDToApproveParameter;
+    parameterTitles.push(proposalPctDIDToApproveParameterTitle);
 
 
     pctDIDRequiredToMergePullRequest = Parameter({

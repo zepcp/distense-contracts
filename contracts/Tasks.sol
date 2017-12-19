@@ -114,9 +114,9 @@ contract Tasks is Approvable {
   }
 
 
-  function setTaskRewardPaid(bytes32 _taskId) public /*onlyApproved*/ returns (bool) {
+  function setTaskRewardPaid(bytes32 _taskId) public onlyApproved returns (bool) {
     tasks[_taskId].rewardPaid = true;
-//    return true;
+    return true;
   }
 
 

@@ -261,7 +261,7 @@ contract('Tasks', function (accounts) {
   it('should return false when someone tries to vote twice', async function () {
 
     const maxRewardParameterTitle = await distense.maxRewardParameterTitle.call()
-    const maxDIDRewardValue = await distense.getParameterValueByTitle.call(maxRewardParameterTitle)
+    const maxDIDRewardValue = await distense.getParameterValueByTitle .call(maxRewardParameterTitle)
 
     await didToken.issueDID(accounts[0], 10000)
 
@@ -280,6 +280,7 @@ contract('Tasks', function (accounts) {
 
   it('should setTaskRewardPaid correctly', async function () {
 
+    await didToken.issueDID(accounts[0], 10000)
     await tasks.addTask(task.taskId)
 
     //  This is from accounts[0] which is approved

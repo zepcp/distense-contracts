@@ -4,6 +4,7 @@ const PullRequests = artifacts.require('PullRequests')
 const DIDToken = artifacts.require('DIDToken')
 const Distense = artifacts.require('Distense')
 
+
 contract('PullRequests', function(accounts) {
   beforeEach(async function() {
     tasks = await Tasks.new()
@@ -14,7 +15,6 @@ contract('PullRequests', function(accounts) {
       distense.address,
       tasks.address
     )
-    numDIDRequiredToApprovePRs = await pullRequests.numDIDRequiredToApprovePRs.call()
   })
 
   const pullRequest = {
@@ -42,28 +42,29 @@ contract('PullRequests', function(accounts) {
   })
 
   it('pullRequestIds.length should be 0', async function() {
+
     let numPRs
-    let submitError
 
     numPRs = await pullRequests.getNumPullRequests.call()
     assert.equal(numPRs.toNumber(), 0, 'numPRs should be 0')
   })
 
-  it('should submitPullRequests correctly', async function() {
-    let submitted
+
+  it('should addPullRequests correctly', async function() {
+    let added
 
     numPRs = await pullRequests.getNumPullRequests.call()
     assert.equal(numPRs.toNumber(), 0, 'numPRs should be 0 initially')
 
     try {
-      submitted = await pullRequests.submitPullRequest.call(
+      added = await pullRequests.addPullRequest.call(
         pullRequest.id,
         pullRequest.taskId
       )
       assert.equal(
-        submitted.toNumber(),
-        1,
-        'Should have successfully submitted PR'
+        added,
+        true,
+        'Should have successfully added PR'
       )
 
       //  Make sure pctDIDApproved is set to 0
@@ -74,88 +75,105 @@ contract('PullRequests', function(accounts) {
         'pctDIDApproved should be 0 for a brand new pullRequest'
       )
 
-      await pullRequests.submitPullRequest.call('4321', '4312')
+      await pullRequests.addPullRequest('4321', '4312')
 
-      numPRs = await pullRequests.getNumPullRequests.call()
+      const numPRs = await pullRequests.getNumPullRequests.call()
       assert.equal(numPRs.toNumber(), 2, 'numPRs should be 2')
     } catch (error) {
       submitError = error
     }
   })
 
-  it('enoughDIDToApprove modifier should work', async function() {
+
+  it('voteOnApproval() enoughDIDToApprove modifier should reject votes from those without enough DID', async function() {
 
     let aNewError
     try {
 
       const numDIDRequired = await pullRequests.numDIDRequiredToApprovePRs.call()
-      assert.equal(
-        numDIDRequired,
-        100,
-        'beginning number of numDIDToApprove should be accurate'
-      )
 
       await didToken.issueDID(accounts[0], numDIDRequired - 1)
       assert.equal(
-        didToken.balances.call(accounts[0]),
+        await didToken.balances.call(accounts[0]),
         numDIDRequired - 1,
         'balance should be 100 or less than threshold here'
       )
 
-      await didToken.issueDID(accounts[0], 20000)
-      assert.isAbove(
-        didToken.balances.call(accounts[0]),
-        numDIDRequired,
-        `balance should be greater than the threshold we're testing here`
-      )
-
-      await pullRequests.voteOnApproval(pullRequestTwo.id, false, {from: accounts[0]})
-
+      await pullRequests.voteOnApproval(pullRequestTwo.id, false)
     } catch (error) {
-      aNewError = error.message
+      aNewError = error
     }
 
-    assert.equal(
+    assert.notEqual(
       aNewError,
       undefined,
-      'error should not be thrown if someone with enough DID approval votes'
+      'error should be thrown if someone with not enough DID approval votes on a PR'
     )
+  })
 
+
+  it('voteOnApproval() should reject approval votes from those who have already voted on that PR', async function () {
+
+    const title = await distense.numDIDRequiredToApproveVotePullRequestTitle.call()
+    const numDIDRequired = await distense.getParameterValueByTitle.call(title)
+    assert.equal(numDIDRequired, 2000, 'beginning number of numDIDToApprove should be accurate'    )
+
+    let anError
+    try {
+
+      await didToken.issueDID(accounts[0], numDIDRequired + 1)
+      assert.equal(
+        await didToken.balances.call(accounts[0]),
+        numDIDRequired,
+        'balance should be sufficient to vote -- above threshold'
+      )
+
+      await pullRequests.addPullRequest(pullRequest.id, pullRequest.taskId)
+
+      //  First time voting -- that's cool
+      await pullRequests.voteOnApproval(pullRequest.id)
+
+      //  WUT?!  How dare you vote a second time!!!!?
+      await pullRequests.voteOnApproval(pullRequest.id)
+
+    } catch (error) {
+      anError = error
+    }
+
+    assert.notEqual(anError, undefined, 'Should throw an error when voting twice')
+    // assert.equal(true, false, 'TODO make sure this throws once something else -- false positive')
 
   })
 
-  // it('should vote/adjust pctDIDApproved correctly', async function() {
-  //   let pr
-  //   let pctVoted
-  //   let anError
-  //
-  //   try {
-  //     await didToken.issueDID(accounts[0], 100)
-  //     let pctDIDOwned = await didToken.percentDID.call(accounts[0])
-  //     assert.equal(await didToken.totalSupply(), 100)
-  //
-  //     submitted = await pullRequests.submitPullRequest.call(
-  //       pullRequest.id,
-  //       pullRequest.taskId,
-  //       {
-  //         from: accounts[1]
-  //       }
-  //     )
-  //
-  //     pctVoted = await pullRequests.voteOnApproval.call(pullRequest.id, true)
-  //     assert.equal(
-  //       pctVoted.toNumber(),
-  //       pctDIDOwned.toNumber(),
-  //       'pctVoted should be 100'
-  //     )
-  //   } catch (error) {
-  //     anError = error
-  //   }
-  //
-  //   assert.equal(
-  //     anError,
-  //     undefined,
-  //     'No error should be thrown for should vote/adjust pctDIDApproved correctly'
-  //   )
-  // })
+
+  it('voteOnApproval() should increment the pctDIDApproved correctly', async function () {
+
+    const title = await distense.numDIDRequiredToApproveVotePullRequestTitle.call()
+    const numDIDRequired = await distense.getParameterValueByTitle.call(title)
+
+    assert.equal(
+      numDIDRequired,
+      2000,
+      'beginning number of numDIDToApprove should be accurate'
+    )
+
+
+    await didToken.issueDID(accounts[0], numDIDRequired)
+    const numDIDOwned = await didToken.balances.call(accounts[0])
+
+
+    assert.equal(
+      numDIDOwned.toNumber(),
+      numDIDRequired,
+      'balance should be sufficient to vote: above threshold'
+    )
+
+    await pullRequests.addPullRequest(pullRequest.id, pullRequest.taskId)
+
+    await pullRequests.voteOnApproval(pullRequest.id)
+    // const votedOnPR = pullRequests.getPullRequestById.call(pullRequestTwo.id)
+
+    // assert.isAbove(votedOnPR[2], 0, 'pctDIDVoted of the votedOnPullRequest should be greater than zero')
+  })
+
 })

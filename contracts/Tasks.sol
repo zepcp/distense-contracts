@@ -83,7 +83,7 @@ contract Tasks is Approvable {
     if (
 
 //    This checks to see if enough DID owners haven't voted on this task.  If they have, let's continue and not allow this vote.
-      tasks[_taskId].pctDIDVoted >= distense.getParameterValue(distense.proposalPctDIDApprovalTitle()) ||
+      tasks[_taskId].pctDIDVoted >= distense.getParameterValueByTitle(distense.proposalPctDIDApprovalTitle()) ||
 
 //    Has the voter already voted on this task?
       tasks[_taskId].rewardVotes[msg.sender] != 0 ||
@@ -97,7 +97,7 @@ contract Tasks is Approvable {
 
 //    Require the reward to be less than or equal to the maximum reward parameter,
 //    which basically is a hard, floating limit on the number of DID that can be issued for any single task
-      _reward >= distense.getParameterValue(distense.maxRewardParameterTitle())
+      _reward >= distense.getParameterValueByTitle(distense.maxRewardParameterTitle())
     ) return false;
 
     tasks[_taskId].rewardVotes[msg.sender] = _reward;

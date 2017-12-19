@@ -7,29 +7,18 @@ import './Distense.sol';
 import './Tasks.sol';
 
 
-contract PullRequests is Approvable {
+contract PullRequests is Approvable, Debuggable {
 
-  DIDToken didToken = DIDToken(DIDTokenAddress);
+
   address public DIDTokenAddress;
-
-  Distense distense;
   address public DistenseAddress;
-
-  Tasks tasks;
   address public TasksAddress;
-
-  uint256 constant public numDIDRequiredToApprovePRs = 100;
 
   struct PullRequest {
     address createdBy;
     bytes32 taskId;
     uint256 pctDIDApproved;
-    mapping (address => Vote) votes;
-  }
-
-  struct Vote {
-    address voter;
-    bool approves;
+    mapping (address => bool) voted;
   }
 
   bytes32[] public pullRequestIds;
@@ -37,8 +26,9 @@ contract PullRequests is Approvable {
   mapping (bytes32 => PullRequest) pullRequests;
 
   event LogInt(uint256 someInt);
-  event LogPullRequestApproval(bytes32 _prId, bytes32 indexed taskId);
+  event LogMergeAndRewardPullRequest(bytes32 _prId, bytes32 indexed taskId);
   event LogPullRequestVote(bytes32 indexed _prId, uint256 pctDIDApproved);
+
 
   function PullRequests(address _DIDTokenAddress, address _DistenseAddress, address _TasksAddress) public {
     DIDTokenAddress = _DIDTokenAddress;
@@ -46,62 +36,77 @@ contract PullRequests is Approvable {
     TasksAddress = _TasksAddress;
   }
 
-  function submitPullRequest(bytes32 _prId, bytes32 _taskId) external returns (uint256) {
-    PullRequest memory _pr = PullRequest(msg.sender, _taskId, 0);
-    //Write the _pr struct to storage
-    _pr.pctDIDApproved = 0;
-    pullRequests[_prId] = _pr;
+
+  function addPullRequest(bytes32 _prId, bytes32 _taskId) external returns (bool) {
+    pullRequests[_prId].createdBy = msg.sender;
+    pullRequests[_prId].taskId = _taskId;
     pullRequestIds.push(_prId);
-    return pullRequestIds.length;
+
+    return true;
   }
+
 
   function getPullRequestById(bytes32 _prId) public view returns (address, bytes32, uint256) {
     PullRequest memory pr = pullRequests[_prId];
     return (pr.createdBy, pr.taskId, pr.pctDIDApproved);
   }
 
+
   function getNumPullRequests() public view returns (uint256) {
     return pullRequestIds.length;
   }
 
-  function voteOnApproval(bytes32 _prId, bool _approve) /*hasntVotedThisWay(_prId, msg.sender, _approve)*/ enoughDIDToApprove(msg
-.sender)
-  external
+
+  function voteOnApproval(bytes32 _prId)
+    hasntVoted(_prId, msg.sender)
+    public
   returns (uint256) {
+
+    Distense distense = Distense(DistenseAddress);
+//    Again with the modifiers in the functions -- sorry stack was too deep
+//    This also only instantiates these external contracts one time so modest gas efficiency by doing this
+    DIDToken didToken = DIDToken(DIDTokenAddress);
+    uint256 didOwned = didToken.balances(msg.sender);
+
+    bytes32 title = distense.numDIDRequiredToApproveVotePullRequestTitle();
+    uint256 numDIDRequiredToApproveVotePullRequest = distense.getParameterValueByTitle(title);
+    require(didOwned >= numDIDRequiredToApproveVotePullRequest);
+
     PullRequest storage _pr = pullRequests[_prId];
 
-    uint256 pctDIDOwned = didToken.pctDIDOwned(msg.sender);
-    _pr.votes[msg.sender].approves = _approve;
+    //  Increment pctDIDApproved by percentage ownership of voter
 
-    if (!_approve) {
-      pctDIDOwned += -pctDIDOwned;
-    }
+    uint256 pctDIDOwned = didToken.pctDIDOwned(msg.sender);
     _pr.pctDIDApproved += pctDIDOwned;
-    uint256 approvalValue = distense.getParameterValue(distense.pullRequestPctDIDRequiredParameterTitle());
-    if (_pr.pctDIDApproved > approvalValue) {
-      approvePullRequest(_pr.taskId, _prId, _pr.createdBy);
+
+    //  Record vote to prevent multiple voting
+    _pr.voted[msg.sender] = true;
+
+    uint256 threshold = distense.getParameterValueByTitle(distense.pctDIDRequiredToMergePullRequestTitle());
+    if (_pr.pctDIDApproved > threshold) {
+//      approvePullRequest(_pr.taskId, _prId, _pr.createdBy);
     }
 
     LogPullRequestVote(_prId, _pr.pctDIDApproved);
+
     return _pr.pctDIDApproved;
+
   }
 
-  function approvePullRequest(bytes32 _taskId, bytes32 _prId, address contributor) internal returns (bool) {
-    LogPullRequestApproval(_taskId, _prId);
+  function mergeAndRewardPullRequest(bytes32 _taskId, bytes32 _prId, address contributor) internal returns (bool) {
+
+    LogMergeAndRewardPullRequest(_taskId, _prId);
+
+    Tasks tasks = Tasks(TasksAddress);
     uint256 taskReward = tasks.getTaskReward(_taskId);
+    DIDToken didToken = DIDToken(DIDTokenAddress);
     didToken.issueDID(contributor, taskReward);
     return true;
   }
 
-  modifier hasntVotedThisWay(bytes32 _prId, address voter, bool vote) {
-    bool alreadyVoted = pullRequests[_prId].votes[voter].approves == vote;
-    require(!alreadyVoted);
-    _;
-  }
-
-  modifier enoughDIDToApprove(address voter) {
-    uint256 didOwned = didToken.balances(voter);
-    require(didOwned >= numDIDRequiredToApprovePRs);
+  modifier hasntVoted(bytes32 _prId, address voter) {
+    bool alreadyVoted = pullRequests[_prId].voted[msg.sender];
+    require(alreadyVoted == false);
     _;
   }
 

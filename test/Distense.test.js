@@ -13,7 +13,7 @@ contract('Distense contract', function(accounts) {
   const pullRequestPctDIDParameter = {
     title: 'pctDIDRequiredToMergePullRequest',
     // Hard coded in constructor function in contract
-    //  Added 0 because Solidity's awesome
+    //  This is 10 because no floating point in Solidity
     value: 100
   }
 

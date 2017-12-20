@@ -27,7 +27,7 @@ contract PullRequests is Approvable, Debuggable {
 
   event LogInt(uint256 someInt);
   event LogMergeAndRewardPullRequest(bytes32 _prId, bytes32 indexed taskId);
-  event LogPullRequestVote(bytes32 indexed _prId, uint256 pctDIDApproved);
+  event LogPullRequestApprovalVote(bytes32 indexed _prId, uint256 pctDIDApproved);
 
 
   function PullRequests(address _DIDTokenAddress, address _DistenseAddress, address _TasksAddress) public {
@@ -57,7 +57,7 @@ contract PullRequests is Approvable, Debuggable {
   }
 
 
-  function voteOnApproval(bytes32 _prId)
+  function approvePullRequest(bytes32 _prId)
     hasntVoted(_prId, msg.sender)
     public
   returns (uint256) {
@@ -87,7 +87,7 @@ contract PullRequests is Approvable, Debuggable {
 //      approvePullRequest(_pr.taskId, _prId, _pr.createdBy);
     }
 
-    LogPullRequestVote(_prId, _pr.pctDIDApproved);
+    LogPullRequestApprovalVote(_prId, _pr.pctDIDApproved);
 
     return _pr.pctDIDApproved;
 

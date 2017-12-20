@@ -99,7 +99,7 @@ contract('PullRequests', function(accounts) {
         'balance should be 100 or less than threshold here'
       )
 
-      await pullRequests.voteOnApproval(pullRequestTwo.id, false)
+      await pullRequests.approvePullRequest(pullRequestTwo.id, false)
     } catch (error) {
       aNewError = error
     }
@@ -131,10 +131,10 @@ contract('PullRequests', function(accounts) {
       await pullRequests.addPullRequest(pullRequest.id, pullRequest.taskId)
 
       //  First time voting -- that's cool
-      await pullRequests.voteOnApproval(pullRequest.id)
+      await pullRequests.approvePullRequest(pullRequest.id)
 
       //  WUT?!  How dare you vote a second time!!!!?
-      await pullRequests.voteOnApproval(pullRequest.id)
+      await pullRequests.approvePullRequest(pullRequest.id)
 
     } catch (error) {
       anError = error
@@ -169,11 +169,12 @@ contract('PullRequests', function(accounts) {
     )
 
     await pullRequests.addPullRequest(pullRequest.id, pullRequest.taskId)
+    await pullRequests.approvePullRequest(pullRequest.id)
 
-    await pullRequests.voteOnApproval(pullRequest.id)
-    // const votedOnPR = pullRequests.getPullRequestById.call(pullRequestTwo.id)
+    const votedOnPR = await pullRequests.getPullRequestById.call(pullRequest.id)
 
-    // assert.isAbove(votedOnPR[2], 0, 'pctDIDVoted of the votedOnPullRequest should be greater than zero')
+    assert.isAbove(votedOnPR[2], 0, 'pctDIDVoted of the votedOnPullRequest should be greater than zero')
+
   })
 
 })

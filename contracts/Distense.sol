@@ -54,7 +54,7 @@ contract Distense {
 
   function Distense(address _DIDTokenAddress) public {
 
-
+    DIDTokenAddress = _DIDTokenAddress;
     // Launch Distense with some votable parameters that can be later updated by contributors
     proposalPctDIDToApproveParameter = Parameter({
     title: proposalPctDIDToApproveParameterTitle,
@@ -161,7 +161,6 @@ contract Distense {
   modifier votingIntervalReached(address _voter, bytes32 _title) {
     Parameter storage parameter = parameters[_title];
     uint256 lastVotedOnParameter = parameter.votes[_voter].lastVoted;
-    if (lastVotedOnParameter != 0)
     require(now >= lastVotedOnParameter + getParameterValueByTitle(votingIntervalParameterTitle));
     _;
   }

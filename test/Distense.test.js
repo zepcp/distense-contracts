@@ -115,7 +115,7 @@ contract('Distense contract', function (accounts) {
   })
 
 
-  it.only(`should restrict voting again if the votingInterval hasn't passed`, async function () {
+  it(`should restrict voting again if the votingInterval hasn't passed`, async function () {
 
     let contractError
 
@@ -142,7 +142,7 @@ contract('Distense contract', function (accounts) {
     assert.notEqual(
       contractError,
       undefined,
-      'asdf'
+      'should throw an error because the voter is trying to vote twice'
     )
 
   })

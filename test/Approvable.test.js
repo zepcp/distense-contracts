@@ -16,12 +16,19 @@ contract('Approvable', function(accounts) {
     assert.equal(msgSenderApproved , true, 'msg sender should be approved here')
   })
 
-  it('other addresses should be initially approved', async function() {
-    const msgSenderApproved = await approvable.approved(accounts[1])
+  it('other addresses should not be initially approved', async function() {
+    let msgSenderApproved = await approvable.approved(accounts[1])
     assert.equal(msgSenderApproved , false, 'msg sender should not be approved here')
+
+    msgSenderApproved = await approvable.approved(accounts[5])
+    assert.equal(msgSenderApproved , false, 'msg sender should not be approved here')
+
+    msgSenderApproved = await approvable.approved(accounts[6])
+    assert.equal(msgSenderApproved , false, 'msg sender should not be approved here')
+
   })
 
-  it('set addresses as approved from only approved addresses', async function() {
+  it('should approve addresses from only approved addresses', async function() {
     const msgSenderApproved = await approvable.approved(accounts[1])
     assert.equal(msgSenderApproved , false, 'msg sender should not be approved here')
   })
@@ -37,9 +44,16 @@ contract('Approvable', function(accounts) {
 
   })
 
-  it('set addresses as approved from only approved addresses', async function() {
-    const msgSenderApproved = await approvable.approved(accounts[1])
-    assert.equal(msgSenderApproved , false, 'msg sender should not be approved here')
+  it('should revokeApproval() correctly', async function() {
+
+    await approvable.approve(accounts[1])
+
+    let msgSenderApproved = await approvable.approved(accounts[1])
+    assert.equal(msgSenderApproved , true, 'msg sender should not be approved here')
+
+    await approvable.revokeApproval(accounts[1])
+    assert.equal(msgSenderApproved , true, 'msg sender should not be approved here')
+
   })
 
   // it('set addresses as approved from only approved addresses', async function() {

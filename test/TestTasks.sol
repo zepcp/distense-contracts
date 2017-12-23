@@ -16,7 +16,7 @@ contract TestTasks is Debuggable {
 
   DIDToken didToken = new DIDToken();
 
-  bytes32 id = 0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9;
+  string id = '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9';
 
   function testGetNumTasks() public {
 

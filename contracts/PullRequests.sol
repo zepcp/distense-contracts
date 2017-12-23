@@ -16,18 +16,18 @@ contract PullRequests is Approvable, Debuggable {
 
   struct PullRequest {
     address createdBy;
-    bytes32 taskId;
+    string taskId;
     uint256 pctDIDApproved;
     mapping (address => bool) voted;
   }
 
-  bytes32[] public pullRequestIds;
+  string[] public pullRequestIds;
 
-  mapping (bytes32 => PullRequest) pullRequests;
+  mapping (string => PullRequest) pullRequests;
 
   event LogInt(uint256 someInt);
-  event LogMergeAndRewardPullRequest(bytes32 _prId, bytes32 indexed taskId);
-  event LogPullRequestApprovalVote(bytes32 indexed _prId, uint256 pctDIDApproved);
+  event LogMergeAndRewardPullRequest(string _prId, string indexed taskId);
+  event LogPullRequestApprovalVote(string indexed _prId, uint256 pctDIDApproved);
 
 
   function PullRequests(address _DIDTokenAddress, address _DistenseAddress, address _TasksAddress) public {
@@ -38,7 +38,7 @@ contract PullRequests is Approvable, Debuggable {
 
 
   //  TODO should we require DID here?
-  function addPullRequest(bytes32 _prId, bytes32 _taskId) external returns (bool) {
+  function addPullRequest(string _prId, string _taskId) external returns (bool) {
     pullRequests[_prId].createdBy = msg.sender;
     pullRequests[_prId].taskId = _taskId;
     pullRequestIds.push(_prId);
@@ -47,7 +47,7 @@ contract PullRequests is Approvable, Debuggable {
   }
 
 
-  function getPullRequestById(bytes32 _prId) public view returns (address, bytes32, uint256) {
+  function getPullRequestById(string _prId) public view returns (address, string, uint256) {
     PullRequest memory pr = pullRequests[_prId];
     return (pr.createdBy, pr.taskId, pr.pctDIDApproved);
   }
@@ -60,7 +60,7 @@ contract PullRequests is Approvable, Debuggable {
 
 //  TODO should we require this to be not over threshold already?  Would save some people some gas
 //  I'm guessing we want to do that
-  function approvePullRequest(bytes32 _prId)
+  function approvePullRequest(string _prId)
     hasntVoted(_prId, msg.sender)
     public
   returns (uint256) {
@@ -95,20 +95,21 @@ contract PullRequests is Approvable, Debuggable {
 
   }
 
-  function mergeAndRewardPullRequest(bytes32 _taskId, bytes32 _prId, address _contributor) internal returns (bool) {
+  function mergeAndRewardPullRequest(string _taskId, string _prId, address _contributor) internal returns (bool) {
 
     LogMergeAndRewardPullRequest(_taskId, _prId);
 
     Tasks tasks = Tasks(TasksAddress);
     uint256 taskReward = tasks.getTaskReward(_taskId);
     assert(taskReward > 0);
-//    DIDToken didToken = DIDToken(DIDTokenAddress);
-//    didToken.issueDID(_contributor, taskReward);
+
+    DIDToken didToken = DIDToken(DIDTokenAddress);
+    didToken.issueDID(_contributor, taskReward);
 
     return true;
   }
 
-  modifier hasntVoted(bytes32 _prId, address voter) {
+  modifier hasntVoted(string _prId, address voter) {
     bool alreadyVoted = pullRequests[_prId].voted[msg.sender];
     require(alreadyVoted == false);
     _;

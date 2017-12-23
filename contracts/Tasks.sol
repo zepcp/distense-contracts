@@ -14,7 +14,7 @@ contract Tasks is Approvable {
   address public DIDTokenAddress;
   address public DistenseAddress;
 
-  bytes32[] public taskIds;
+  string[] public taskIds;
 
   struct Task {
     address createdBy;
@@ -24,11 +24,11 @@ contract Tasks is Approvable {
     mapping (address => uint256) rewardVotes;
   }
 
-  mapping (bytes32 => Task) tasks;
+  mapping (string => Task) tasks;
 
-  event LogAddTask(bytes32 taskId);
-  event LogRewardVote(bytes32 taskId, uint256 reward, uint256 pctDIDVoted);
-  event LogRewardDetermined(bytes32 indexed taskId, uint256 sum);
+  event LogAddTask(string taskId);
+  event LogRewardVote(string taskId, uint256 reward, uint256 pctDIDVoted);
+  event LogRewardDetermined(string indexed taskId, uint256 sum);
 
 
   function Tasks(address _DIDTokenAddress, address _DistenseAddress) public {
@@ -37,8 +37,9 @@ contract Tasks is Approvable {
   }
 
 
-  function addTask(bytes32 _taskId) public hasDID(msg.sender) returns (bool) {
-    require(_taskId[0] != 0);
+  function addTask(string _taskId) public hasDID(msg.sender) returns (bool) {
+    bytes memory bytesTaskId = bytes(_taskId);
+    require(bytesTaskId.length > 0);
 
     tasks[_taskId].createdBy = msg.sender;
     tasks[_taskId].reward = 0;
@@ -51,7 +52,7 @@ contract Tasks is Approvable {
   }
 
 
-  function getTaskById(bytes32 _taskId) public view returns (address, uint256, bool, uint256) {
+  function getTaskById(string _taskId) public view returns (address, uint256, bool, uint256) {
     return (
       tasks[_taskId].createdBy,
       tasks[_taskId].reward,
@@ -61,7 +62,7 @@ contract Tasks is Approvable {
   }
 
 
-  function taskExists(bytes32 _taskId) public view returns (bool) {
+  function taskExists(string _taskId) public view returns (bool) {
     return tasks[_taskId].createdBy != 0;
   }
 
@@ -71,7 +72,7 @@ contract Tasks is Approvable {
   }
 
 
-  function voteOnReward(bytes32 _taskId, uint256 _reward) public returns (bool) {
+  function voteOnReward(string _taskId, uint256 _reward) public returns (bool) {
 
     DIDToken didToken = DIDToken(DIDTokenAddress);
     uint256 balance = didToken.balances(msg.sender);
@@ -109,13 +110,13 @@ contract Tasks is Approvable {
 
 }
 
-  function getTaskReward(bytes32 _taskId) public view returns (uint256) {
+  function getTaskReward(string _taskId) public view returns (uint256) {
     return tasks[_taskId].reward;
   }
 
 
 //  TODO is this going to be manually called?
-  function setTaskRewardPaid(bytes32 _taskId) public onlyApproved returns (bool) {
+  function setTaskRewardPaid(string _taskId) public onlyApproved returns (bool) {
     tasks[_taskId].rewardPaid = true;
     return true;
   }

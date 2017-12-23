@@ -28,13 +28,4 @@ library StringArrayUtils {
     // self.length--;
   }
 
-//  function remove(string[] self, string value) internal {
-    // remove(self, indexOf(self, value));
-//  }
-
-  //  function replace(string[] self, string oldValue, string newValue) internal {
-  //    int index = self.indexOf(oldValue);
-  //    self[index] = newValue;
-  //  }
-
 }

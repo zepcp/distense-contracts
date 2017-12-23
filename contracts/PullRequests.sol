@@ -37,6 +37,7 @@ contract PullRequests is Approvable, Debuggable {
   }
 
 
+  //  TODO should we require DID here?
   function addPullRequest(bytes32 _prId, bytes32 _taskId) external returns (bool) {
     pullRequests[_prId].createdBy = msg.sender;
     pullRequests[_prId].taskId = _taskId;
@@ -57,14 +58,14 @@ contract PullRequests is Approvable, Debuggable {
   }
 
 
+//  TODO should we require this to be not over threshold already?  Would save some people some gas
+//  I'm guessing we want to do that
   function approvePullRequest(bytes32 _prId)
     hasntVoted(_prId, msg.sender)
     public
   returns (uint256) {
 
     Distense distense = Distense(DistenseAddress);
-//    Again with the modifiers in the functions -- sorry stack was too deep
-//    This also only instantiates these external contracts one time so modest gas efficiency by doing this
     DIDToken didToken = DIDToken(DIDTokenAddress);
     uint256 didOwned = didToken.balances(msg.sender);
 
@@ -75,16 +76,17 @@ contract PullRequests is Approvable, Debuggable {
     PullRequest storage _pr = pullRequests[_prId];
 
     //  Increment pctDIDApproved by percentage ownership of voter
-
     uint256 pctDIDOwned = didToken.pctDIDOwned(msg.sender);
     _pr.pctDIDApproved += pctDIDOwned;
 
-    //  Record vote to prevent multiple voting
+    //  Record approval to prevent multiple voting
     _pr.voted[msg.sender] = true;
 
     uint256 threshold = distense.getParameterValueByTitle(distense.pctDIDRequiredToMergePullRequestTitle());
+    LogString('threshold');
+    LogUInt256(threshold);
     if (_pr.pctDIDApproved > threshold) {
-//      approvePullRequest(_pr.taskId, _prId, _pr.createdBy);
+      mergeAndRewardPullRequest(_pr.taskId, _prId, _pr.createdBy);
     }
 
     LogPullRequestApprovalVote(_prId, _pr.pctDIDApproved);
@@ -93,14 +95,16 @@ contract PullRequests is Approvable, Debuggable {
 
   }
 
-  function mergeAndRewardPullRequest(bytes32 _taskId, bytes32 _prId, address contributor) internal returns (bool) {
+  function mergeAndRewardPullRequest(bytes32 _taskId, bytes32 _prId, address _contributor) internal returns (bool) {
 
     LogMergeAndRewardPullRequest(_taskId, _prId);
 
     Tasks tasks = Tasks(TasksAddress);
     uint256 taskReward = tasks.getTaskReward(_taskId);
-    DIDToken didToken = DIDToken(DIDTokenAddress);
-    didToken.issueDID(contributor, taskReward);
+    assert(taskReward > 0);
+//    DIDToken didToken = DIDToken(DIDTokenAddress);
+//    didToken.issueDID(_contributor, taskReward);
+
     return true;
   }
 

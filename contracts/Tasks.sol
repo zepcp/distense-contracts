@@ -114,6 +114,7 @@ contract Tasks is Approvable {
   }
 
 
+//  TODO is this going to be manually called?
   function setTaskRewardPaid(bytes32 _taskId) public onlyApproved returns (bool) {
     tasks[_taskId].rewardPaid = true;
     return true;

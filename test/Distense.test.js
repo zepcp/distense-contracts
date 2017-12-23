@@ -5,7 +5,6 @@ const convertBytes32ToString = require('./helpers/utils')
 const assertJump = require('./helpers/assertJump')
 
 
-
 contract('Distense contract', function (accounts) {
   const proposalPctDIDToApproveParameter = {
     title: 'proposalPctDIDToApprove',
@@ -57,24 +56,8 @@ contract('Distense contract', function (accounts) {
   })
 
 
-  it('should correctly throw errors for proposalPctDIDApproval votes with values equal to the current value', async function () {
-    let equalValueError
-    const didToken = await DIDToken.new()
+  it('should reject parameter votes with values equal to the current value', async function () {
 
-    const distense = await Distense.new(didToken.address)
-    try {
-      await distense.voteOnParameter(
-        proposalPctDIDToApproveParameter.title,
-        proposalPctDIDToApproveParameter.value
-      )
-    } catch (error) {
-      equalValueError = error
-    }
-    assert.notEqual(equalValueError, undefined, 'Error must be thrown')
-  })
-
-
-  it('should correctly throw errors for pullRequestNumApprovalsParameter votes with values equal to the current value', async function () {
     let equalValueError
     const didToken = await DIDToken.new()
 
@@ -88,10 +71,23 @@ contract('Distense contract', function (accounts) {
       equalValueError = error
     }
     assert.notEqual(equalValueError, undefined, 'Error must be thrown')
+
+    let votingIntervalParameterError
+    try {
+      await distense.voteOnParameter(
+        votingIntervalParameter.title,
+        votingIntervalParameter.value
+      )
+    } catch (error) {
+      votingIntervalParameterError = error
+    }
+    assert.notEqual(votingIntervalParameterError, undefined, 'Error must be thrown')
+
+
   })
 
 
-  it('should disallow voting for those who don\'t own DID', async function () {
+  it(`should disallow voting for those who don't own DID`, async function () {
     let equalValueError
     try {
       await distense.voteOnParameter(pullRequestPctDIDParameter.title, 122, {
@@ -126,13 +122,14 @@ contract('Distense contract', function (accounts) {
 
       await distense.voteOnParameter(
         votingIntervalParameter.title,
-        votingIntervalParameter.value + 123
+        votingIntervalParameter.value + 1
       )
 
       await distense.voteOnParameter(
         votingIntervalParameter.title,
         votingIntervalParameter.value + 1
       )
+
 
     } catch (error) {
       contractError = error
@@ -148,4 +145,45 @@ contract('Distense contract', function (accounts) {
   })
 
 
+  it(`should allow voting after the votingInterval has passed`, async function () {
+
+    const userBalance = await didToken.balances.call(accounts[0])
+    assert.isAbove(userBalance, 0, 'user should have DID here to vote')
+
+    let contractError
+    try {
+
+
+      await distense.voteOnParameter(
+        votingIntervalParameter.title,
+        votingIntervalParameter.value + 123
+      )
+
+      // increaseTime(1)
+      await distense.voteOnParameter(
+        votingIntervalParameter.title,
+        votingIntervalParameter.value + 1
+      )
+
+    } catch (error) {
+      // assertJump(error)
+     contractError = error
+    }
+
+    assert.notEqual(
+      contractError,
+      undefined,
+      'should throw an error because the voter is trying to vote twice'
+    )
+
+  })
 })
+
+const increaseTime = addSeconds => {
+  web3.currentProvider.send({
+    jsonrpc: '2.0',
+    method: 'evm_increaseTime',
+    params: [addSeconds], id: 0
+  })
+}
+

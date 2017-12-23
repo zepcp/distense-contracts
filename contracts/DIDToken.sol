@@ -2,14 +2,12 @@ pragma solidity ^0.4.17;
 
 import './lib/Approvable.sol';
 import './lib/SafeMath.sol';
-import './lib/AddressUtils.sol';
 import './lib/Token.sol';
 import './Debuggable.sol';
 
 
 contract DIDToken is Token, Approvable, Debuggable {
 
-  using AddressUtils for address;
   using SafeMath for uint256;
 
   event LogIssueDID(address indexed to, uint256 numDID);
@@ -20,7 +18,7 @@ contract DIDToken is Token, Approvable, Debuggable {
   }
 
   function issueDID(address _recipient, uint256 _numDID) external onlyApproved returns (uint256) {
-    require(_recipient.isValid());
+    require(_recipient != address(0));
     require(_numDID > 0);
 
     totalSupply = totalSupply.add(_numDID);

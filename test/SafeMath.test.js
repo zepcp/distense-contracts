@@ -1,3 +1,4 @@
+
 const assertJump = function(error) {
   assert.isAbove(error.message.search('invalid opcode'), -1, 'Invalid opcode error must be returned');
 }
@@ -76,7 +77,7 @@ contract('SafeMath', function(accounts) {
     let subtract = await safeMath.subtract(a, b);
     let result = await safeMath.result();
 
-    assert.equal(result, a-b);
+    assert.equal(result, a - b);
   });
 
   it("should throw an error if subtraction result would be negative", async function () {

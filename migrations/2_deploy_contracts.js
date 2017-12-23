@@ -4,7 +4,6 @@ const PullRequests = artifacts.require('./PullRequests.sol')
 const Tasks = artifacts.require('./Tasks.sol')
 const SafeMath = artifacts.require('./SafeMath.sol')
 const SafeMathMock = artifacts.require('./SafeMathMock')
-// const mockData = require('./mockData')
 
 
 module.exports = deployer => {
@@ -27,7 +26,6 @@ module.exports = deployer => {
         const balance = await didToken.balances.call(web3.eth.accounts[0])
         console.log(`coinbase balance: ${balance}`)
       }
-      return
     })
     .then(() => {
       return deployer.deploy(Distense, DIDToken.address)

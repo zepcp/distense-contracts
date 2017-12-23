@@ -1,9 +1,7 @@
 pragma solidity ^0.4.15;
 
-import './AddressUtils.sol';
 
 contract Approvable {
-  using AddressUtils for address;
 
   mapping(address => bool) public approved;
 
@@ -12,12 +10,12 @@ contract Approvable {
   }
 
   function approve(address _address) external onlyApproved {
-    require(_address.isValid());
+    require(_address != address(0));
     approved[_address] = true;
   }
 
   function revokeApproval(address _address) external onlyApproved {
-    require(_address.isValid());
+    require(_address != address(0));
     approved[_address] = false;
   }
 

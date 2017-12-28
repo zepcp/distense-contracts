@@ -14,7 +14,7 @@ contract Distense {
     that defines a system or sets the conditions of its operation".
   */
 
-  //  Titles are what uniquely define parameters, so query by titles when iterating with client
+  //  Titles are what uniquely define parameters, so query by titles when iterating with clients
   bytes32[] public parameterTitles;
   struct Parameter {
     bytes32 title;
@@ -50,6 +50,9 @@ contract Distense {
 
   Parameter public minNumberOfTaskRewardVotersParameter;
   bytes32 public minNumberOfTaskRewardVotersParameterTitle = 'minNumberOfTaskRewardVoters';
+
+  Parameter public defaultRewardParameter;
+  bytes32 public defaultRewardParameterTitle = 'defaultReward';
 
 
   event LogParameterValueUpdate(bytes32 title, uint256 value);
@@ -129,10 +132,19 @@ contract Distense {
       title: numDIDRequiredToApproveVotePullRequestParameterTitle,
       //     Every hard-coded int in Solidity is a decimal to one decimal place
       //     So this is 200.0
-      value: 3000
+      value: 2000
     });
     parameters[numDIDRequiredToApproveVotePullRequestParameterTitle] = numDIDRequiredToApproveVotePullRequestParameter;
     parameterTitles.push(numDIDRequiredToApproveVotePullRequestParameterTitle);
+
+    defaultRewardParameter = Parameter({
+    title: defaultRewardParameterTitle,
+    //     Every hard-coded int in Solidity is a decimal to one decimal place
+    //     So this is 100.0
+    value: 1000
+    });
+    parameters[defaultRewardParameterTitle] = defaultRewardParameter;
+    parameterTitles.push(defaultRewardParameterTitle);
 
   }
 

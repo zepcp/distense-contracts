@@ -16,12 +16,14 @@ contract Tasks is Approvable, Debuggable {
 
   string[] public taskIds;
 
+  enum RewardStatus { Default, Tentative, Determined, Paid }
+
   struct Task {
     address createdBy;
     uint256 reward;
-    bool rewardPaid;
+    RewardStatus rewardStatus;
     uint256 pctDIDVoted;
-    Vote[] votes;
+    uint256 numVotes;
     mapping (address => bool) rewardVotes;
   }
 
@@ -34,7 +36,7 @@ contract Tasks is Approvable, Debuggable {
 
   event LogAddTask(string taskId);
   event LogRewardVote(string taskId, uint256 reward, uint256 pctDIDVoted);
-  event LogRewardDetermined(string taskId, uint256 sum);
+  event LogTaskRewardDetermined(string taskId, uint256 sum);
 
 
   function Tasks(address _DIDTokenAddress, address _DistenseAddress) public {
@@ -43,13 +45,13 @@ contract Tasks is Approvable, Debuggable {
   }
 
 
-  function addTask(string _taskId) public hasDID(msg.sender) returns (bool) {
+  function addTask(string _taskId) public hasEnoughDID(msg.sender, 10) returns (bool) {
     bytes memory bytesTaskId = bytes(_taskId);
     require(bytesTaskId.length > 0);
 
     tasks[_taskId].createdBy = msg.sender;
     tasks[_taskId].reward = 0;
-    tasks[_taskId].rewardPaid = false;
+    tasks[_taskId].rewardStatus = RewardStatus.Default;
 
     taskIds.push(_taskId);
     LogAddTask(_taskId);
@@ -58,12 +60,12 @@ contract Tasks is Approvable, Debuggable {
   }
 
 
-  function getTaskById(string _taskId) public view returns (address, uint256, bool, uint256) {
+  function getTaskById(string _taskId) public view returns (address, uint256, Tasks.RewardStatus, uint256) {
     return (
-      tasks[_taskId].createdBy,
-      tasks[_taskId].reward,
-      tasks[_taskId].rewardPaid,
-      tasks[_taskId].pctDIDVoted
+    tasks[_taskId].createdBy,
+    tasks[_taskId].reward,
+    tasks[_taskId].rewardStatus,
+    tasks[_taskId].pctDIDVoted
     );
   }
 
@@ -84,27 +86,38 @@ contract Tasks is Approvable, Debuggable {
     uint256 balance = didToken.balances(msg.sender);
     Distense distense = Distense(DistenseAddress);
 
+    uint256 pctDIDVotedThreshold = distense.getParameterValueByTitle(
+      distense.proposalPctDIDToApproveParameterTitle()
+    );
+
+    uint256 minNumVoters = distense.getParameterValueByTitle(
+      distense.minNumberOfTaskRewardVotersParameterTitle()
+    );
+
     //  Please excuse the following.
     //  The stack was too deep so using fewer local vars here instead of in modifiers
     //  These if checks are essentially modifiers:
     if (
 
-      //  This checks to see if enough DID owners haven't voted on this task.  If they have, let's continue and not allow this vote.
-      tasks[_taskId].pctDIDVoted >= distense.getParameterValueByTitle(distense.proposalPctDIDToApproveParameterTitle()) ||
+    tasks[_taskId].pctDIDVoted >= pctDIDVotedThreshold ||
 
-      //  Has the voter already voted on this task?
-      tasks[_taskId].rewardVotes[msg.sender] ||
+    tasks[_taskId].numVotes >= minNumVoters ||
+    //  This checks to see if enough DID owners haven't voted on this task.  If they have, let's continue and not allow this vote.
+    tasks[_taskId].pctDIDVoted >= distense.getParameterValueByTitle(distense.proposalPctDIDToApproveParameterTitle()) ||
 
-      //  Does the voter own at least as many DID as the reward their voting for?
-      //  This ensures new contributors don't have too much sway over the issuance of new DID.
-      balance < distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle()) ||
+    //  Has the voter already voted on this task?
+    tasks[_taskId].rewardVotes[msg.sender] ||
 
-      //  Don't let the voter vote for 0 reward which will have no effect on the reward and will cost the gas
-      _reward < 1 ||
+    //  Does the voter own at least as many DID as the reward their voting for?
+    //  This ensures new contributors don't have too much sway over the issuance of new DID.
+    balance < distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle()) ||
 
-      //  Require the reward to be less than or equal to the maximum reward parameter,
-      //  which basically is a hard, floating limit on the number of DID that can be issued for any single task
-      _reward >= distense.getParameterValueByTitle(distense.maxRewardParameterTitle())
+    //  Don't let the voter vote for 0 reward which will have no effect on the reward and will cost the gas
+    _reward < 1 ||
+
+    //  Require the reward to be less than or equal to the maximum reward parameter,
+    //  which basically is a hard, floating limit on the number of DID that can be issued for any single task
+    _reward >= distense.getParameterValueByTitle(distense.maxRewardParameterTitle())
 
     ) return false;
 
@@ -113,26 +126,17 @@ contract Tasks is Approvable, Debuggable {
     uint256 pctDIDOwned = didToken.pctDIDOwned(msg.sender);
     tasks[_taskId].pctDIDVoted = tasks[_taskId].pctDIDVoted + pctDIDOwned;
 
-    Vote memory vote = Vote(
-      _reward,
-      msg.sender
-    );
-    tasks[_taskId].votes.push(vote);
-
-    uint256 threshold = distense.getParameterValueByTitle(
-      distense.proposalPctDIDToApproveParameterTitle()
-    );
-
     LogRewardVote(_taskId, _reward, tasks[_taskId].pctDIDVoted);
 
-    if (tasks[_taskId].pctDIDVoted > threshold || tasks[_taskId].votes.length >= 6) {
-//      LogString('determineReward');
-      determineReward(_taskId);
-    }
+    tasks[_taskId].rewardStatus = RewardStatus.Tentative;
+    tasks[_taskId].numVotes += 1;
+
+    if (tasks[_taskId].pctDIDVoted > pctDIDVotedThreshold || tasks[_taskId].numVotes > minNumVoters)
+      tasks[_taskId].rewardStatus = RewardStatus.Determined;
 
     return true;
 
-}
+  }
 
 
   function getTaskReward(string _taskId) public view returns (uint256) {
@@ -140,49 +144,17 @@ contract Tasks is Approvable, Debuggable {
   }
 
 
-//  TODO is this going to be manually called?
+  //  TODO is this going to be manually called?
   function setTaskRewardPaid(string _taskId) public onlyApproved returns (bool) {
-    tasks[_taskId].rewardPaid = true;
+    tasks[_taskId].rewardStatus = RewardStatus.Paid;
     return true;
   }
 
 
-  //  TODO figure out visbility here; adding internal causes "invalid number of arguments to Solidity function"
-  function determineReward(string _taskId) public /*onlyApproved */returns (uint256) {
-
-    Task storage task = tasks[_taskId];
-
-    if (task.votes.length == 1) return task.votes[0].vote;
-
-    Vote[] memory votes = task.votes;
-
-    Distense distense = Distense(DistenseAddress);
-    uint256 minNumberVoters = distense.getParameterValueByTitle(distense.minNumberOfTaskRewardVotersParameterTitle()) / 10;
-
-    uint256 weight;
-    uint256 taskReward = 0;
-    DIDToken didToken = DIDToken(DIDTokenAddress);
-
-    for (uint8 i; i <= 4; i++) {
-      uint256 balance = didToken.balances(votes[i].voter);
-      uint256 votersPctOfDIDVoted = balance / (tasks[_taskId].pctDIDVoted * didToken.totalSupply()) / 100;
-      uint256 wtdReward = (votes[i].vote * votersPctOfDIDVoted) / 100;
-      taskReward += wtdReward;
-    }
-
-    task.reward = taskReward;
-    LogUInt256(taskReward);
-    LogRewardDetermined(_taskId, taskReward);
-
-    return 123;
-//    return task.reward;
-  }
-
-
-  modifier hasDID(address voter) {
+  modifier hasEnoughDID(address voter, uint256 num) {
     DIDToken didToken = DIDToken(DIDTokenAddress);
     uint256 balance = didToken.balances(msg.sender);
-    require(balance > 0);
+    require(balance > num);
     _;
   }
 

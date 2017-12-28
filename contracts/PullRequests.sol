@@ -26,8 +26,8 @@ contract PullRequests is Approvable, Debuggable {
   mapping (string => PullRequest) pullRequests;
 
   event LogInt(uint256 someInt);
-  event LogMergeAndRewardPullRequest(string _prId, string indexed taskId);
-  event LogPullRequestApprovalVote(string indexed _prId, uint256 pctDIDApproved);
+  event LogMergeAndRewardPullRequest(string _prId, string taskId);
+  event LogPullRequestApprovalVote(string  _prId, uint256 pctDIDApproved);
 
 
   function PullRequests(address _DIDTokenAddress, address _DistenseAddress, address _TasksAddress) public {
@@ -69,7 +69,7 @@ contract PullRequests is Approvable, Debuggable {
     DIDToken didToken = DIDToken(DIDTokenAddress);
     uint256 didOwned = didToken.balances(msg.sender);
 
-    bytes32 title = distense.numDIDRequiredToApproveVotePullRequestTitle();
+    bytes32 title = distense.numDIDRequiredToApproveVotePullRequestParameterTitle();
     uint256 numDIDRequiredToApproveVotePullRequest = distense.getParameterValueByTitle(title);
     require(didOwned >= numDIDRequiredToApproveVotePullRequest);
 
@@ -83,8 +83,6 @@ contract PullRequests is Approvable, Debuggable {
     _pr.voted[msg.sender] = true;
 
     uint256 threshold = distense.getParameterValueByTitle(distense.pctDIDRequiredToMergePullRequestTitle());
-    LogString('threshold');
-    LogUInt256(threshold);
     if (_pr.pctDIDApproved > threshold) {
       mergeAndRewardPullRequest(_pr.taskId, _prId, _pr.createdBy);
     }

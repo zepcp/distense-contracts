@@ -27,16 +27,14 @@ contract Distense {
     uint256 lastVoted;
   }
 
+
   mapping (bytes32 => Parameter) public parameters;
 
   Parameter public proposalPctDIDToApproveParameter;
   bytes32 public proposalPctDIDToApproveParameterTitle = 'proposalPctDIDToApprove';
 
-
   Parameter public pctDIDRequiredToMergePullRequest;
   bytes32 public pctDIDRequiredToMergePullRequestTitle = 'pctDIDRequiredToMergePullRequest';
-
-//  uint256 public votingInterval;  // Period of time between when voters can update these Distense parameters
 
   Parameter public votingIntervalParameter;
   bytes32 public votingIntervalParameterTitle = 'votingInterval';
@@ -44,9 +42,14 @@ contract Distense {
   Parameter public maxRewardParameter;
   bytes32 public maxRewardParameterTitle = 'maxReward';
 
-//    TODO probably improve name of this one
-  Parameter public numDIDRequiredToApproveVotePullRequest;
-  bytes32 public numDIDRequiredToApproveVotePullRequestTitle = 'numDIDReqApproveVotePullRequest';
+  Parameter public numDIDRequiredToApproveVotePullRequestParameter;
+  bytes32 public numDIDRequiredToApproveVotePullRequestParameterTitle = 'numDIDReqApproveVotePullRequest';
+
+  Parameter public numDIDRequiredToTaskRewardVoteParameter;
+  bytes32 public numDIDRequiredToTaskRewardVoteParameterTitle = 'numDIDRequiredToTaskRewardVote';
+
+  Parameter public minNumberOfTaskRewardVotersParameter;
+  bytes32 public minNumberOfTaskRewardVotersParameterTitle = 'minNumberOfTaskRewardVoters';
 
 
   event LogParameterValueUpdate(bytes32 title, uint256 value);
@@ -98,6 +101,15 @@ contract Distense {
     parameterTitles.push(maxRewardParameterTitle);
 
 
+    minNumberOfTaskRewardVotersParameter = Parameter({
+      title: minNumberOfTaskRewardVotersParameterTitle,
+      //     Every hard-coded int in Solidity is a decimal to one decimal place
+      //     So this is 5.0
+      value: 50
+    });
+    parameters[minNumberOfTaskRewardVotersParameterTitle] = minNumberOfTaskRewardVotersParameter;
+    parameterTitles.push(minNumberOfTaskRewardVotersParameterTitle);
+
     // This parameter is the number of DID an account must own to vote on a task's reward
     // The task reward is the number of DID payable upon successful completion and approval of a task
 
@@ -105,22 +117,22 @@ contract Distense {
     //   as looping through voters to determineReward()s is gas-expensive.
 
     // This parameter also limits attacks by noobs that want to mess with Distense.
-    numDIDRequiredToTaskRewardVote = Parameter({
-      title: numDIDRequiredToTaskRewardVoteTitle,
+    numDIDRequiredToTaskRewardVoteParameter = Parameter({
+      title: numDIDRequiredToTaskRewardVoteParameterTitle,
       value: 1500 // 150 -> Every hard-coded int in Solidity is a decimal to one decimal place
     });
-    parameters[numDIDRequiredToApproveVotePullRequestTitle] = numDIDRequiredToApproveVotePullRequest;
-    parameterTitles.push(numDIDRequiredToApproveVotePullRequestTitle);
+    parameters[numDIDRequiredToTaskRewardVoteParameterTitle] = numDIDRequiredToTaskRewardVoteParameter;
+    parameterTitles.push(numDIDRequiredToTaskRewardVoteParameterTitle);
 
 
-    numDIDRequiredToApproveVotePullRequest = Parameter({
-      title: numDIDRequiredToApproveVotePullRequestTitle,
+    numDIDRequiredToApproveVotePullRequestParameter = Parameter({
+      title: numDIDRequiredToApproveVotePullRequestParameterTitle,
       //     Every hard-coded int in Solidity is a decimal to one decimal place
       //     So this is 200.0
-      value: 2000
+      value: 3000
     });
-    parameters[numDIDRequiredToApproveVotePullRequestTitle] = numDIDRequiredToApproveVotePullRequest;
-    parameterTitles.push(numDIDRequiredToApproveVotePullRequestTitle);
+    parameters[numDIDRequiredToApproveVotePullRequestParameterTitle] = numDIDRequiredToApproveVotePullRequestParameter;
+    parameterTitles.push(numDIDRequiredToApproveVotePullRequestParameterTitle);
 
   }
 

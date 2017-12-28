@@ -6,6 +6,14 @@ const assertJump = require('./helpers/assertJump')
 const proposalPctDIDRequiredValue = require('./Distense.test')
 
 
+const convertIntToSolidityInt = function (integer) {
+  return integer * 10
+}
+
+const convertSolidityIntToInt = function (integer) {
+  return integer / 10
+}
+
 contract('Tasks', function (accounts) {
 
   beforeEach(async function () {
@@ -320,20 +328,25 @@ contract('Tasks', function (accounts) {
 
     await tasks.addTask(taskTwo.taskId)
 
-    await tasks.taskRewardVote(taskTwo.taskId, 100, {
+    testTask = await tasks.getTaskById.call(taskTwo.taskId)
+    assert.equal(testTask[1].toNumber(), convertIntToSolidityInt(100), 'task reward should now be here')
+
+
+    await tasks.taskRewardVote(taskTwo.taskId, convertIntToSolidityInt(100), {
       from: accounts[2]
     })
+    testTask = await tasks.getTaskById.call(taskTwo.taskId)
+    assert.equal(testTask[1].toNumber(), convertIntToSolidityInt(100), 'task reward should still be 100 because that\'s equal to the default vote')
 
-    await tasks.taskRewardVote(taskTwo.taskId, 200, {
+
+    await tasks.taskRewardVote(taskTwo.taskId, convertSolidityIntToInt(200), {
       from: accounts[3]
     })
 
-    await tasks.taskRewardVote(taskTwo.taskId, 300, {
-      from: accounts[4]
-    })
-
     testTask = await tasks.getTaskById.call(taskTwo.taskId)
-    assert.equal(testTask[1].toNumber(), 2000, 'task reward should now be here')
+    assert.equal(testTask[1].toNumber(), convertIntToSolidityInt(120), 'task reward should now be 120')
+    // assert.equal(testTask[2].toNumber(), convertIntToSolidityInt(3), 'Reward status should be determined since enough DID have voted')
+    // assert.equal(testTask[3].toNumber(), convertIntToSolidityInt(40), '40% have voted')
 
   })
 

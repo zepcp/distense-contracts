@@ -105,6 +105,9 @@ contract Tasks is Approvable, Debuggable {
     //  These if checks are essentially modifiers:
     if (
 
+    // Restrict voting if enough DID or voters have voted
+      task.reward == _reward ||
+
       // Restrict voting if enough DID or voters have voted
       task.pctDIDVoted >= pctDIDVotedThreshold ||
 

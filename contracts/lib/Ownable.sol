@@ -14,8 +14,4 @@ contract Ownable {
     _;
   }
 
-  function transferOwnership(address _newOwner) external onlyOwner {
-    require(_newOwner != address(0));
-    owner = _newOwner;
-  }
 }

@@ -55,50 +55,69 @@ contract Distense {
   function Distense(address _DIDTokenAddress) public {
 
     DIDTokenAddress = _DIDTokenAddress;
-    // Launch Distense with some votable parameters that can be later updated by contributors
+
+    // Launch Distense with some votable parameters
+    // that can be later updated by contributors
+
+    // PCT of DID that must vote on a proposal for it to be approved and payable
     proposalPctDIDToApproveParameter = Parameter({
-    title: proposalPctDIDToApproveParameterTitle,
-    //     Every hard-coded int in Solidity is a decimal to one decimal place
-    //     So this is 25.0
-    value: 250
+      title: proposalPctDIDToApproveParameterTitle,
+      //     Every hard-coded int in Solidity is a decimal to one decimal place
+      //     So this is 25.0
+      value: 250
     });
     parameters[proposalPctDIDToApproveParameterTitle] = proposalPctDIDToApproveParameter;
     parameterTitles.push(proposalPctDIDToApproveParameterTitle);
 
 
     pctDIDRequiredToMergePullRequest = Parameter({
-    title: pctDIDRequiredToMergePullRequestTitle,
-    //     Every hard-coded int in Solidity is a decimal to one decimal place
-    //     So this is 10.0
-    value: 100
+      title: pctDIDRequiredToMergePullRequestTitle,
+      //     Every hard-coded int in Solidity is a decimal to one decimal place
+      //     So this is 10.0
+      value: 100
     });
     parameters[pctDIDRequiredToMergePullRequestTitle] = pctDIDRequiredToMergePullRequest;
     parameterTitles.push(pctDIDRequiredToMergePullRequestTitle);
 
 
     votingIntervalParameter = Parameter({
-    title: votingIntervalParameterTitle,
-    value: 15 days  // 15 * 86400 = 1.296e+6
+      title: votingIntervalParameterTitle,
+      value: 15 days  // 15 * 86400 = 1.296e+6
     });
     parameters[votingIntervalParameterTitle] = votingIntervalParameter;
     parameterTitles.push(votingIntervalParameterTitle);
 
 
     maxRewardParameter = Parameter({
-    title: maxRewardParameterTitle,
-    //     Every hard-coded int in Solidity is a decimal to one decimal place
-    //     So this is 100.0
-    value: 1000
+      title: maxRewardParameterTitle,
+      //     Every hard-coded int in Solidity is a decimal to one decimal place
+      //     So this is 100.0
+      value: 1000
     });
     parameters[maxRewardParameterTitle] = maxRewardParameter;
     parameterTitles.push(maxRewardParameterTitle);
 
 
+    // This parameter is the number of DID an account must own to vote on a task's reward
+    // The task reward is the number of DID payable upon successful completion and approval of a task
+
+    // This parameter mostly exists to get the percentage of DID that have voted higher per voter
+    //   as looping through voters to determineReward()s is gas-expensive.
+
+    // This parameter also limits attacks by noobs that want to mess with Distense.
+    numDIDRequiredToTaskRewardVote = Parameter({
+      title: numDIDRequiredToTaskRewardVoteTitle,
+      value: 1500 // 150 -> Every hard-coded int in Solidity is a decimal to one decimal place
+    });
+    parameters[numDIDRequiredToApproveVotePullRequestTitle] = numDIDRequiredToApproveVotePullRequest;
+    parameterTitles.push(numDIDRequiredToApproveVotePullRequestTitle);
+
+
     numDIDRequiredToApproveVotePullRequest = Parameter({
-    title: numDIDRequiredToApproveVotePullRequestTitle,
-    //     Every hard-coded int in Solidity is a decimal to one decimal place
-    //     So this is 200.0
-    value: 2000
+      title: numDIDRequiredToApproveVotePullRequestTitle,
+      //     Every hard-coded int in Solidity is a decimal to one decimal place
+      //     So this is 200.0
+      value: 2000
     });
     parameters[numDIDRequiredToApproveVotePullRequestTitle] = numDIDRequiredToApproveVotePullRequest;
     parameterTitles.push(numDIDRequiredToApproveVotePullRequestTitle);
@@ -111,9 +130,9 @@ contract Distense {
   }
 
 
-  function voteOnParameter(bytes32 _title, uint256 _voteValue )
+  function voteOnParameter(bytes32 _title, uint256 _voteValue)
   public
-  voteWithinRange(_title, _voteValue )
+  voteWithinRange(_title, _voteValue)
   votingIntervalReached(msg.sender, _title)
   returns
   (uint256) {

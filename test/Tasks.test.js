@@ -332,8 +332,8 @@ contract('Tasks', function (accounts) {
       from: accounts[4]
     })
 
-    // testTask = await tasks.getTaskById.call(taskTwo.taskId)
-    // assert.equal(testTask[1].toNumber(), 2000, 'task reward should now be here')
+    testTask = await tasks.getTaskById.call(taskTwo.taskId)
+    assert.equal(testTask[1].toNumber(), 2000, 'task reward should now be here')
 
   })
 

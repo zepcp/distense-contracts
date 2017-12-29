@@ -216,7 +216,7 @@ contract('Tasks', function (accounts) {
 
     let LogAddTaskEventListener = tasks.LogAddTask()
 
-    await didToken.issueDID(accounts[0], 1)
+    await didToken.issueDID(accounts[0], 90)
 
     await tasks.addTask(task.taskId)
 

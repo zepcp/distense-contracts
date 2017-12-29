@@ -78,7 +78,7 @@ contract('Tasks', function (accounts) {
   })
 
 
-  it.only('should return true or otherwise modify the task with taskRewardVote() when the voter hasDID', async function () {
+  it('should return true or otherwise modify the task with taskRewardVote() when the voter hasDID', async function () {
 
     await didToken.issueDID(accounts[0], convertIntToSolidityInt(1000))
     await didToken.issueDID(accounts[1], convertIntToSolidityInt(1000))
@@ -119,62 +119,64 @@ contract('Tasks', function (accounts) {
   })
 
 
-  it('should return false when someone tries to vote on a task for for a reward that is greater than the number of DID they own', async function () {
+  it('should throw when someone tries to vote on a task for for a reward that is greater than the number of DID they own', async function () {
 
-    const maxRewardParameterTitle = await distense.maxRewardParameterTitle.call()
-    const maxDIDRewardValue = await distense.getParameterValueByTitle.call(maxRewardParameterTitle)
+    let anError
+    try {
+      const maxRewardParameterTitle = await distense.maxRewardParameterTitle.call()
+      const maxDIDRewardValue = await distense.getParameterValueByTitle.call(maxRewardParameterTitle)
 
-    const didOwnedByVoter = 50
-    await didToken.issueDID(accounts[0], didOwnedByVoter)
+      const didOwnedByVoter = 50
+      await didToken.issueDID(accounts[0], didOwnedByVoter)
 
-    assert.isBelow(didOwnedByVoter, maxDIDRewardValue, 'Make sure voter will not accidentally trip a the higher than maxDIDReward parameter value')
+      assert.isBelow(didOwnedByVoter, maxDIDRewardValue, 'Make sure voter will not accidentally trip a the higher than maxDIDReward parameter value')
 
-    await tasks.addTask(task.taskId)
-    const taskExists = await tasks.taskExists(task.taskId)
-    assert.equal(taskExists, true, 'task should exist')
+      await tasks.addTask(task.taskId)
+      const taskExists = await tasks.taskExists(task.taskId)
+      assert.equal(taskExists, true, 'task should exist')
 
-    //  Voter is voting for more than the DID they have
-    let voted = await tasks.taskRewardVote.call(task.taskId, didOwnedByVoter + 1, {
-      from: accounts[0]
-    })
-    assert.equal(voted, false, `Reject votes for rewards greater than the number of DID someone owns`)
+      //  Voter is voting for more than the DID they have
+      let voted = await tasks.taskRewardVote.call(task.taskId, didOwnedByVoter + 1, {
+        from: accounts[0]
+      })
+      assert.equal(voted, false, `Reject votes for rewards greater than the number of DID someone owns`)
 
-    // Voter is now voting for how much DID they own minus 1
-    voted = await tasks.taskRewardVote.call(task.taskId, didOwnedByVoter - 1, {
-      from: accounts[0]
-    })
-    assert.equal(voted, true, `Accept votes for rewards less than the number of DID someone owns`)
+      // Voter is now voting for how much DID they own minus 1
+      voted = await tasks.taskRewardVote.call(task.taskId, didOwnedByVoter - 1, {
+        from: accounts[0]
+      })
+      assert.equal(voted, true, `Accept votes for rewards less than the number of DID someone owns`)
+    } catch (error) {
+      anError = error
+    }
+
+    assert.notEqual(anError, undefined, 'error should have been thrown here')
 
   })
 
 
   it('should prevent votes over the maxRewardParameter value of maximum DID per task reward', async function () {
 
-    const maxRewardParameterTitle = await distense.maxRewardParameterTitle.call()
-    const maxDIDRewardValue = await distense.getParameterValueByTitle.call(maxRewardParameterTitle)
+    let anError
+    try {
 
-    const votersNumDID = maxDIDRewardValue + 1  // Voter now owns at least as much DID as the max reward parameter
+      const maxRewardParameterTitle = await distense.maxRewardParameterTitle.call()
+      assert.isAbove(maxRewardParameterTitle, 0, 'ensure sanity')
+      const maxDIDRewardValue = await distense.getParameterValueByTitle.call(maxRewardParameterTitle)
+      await didToken.issueDID(accounts[0], 10000)
 
-    await didToken.issueDID(accounts[0], 10000000)
+      await tasks.addTask(task.taskId)
+      const taskExists = await tasks.taskExists(task.taskId)
+      assert.equal(taskExists, true, 'task should exist')
 
+      voted = await tasks.taskRewardVote.call(task.taskId, maxDIDRewardValue + 1, {
+        from: accounts[0]
+      })
+    } catch (error) {
+      anError = error
+    }
 
-    await tasks.addTask(task.taskId)
-    const taskExists = await tasks.taskExists(task.taskId)
-    assert.equal(taskExists, true, 'task should exist')
-
-    //  Voter only has 100 and 101 is more than 100, so... this should fail
-    let voted = await tasks.taskRewardVote.call(task.taskId, maxDIDRewardValue + 1, {
-      from: accounts[0]
-    })
-
-    assert.equal(voted, false, `taskRewardVote should return false when user votes over maxRewardParameter`)
-
-    voted = await tasks.taskRewardVote.call(task.taskId, /*maxDIDRewardValue - */1, {
-      from: accounts[0]
-    })
-
-    assert.equal(voted, true, `Voter voted for less than the maxDIDRewardValue so true`)
-
+    assert.notEqual(anError, undefined, 'voting over the maxDIDRewardValue should throw')
   })
 
 
@@ -232,22 +234,18 @@ contract('Tasks', function (accounts) {
 
   it('should increase the pctDIDVoted on a task correctly', async function () {
 
-    const maxDIDRewardValue = await distense.getParameterValueByTitle.call(
-      await distense.maxRewardParameterTitle.call()
-    )
+    await didToken.issueDID(accounts[0], 90000)
+    await didToken.issueDID(accounts[1], 60000)
 
-    await didToken.issueDID(accounts[0], 9000)
-    await didToken.issueDID(accounts[1], 1000)
+    await tasks.addTask(taskTwo.taskId)
 
-    await tasks.addTask(task.taskId)
-
-    await tasks.taskRewardVote(task.taskId, 1, {
+    await tasks.taskRewardVote(taskTwo.taskId, 90, {
       from: accounts[1]
     })
 
-    const testTask = await tasks.getTaskById.call(task.taskId)
+    const testTask = await tasks.getTaskById.call(taskTwo.taskId)
 
-    assert.equal(testTask[3].toNumber(), 100, `sadf`)
+    assert.equal(testTask[3].toNumber(), convertIntToSolidityInt(40), `pctDIDVoted should be ...`)
 
   })
 

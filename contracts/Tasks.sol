@@ -27,11 +27,6 @@ contract Tasks is Approvable, Debuggable {
     mapping (address => bool) rewardVotes;
   }
 
-  struct Vote {
-    uint256 vote;
-    address voter;
-  }
-
   mapping (string => Task) tasks;
 
   event LogAddTask(string taskId);
@@ -124,6 +119,9 @@ contract Tasks is Approvable, Debuggable {
 
     uint256 pctDIDOwned = didToken.pctDIDOwned(msg.sender);
     task.pctDIDVoted = task.pctDIDVoted + pctDIDOwned;
+
+    LogString('task.pctDIDVoted');
+    LogUInt256(task.pctDIDVoted);
 
     uint256 update = _reward == 0 ? pctDIDOwned : (_reward * pctDIDOwned) / 100;
 

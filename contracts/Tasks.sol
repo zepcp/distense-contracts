@@ -35,8 +35,8 @@ contract Tasks is Approvable, Debuggable {
   mapping (string => Task) tasks;
 
   event LogAddTask(string taskId);
-  event LogRewardVote(string taskId, uint256 reward, uint256 pctDIDVoted);
-  event LogTaskRewardDetermined(string taskId, uint256 sum);
+  event LogTaskRewardVote(string taskId, uint256 reward, uint256 pctDIDVoted);
+  event LogTaskRewardDetermined(string taskId, uint256 reward);
 
 
   function Tasks(address _DIDTokenAddress, address _DistenseAddress) public {
@@ -100,63 +100,52 @@ contract Tasks is Approvable, Debuggable {
 
     Task storage task = tasks[_taskId];
 
-    //  Please excuse the following.
-    //  The stack was too deep so using fewer local vars here instead of in modifiers
-    //  These if checks are essentially modifiers:
-    if (
+    require(_reward >= 0);
+
+    //  Essentially refund the remaining gas if user's vote will have no effect
+    require(task.reward != _reward);
+    require(task.pctDIDVoted < pctDIDVotedThreshold);
 
     // Restrict voting if enough DID or voters have voted
-      task.reward == _reward ||
+    require(task.numVotes < minNumVoters);
 
-      // Restrict voting if enough DID or voters have voted
-      task.pctDIDVoted >= pctDIDVotedThreshold ||
+    //  Has the voter already voted on this task?
+    require(!task.rewardVotes[msg.sender]);
 
-      // Restrict voting if enough DID or voters have voted
-      task.numVotes >= minNumVoters ||
+    //  Does the voter own at least as many DID as the reward their voting for?
+    //  This ensures new contributors don't have too much sway over the issuance of new DID.
+    require(balance > distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle()));
 
-      //  Has the voter already voted on this task?
-      task.rewardVotes[msg.sender] ||
-
-      //  Does the voter own at least as many DID as the reward their voting for?
-      //  This ensures new contributors don't have too much sway over the issuance of new DID.
-      balance < distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle()) ||
-
-      //  Don't let the voter vote for 0 reward which will have no effect on the reward and will cost the gas
-      _reward < 1 ||
-
-      //  Require the reward to be less than or equal to the maximum reward parameter,
-      //  which basically is a hard, floating limit on the number of DID that can be issued for any single task
-      _reward >= distense.getParameterValueByTitle(distense.maxRewardParameterTitle())
-
-    ) return false;
+    //  Require the reward to be less than or equal to the maximum reward parameter,
+    //  which basically is a hard, floating limit on the number of DID that can be issued for any single task
+    require(_reward <= distense.getParameterValueByTitle(distense.maxRewardParameterTitle()));
 
     task.rewardVotes[msg.sender] = true;
 
     uint256 pctDIDOwned = didToken.pctDIDOwned(msg.sender);
     task.pctDIDVoted = task.pctDIDVoted + pctDIDOwned;
 
-    uint256 updateFactor = (_reward * SafeMath.percent(
-      didToken.balances(msg.sender),
-      didToken.totalSupply(),
-      3
-    )) / 100;
+    uint256 update = _reward == 0 ? pctDIDOwned : (_reward * pctDIDOwned) / 100;
+
     if (_reward > task.reward) {
-      task.reward += updateFactor;
+      task.reward += update;
     } else {
-      task.reward -= updateFactor;
+      task.reward -= update;
     }
 
     LogString('updatedReward');
     LogUInt256(task.reward);
 
-    LogRewardVote(_taskId, _reward, task.pctDIDVoted);
+    LogTaskRewardVote(_taskId, _reward, task.pctDIDVoted);
 
-    if (task.rewardStatus != RewardStatus.Default)
+    if (task.rewardStatus == RewardStatus.Default)
       task.rewardStatus = RewardStatus.Tentative;
     task.numVotes += 1;
 
-    if (task.pctDIDVoted > pctDIDVotedThreshold || task.numVotes > minNumVoters)
+    if (task.pctDIDVoted > pctDIDVotedThreshold || task.numVotes > minNumVoters) {
+      LogTaskRewardDetermined(_taskId, task.reward);
       task.rewardStatus = RewardStatus.Determined;
+    }
 
     return true;
 

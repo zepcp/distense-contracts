@@ -6,6 +6,7 @@ const assertJump = require('./helpers/assertJump')
 
 
 contract('Distense contract', function (accounts) {
+
   const proposalPctDIDToApproveParameter = {
     title: 'proposalPctDIDToApprove',
     value: 250 // Hard coded in constructor function in contract
@@ -23,17 +24,28 @@ contract('Distense contract', function (accounts) {
     value: 1296000 // Equal to 15 days in Solidity
   }
 
+  const numDIDRequiredToRewardVoteTask = {
+    title: 'votingInterval',
+    value: 150 // Equal to 15 days in Solidity
+  }
+
+  const numDIDRequiredToApproveVotePullRequest = {
+    title: 'votingInterval',
+    value: 300 // Equal to 15 days in Solidity
+  }
+
 
   it('should set the initial attributes correctly', async function () {
+
     let param = await distense.getParameterByTitle(
       pullRequestPctDIDParameter.title
     )
-
     assert.equal(
       convertBytes32ToString(param[0]),
       pullRequestPctDIDParameter.title
     )
     assert.equal(param[1].toNumber(), pullRequestPctDIDParameter.value)
+
   })
 
 
@@ -52,7 +64,7 @@ contract('Distense contract', function (accounts) {
 
   it('should set the initial attributes correctly', async function () {
     const numParameters = await distense.getNumParameters.call()
-    assert.equal(numParameters.toNumber(), 5)
+    assert.equal(numParameters.toNumber(), 8)
   })
 
 

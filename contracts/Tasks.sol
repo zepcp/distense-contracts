@@ -13,6 +13,7 @@ contract Tasks is Approvable, Debuggable {
 
   address public DIDTokenAddress;
   address public DistenseAddress;
+  address public PullRequestsAddress;
 
   string[] public taskIds;
 
@@ -20,10 +21,15 @@ contract Tasks is Approvable, Debuggable {
 
   struct Task {
     address createdBy;
+    uint256 created;
     uint256 reward;
     RewardStatus rewardStatus;
     uint256 pctDIDVoted;
-    uint256 numVotes;
+    uint64 numVotes;
+    string title;
+    bytes16 issueNum;
+    bytes16 repo;
+    string tagsString;
     mapping (address => bool) rewardVotes;
   }
 
@@ -33,21 +39,27 @@ contract Tasks is Approvable, Debuggable {
   event LogTaskRewardVote(string taskId, uint256 reward, uint256 pctDIDVoted);
   event LogTaskRewardDetermined(string taskId, uint256 reward);
 
-
   function Tasks(address _DIDTokenAddress, address _DistenseAddress) public {
     DIDTokenAddress = _DIDTokenAddress;
     DistenseAddress = _DistenseAddress;
   }
 
 
-  function addTask(string _taskId) public hasEnoughDID(msg.sender, 10) returns (bool) {
+  function addTask(string _taskId, string _title, string _tagsString, bytes16 _issueNum, bytes16 _repo) public hasEnoughDID(msg.sender, 50) returns
+  (bool) {
+
     bytes memory bytesTaskId = bytes(_taskId);
     require(bytesTaskId.length > 0);
 
     Distense distense = Distense(DistenseAddress);
     tasks[_taskId].createdBy = msg.sender;
+    tasks[_taskId].created = now;
     tasks[_taskId].reward = distense.getParameterValueByTitle(distense.defaultRewardParameterTitle());
     tasks[_taskId].rewardStatus = RewardStatus.Default;
+    tasks[_taskId].title = _title;
+    tasks[_taskId].issueNum = _issueNum;
+    tasks[_taskId].repo = _repo;
+    tasks[_taskId].tagsString = _tagsString;
 
     taskIds.push(_taskId);
     LogAddTask(_taskId);
@@ -57,13 +69,31 @@ contract Tasks is Approvable, Debuggable {
   }
 
 
-  function getTaskById(string _taskId) public view returns (address, uint256, Tasks.RewardStatus, uint256) {
+  function getTaskById(string _taskId) public view returns (
+    address,
+    uint256,
+    uint256,
+    Tasks.RewardStatus,
+    uint256,
+    uint64,
+    string,
+    bytes16,
+    bytes16,
+    string
+  ) {
 
+    Task memory task = tasks[_taskId];
     return (
-      tasks[_taskId].createdBy,
-      tasks[_taskId].reward,
-      tasks[_taskId].rewardStatus,
-      tasks[_taskId].pctDIDVoted
+      task.createdBy,
+      task.created,
+      task.reward,
+      task.rewardStatus,
+      task.pctDIDVoted,
+      task.numVotes,
+      task.title,
+      task.issueNum,
+      task.repo,
+      task.tagsString
     );
 
   }
@@ -99,6 +129,7 @@ contract Tasks is Approvable, Debuggable {
 
     //  Essentially refund the remaining gas if user's vote will have no effect
     require(task.reward != _reward);
+
     require(task.pctDIDVoted < pctDIDVotedThreshold);
 
     // Restrict voting if enough DID or voters have voted
@@ -120,9 +151,6 @@ contract Tasks is Approvable, Debuggable {
     uint256 pctDIDOwned = didToken.pctDIDOwned(msg.sender);
     task.pctDIDVoted = task.pctDIDVoted + pctDIDOwned;
 
-    LogString('task.pctDIDVoted');
-    LogUInt256(task.pctDIDVoted);
-
     uint256 update = _reward == 0 ? pctDIDOwned : (_reward * pctDIDOwned) / 100;
 
     if (_reward > task.reward) {
@@ -130,9 +158,6 @@ contract Tasks is Approvable, Debuggable {
     } else {
       task.reward -= update;
     }
-
-    LogString('updatedReward');
-    LogUInt256(task.reward);
 
     LogTaskRewardVote(_taskId, _reward, task.pctDIDVoted);
 
@@ -155,7 +180,6 @@ contract Tasks is Approvable, Debuggable {
   }
 
 
-  //  TODO is this going to be manually called?
   function setTaskRewardPaid(string _taskId) public onlyApproved returns (bool) {
     tasks[_taskId].rewardStatus = RewardStatus.Paid;
     return true;

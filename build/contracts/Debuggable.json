@@ -80,18 +80,18 @@
       "type": "event"
     }
   ],
-  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a72305820696993917aa0821d6370c6789fffbd076ad07eaa6675a3a8133b4853bd7888a90029",
-  "deployedBytecode": "0x6060604052600080fd00a165627a7a72305820696993917aa0821d6370c6789fffbd076ad07eaa6675a3a8133b4853bd7888a90029",
+  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a723058203a5a707d4739fedf7c030475ff95ea45e3accd6bfe235968604e8f655f0ee1090029",
+  "deployedBytecode": "0x6060604052600080fd00a165627a7a723058203a5a707d4739fedf7c030475ff95ea45e3accd6bfe235968604e8f655f0ee1090029",
   "sourceMap": "26:280:1:-;;;269:35;;;;;;;;26:280;;;;;;",
   "deployedSourceMap": "26:280:1:-;;;;;",
   "source": "pragma solidity ^0.4.0;\n\n\ncontract Debuggable {\n\n  event LogAddress(address someAddress);\n  event LogBool(bool boolean);\n  event LogBytes(bytes someBytes);\n  event LogBytes32(bytes32 aBytes32);\n  event LogString(string aString);\n  event LogUInt256(uint256 someInt);\n\n  function Debuggable() public {\n\n  }\n}\n",
-  "sourcePath": "/Users/john/distense-ui/node_modules/distense-contracts/contracts/Debuggable.sol",
+  "sourcePath": "/Users/john/distense-contracts/contracts/Debuggable.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/john/distense-ui/node_modules/distense-contracts/contracts/Debuggable.sol",
+      "absolutePath": "/Users/john/distense-contracts/contracts/Debuggable.sol",
       "exportedSymbols": {
         "Debuggable": [
-          140
+          138
         ]
       }
     },
@@ -105,7 +105,7 @@
             ".0"
           ]
         },
-        "id": 111,
+        "id": 109,
         "name": "PragmaDirective",
         "src": "0:23:1"
       },
@@ -121,10 +121,10 @@
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            140
+            138
           ],
           "name": "Debuggable",
-          "scope": 141
+          "scope": 139
         },
         "children": [
           {
@@ -140,7 +140,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "someAddress",
-                      "scope": 115,
+                      "scope": 113,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -153,22 +153,22 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 112,
+                        "id": 110,
                         "name": "ElementaryTypeName",
                         "src": "68:7:1"
                       }
                     ],
-                    "id": 113,
+                    "id": 111,
                     "name": "VariableDeclaration",
                     "src": "68:19:1"
                   }
                 ],
-                "id": 114,
+                "id": 112,
                 "name": "ParameterList",
                 "src": "67:21:1"
               }
             ],
-            "id": 115,
+            "id": 113,
             "name": "EventDefinition",
             "src": "51:38:1"
           },
@@ -185,7 +185,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "boolean",
-                      "scope": 119,
+                      "scope": 117,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bool",
@@ -198,22 +198,22 @@
                           "name": "bool",
                           "type": "bool"
                         },
-                        "id": 116,
+                        "id": 114,
                         "name": "ElementaryTypeName",
                         "src": "106:4:1"
                       }
                     ],
-                    "id": 117,
+                    "id": 115,
                     "name": "VariableDeclaration",
                     "src": "106:12:1"
                   }
                 ],
-                "id": 118,
+                "id": 116,
                 "name": "ParameterList",
                 "src": "105:14:1"
               }
             ],
-            "id": 119,
+            "id": 117,
             "name": "EventDefinition",
             "src": "92:28:1"
           },
@@ -230,7 +230,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "someBytes",
-                      "scope": 123,
+                      "scope": 121,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bytes memory",
@@ -243,22 +243,22 @@
                           "name": "bytes",
                           "type": "bytes storage pointer"
                         },
-                        "id": 120,
+                        "id": 118,
                         "name": "ElementaryTypeName",
                         "src": "138:5:1"
                       }
                     ],
-                    "id": 121,
+                    "id": 119,
                     "name": "VariableDeclaration",
                     "src": "138:15:1"
                   }
                 ],
-                "id": 122,
+                "id": 120,
                 "name": "ParameterList",
                 "src": "137:17:1"
               }
             ],
-            "id": 123,
+            "id": 121,
             "name": "EventDefinition",
             "src": "123:32:1"
           },
@@ -275,7 +275,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "aBytes32",
-                      "scope": 127,
+                      "scope": 125,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bytes32",
@@ -288,22 +288,22 @@
                           "name": "bytes32",
                           "type": "bytes32"
                         },
-                        "id": 124,
+                        "id": 122,
                         "name": "ElementaryTypeName",
                         "src": "175:7:1"
                       }
                     ],
-                    "id": 125,
+                    "id": 123,
                     "name": "VariableDeclaration",
                     "src": "175:16:1"
                   }
                 ],
-                "id": 126,
+                "id": 124,
                 "name": "ParameterList",
                 "src": "174:18:1"
               }
             ],
-            "id": 127,
+            "id": 125,
             "name": "EventDefinition",
             "src": "158:35:1"
           },
@@ -320,7 +320,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "aString",
-                      "scope": 131,
+                      "scope": 129,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "string memory",
@@ -333,22 +333,22 @@
                           "name": "string",
                           "type": "string storage pointer"
                         },
-                        "id": 128,
+                        "id": 126,
                         "name": "ElementaryTypeName",
                         "src": "212:6:1"
                       }
                     ],
-                    "id": 129,
+                    "id": 127,
                     "name": "VariableDeclaration",
                     "src": "212:14:1"
                   }
                 ],
-                "id": 130,
+                "id": 128,
                 "name": "ParameterList",
                 "src": "211:16:1"
               }
             ],
-            "id": 131,
+            "id": 129,
             "name": "EventDefinition",
             "src": "196:32:1"
           },
@@ -365,7 +365,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "someInt",
-                      "scope": 135,
+                      "scope": 133,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -378,22 +378,22 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 132,
+                        "id": 130,
                         "name": "ElementaryTypeName",
                         "src": "248:7:1"
                       }
                     ],
-                    "id": 133,
+                    "id": 131,
                     "name": "VariableDeclaration",
                     "src": "248:15:1"
                   }
                 ],
-                "id": 134,
+                "id": 132,
                 "name": "ParameterList",
                 "src": "247:17:1"
               }
             ],
-            "id": 135,
+            "id": 133,
             "name": "EventDefinition",
             "src": "231:34:1"
           },
@@ -407,7 +407,7 @@
               ],
               "name": "Debuggable",
               "payable": false,
-              "scope": 140,
+              "scope": 138,
               "stateMutability": "nonpayable",
               "superFunction": null,
               "visibility": "public"
@@ -420,7 +420,7 @@
                   ]
                 },
                 "children": [],
-                "id": 136,
+                "id": 134,
                 "name": "ParameterList",
                 "src": "288:2:1"
               },
@@ -431,7 +431,7 @@
                   ]
                 },
                 "children": [],
-                "id": 137,
+                "id": 135,
                 "name": "ParameterList",
                 "src": "298:0:1"
               },
@@ -442,22 +442,22 @@
                   ]
                 },
                 "children": [],
-                "id": 138,
+                "id": 136,
                 "name": "Block",
                 "src": "298:6:1"
               }
             ],
-            "id": 139,
+            "id": 137,
             "name": "FunctionDefinition",
             "src": "269:35:1"
           }
         ],
-        "id": 140,
+        "id": 138,
         "name": "ContractDefinition",
         "src": "26:280:1"
       }
     ],
-    "id": 141,
+    "id": 139,
     "name": "SourceUnit",
     "src": "0:307:1"
   },
@@ -467,5 +467,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-12-15T06:19:47.762Z"
+  "updatedAt": "2018-01-06T00:35:35.601Z"
 }

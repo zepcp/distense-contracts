@@ -123,7 +123,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 2497,
+          "SourceUnit": 2426,
           "absolutePath": "/Users/john/distense-contracts/contracts/lib/SafeMath.sol",
           "file": "./lib/SafeMath.sol",
           "scope": 1040,
@@ -160,7 +160,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "SafeMath",
-                  "referencedDeclaration": 2496,
+                  "referencedDeclaration": 2425,
                   "type": "library SafeMath"
                 },
                 "id": 967,
@@ -354,7 +354,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "mul",
-                                  "referencedDeclaration": 2328,
+                                  "referencedDeclaration": 2257,
                                   "type": "function (uint256,uint256) pure returns (uint256)"
                                 },
                                 "children": [
@@ -364,7 +364,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2496,
+                                      "referencedDeclaration": 2425,
                                       "type": "type(library SafeMath)",
                                       "value": "SafeMath"
                                     },
@@ -577,7 +577,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "sub",
-                                  "referencedDeclaration": 2366,
+                                  "referencedDeclaration": 2295,
                                   "type": "function (uint256,uint256) pure returns (uint256)"
                                 },
                                 "children": [
@@ -587,7 +587,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2496,
+                                      "referencedDeclaration": 2425,
                                       "type": "type(library SafeMath)",
                                       "value": "SafeMath"
                                     },
@@ -800,7 +800,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "add",
-                                  "referencedDeclaration": 2390,
+                                  "referencedDeclaration": 2319,
                                   "type": "function (uint256,uint256) pure returns (uint256)"
                                 },
                                 "children": [
@@ -810,7 +810,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2496,
+                                      "referencedDeclaration": 2425,
                                       "type": "type(library SafeMath)",
                                       "value": "SafeMath"
                                     },
@@ -1053,7 +1053,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "percent",
-                                  "referencedDeclaration": 2427,
+                                  "referencedDeclaration": 2356,
                                   "type": "function (uint256,uint256,uint256) pure returns (uint256)"
                                 },
                                 "children": [
@@ -1063,7 +1063,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2496,
+                                      "referencedDeclaration": 2425,
                                       "type": "type(library SafeMath)",
                                       "value": "SafeMath"
                                     },
@@ -1161,16 +1161,10 @@
     "5777": {
       "events": {},
       "links": {
-        "SafeMath": "0x345ca3e014aaf5dca488057592ee47305d9b3e10"
-      }
-    },
-    "9000": {
-      "events": {},
-      "links": {
-        "SafeMath": "0xbfda098be6911fe479b11e35ac31bf15b9b3e656"
+        "SafeMath": "0x9f544a3fc3d1045e6ec49d4ecef6dcd700457165"
       }
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-06T00:47:59.574Z"
+  "updatedAt": "2018-01-07T15:28:18.925Z"
 }

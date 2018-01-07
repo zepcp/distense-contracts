@@ -15,29 +15,25 @@ contract Tasks is Approvable, Debuggable {
   address public DistenseAddress;
   address public PullRequestsAddress;
 
-  string[] public taskIds;
+  bytes32[] public taskIds;
 
   enum RewardStatus { Default, Tentative, Determined, Paid }
 
   struct Task {
+    bytes32 title;
     address createdBy;
-    uint256 created;
     uint256 reward;
     RewardStatus rewardStatus;
     uint256 pctDIDVoted;
     uint64 numVotes;
-    string title;
-    bytes16 issueNum;
-    bytes16 repo;
-    string tagsString;
     mapping (address => bool) rewardVotes;
   }
 
-  mapping (string => Task) tasks;
+  mapping (bytes32 => Task) tasks;
 
-  event LogAddTask(string taskId);
-  event LogTaskRewardVote(string taskId, uint256 reward, uint256 pctDIDVoted);
-  event LogTaskRewardDetermined(string taskId, uint256 reward);
+  event LogAddTask(bytes32 taskId);
+  event LogTaskRewardVote(bytes32 taskId, uint256 reward, uint256 pctDIDVoted);
+  event LogTaskRewardDetermined(bytes32 taskId, uint256 reward);
 
   function Tasks(address _DIDTokenAddress, address _DistenseAddress) public {
     DIDTokenAddress = _DIDTokenAddress;
@@ -45,21 +41,19 @@ contract Tasks is Approvable, Debuggable {
   }
 
 
-  function addTask(string _taskId, string _title, string _tagsString, bytes16 _issueNum, bytes16 _repo) public hasEnoughDID(msg.sender, 50) returns
+  function addTask(bytes32 _taskId, bytes32 _title) public hasEnoughDID(msg.sender, 50) returns
   (bool) {
 
-    bytes memory bytesTaskId = bytes(_taskId);
-    require(bytesTaskId.length > 0);
+//    TODO check for empty _taskId
+//    bytes memory bytesTaskId = bytes(_taskId);
+//    require(bytesTaskId.length > 0);
 
     Distense distense = Distense(DistenseAddress);
+
     tasks[_taskId].createdBy = msg.sender;
-    tasks[_taskId].created = now;
+    tasks[_taskId].title = _title;
     tasks[_taskId].reward = distense.getParameterValueByTitle(distense.defaultRewardParameterTitle());
     tasks[_taskId].rewardStatus = RewardStatus.Default;
-    tasks[_taskId].title = _title;
-    tasks[_taskId].issueNum = _issueNum;
-    tasks[_taskId].repo = _repo;
-    tasks[_taskId].tagsString = _tagsString;
 
     taskIds.push(_taskId);
     LogAddTask(_taskId);
@@ -69,37 +63,29 @@ contract Tasks is Approvable, Debuggable {
   }
 
 
-  function getTaskById(string _taskId) public view returns (
+  function getTaskById(bytes32 _taskId) public view returns (
+    bytes32,
     address,
-    uint256,
     uint256,
     Tasks.RewardStatus,
     uint256,
-    uint64,
-    string,
-    bytes16,
-    bytes16,
-    string
+    uint64
   ) {
 
     Task memory task = tasks[_taskId];
     return (
+      task.title,
       task.createdBy,
-      task.created,
       task.reward,
       task.rewardStatus,
       task.pctDIDVoted,
-      task.numVotes,
-      task.title,
-      task.issueNum,
-      task.repo,
-      task.tagsString
+      task.numVotes
     );
 
   }
 
 
-  function taskExists(string _taskId) public view returns (bool) {
+  function taskExists(bytes32 _taskId) public view returns (bool) {
     return tasks[_taskId].createdBy != 0;
   }
 
@@ -109,7 +95,7 @@ contract Tasks is Approvable, Debuggable {
   }
 
 
-  function taskRewardVote(string _taskId, uint256 _reward) public returns (bool) {
+  function taskRewardVote(bytes32 _taskId, uint256 _reward) public returns (bool) {
 
     DIDToken didToken = DIDToken(DIDTokenAddress);
     uint256 balance = didToken.balances(msg.sender);
@@ -175,12 +161,12 @@ contract Tasks is Approvable, Debuggable {
   }
 
 
-  function getTaskReward(string _taskId) public view returns (uint256) {
+  function getTaskReward(bytes32 _taskId) public view returns (uint256) {
     return tasks[_taskId].reward;
   }
 
 
-  function setTaskRewardPaid(string _taskId) public onlyApproved returns (bool) {
+  function setTaskRewardPaid(bytes32 _taskId) public onlyApproved returns (bool) {
     tasks[_taskId].rewardStatus = RewardStatus.Paid;
     return true;
   }

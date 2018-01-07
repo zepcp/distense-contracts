@@ -89,7 +89,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 2297,
+          "SourceUnit": 2226,
           "absolutePath": "/Users/john/distense-contracts/contracts/lib/Ownable.sol",
           "file": "./lib/Ownable.sol",
           "scope": 655,
@@ -105,14 +105,14 @@
       {
         "attributes": {
           "contractDependencies": [
-            2296
+            2225
           ],
           "contractKind": "contract",
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
             654,
-            2296
+            2225
           ],
           "name": "Migrations",
           "scope": 655
@@ -129,7 +129,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "Ownable",
-                  "referencedDeclaration": 2296,
+                  "referencedDeclaration": 2225,
                   "type": "contract Ownable"
                 },
                 "id": 618,
@@ -237,7 +237,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2295,
+                      "referencedDeclaration": 2224,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -383,7 +383,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2295,
+                      "referencedDeclaration": 2224,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -596,14 +596,9 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x8cdaf0cd259887258bc13a92c0a6da92698644c0"
-    },
-    "9000": {
-      "events": {},
-      "links": {},
-      "address": "0xbb730f7d1e5a61139d7e859df695335830c81298"
+      "address": "0xde5491f774f0cb009abcea7326342e105dbb1b2e"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-06T00:47:59.572Z"
+  "updatedAt": "2018-01-07T15:28:18.923Z"
 }

@@ -1,20 +1,14 @@
-module.exports = async function(tasksInstance) {
-  console.log(`Beginning insert of dummy data`)
+const web3Utils = require('web3-utils')
+
+module.exports.tasksData = async function (accountZero, tasksInstance) {
+
+  console.log(`Inserting mock data`)
+
   const tasksArtifacts = require('../build/contracts/Tasks.json')
-  const pullRequestsArtifacts = require('../build/contracts/PullRequests.json')
   const contract = require('truffle-contract')
   let Tasks = contract(tasksArtifacts)
-  let PullRequests = contract(pullRequestsArtifacts)
 
   const faker = require('faker')
-  const web3Utils = require('web3-utils')
-  const IPFS = require('ipfs')
-
-  const ipfsNode = new IPFS({
-    repo: String(Math.random()),
-    init: true,
-    start: true
-  })
 
   async function addTasks() {
     const tagsOptions = [
@@ -44,27 +38,42 @@ module.exports = async function(tasksInstance) {
       'Tasks Contract'
     ]
 
-    console.log(`Inserting mock data because not on Mainnet/Network 1`)
-
-    for (let i = 0; i <= 10; i++) {
+    for (let i = 0; i < 30; i++) {
 
       try {
-        console.log(`Inserting mock: ${i}`)
-        const task = {
-          bytes32: web3Utils.randomHex(66).toString(),
-          title: faker.hacker.phrase(),
-          tags: [tagsOptions[Math.floor(Math.random() * tagsOptions.length)]],
-          issueURL:
-            'https://github.com/Distense/distense/issues/' +
-            Math.floor(Math.random() * (200 - 1 + 1)) +
-            1
-        }
-        await addTask(task)
+        console.log(`Inserting task mock: ${i}`)
 
-        // const pr = {
-        //   bytes32: web3Utils.randomHex(64).toString(),
-        //   taskId: task.bytes32
-        // }
+        const taskID = web3Utils.randomHex(32).toString()
+
+        const title = faker.lorem.sentence()
+        console.log(`title: ${title}`)
+
+        const issueNUM = Math.floor(Math.random() * (500 - 1 + 1)) + 1
+
+        const task = {
+          _taskId: taskID,
+          title: title,
+          tags: 'Contracts:Frontend:Parameters',
+          issueNum: issueNUM,
+          repo: 'contracts'
+        }
+
+        console.log(`account0 : ${accountZero}`)
+        // await tasksInstance.addTask(task)
+        await tasksInstance.addTask(
+          task._taskId,
+          title,
+          task.tags,
+          issueNUM,
+          task.repo, {
+            from: accountZero
+          })
+
+        await tasksInstance.taskRewardVote(
+          task._taskId, {
+            from: accountZero
+          })
+
       } catch (error) {
         console.log(`error inserting mock data: ${error}`)
       }
@@ -72,20 +81,65 @@ module.exports = async function(tasksInstance) {
     return true
   }
 
-  ipfsNode.on('ready', async () => {
-    console.log(`ipfs ready`)
-    await addTasks()
-  })
-
-  async function addTask(task) {
-    const cid = await ipfsNode.dag.put(task, {
-      format: 'dag-cbor',
-      hashAlg: 'sha2-256'
-    })
-
-    task._id = cid.toBaseEncodedString() // Get real IPFS hash 'zdpu...'
-    return await tasksInstance.addTask(task.bytes32)
-  }
+  await addTasks()
 
   return true
 }
+
+module.exports.pullRequestsData = async function (accountZero, tasksInstance) {
+
+  console.log(`Inserting mock data`)
+
+  const pullRequestsArtifacts = require('../build/contracts/PullRequests.json')
+  const contract = require('truffle-contract')
+  let PullRequests = contract(pullRequestsArtifacts)
+
+  const faker = require('faker')
+
+  async function addPullRequests() {
+
+    for (let i = 0; i < 30; i++) {
+
+      try {
+        console.log(`Inserting pullRequest: ${i}`)
+
+        const taskID = web3Utils.randomHex(32).toString()
+        console.log(`taskID: ${taskID}`)
+
+        const title = faker.lorem.sentence()
+        console.log(`title: ${title}`)
+
+        const issueNUM = Math.floor(Math.random() * (500 - 1 + 1)) + 1
+        console.log(`issueNUM: ${issueNUM}`)
+
+        const task = {
+          _taskId: taskID,
+          title: title,
+          tags: 'Contracts:Frontend:Parameters',
+          issueNum: issueNUM,
+          repo: 'contracts'
+        }
+
+        console.log(`account0 : ${accountZero}`)
+        // await tasksInstance.addTask(task)
+        await pullRequests.addTask(
+          task._taskId,
+          title,
+          task.tags,
+          issueNUM,
+          task.repo, {
+            from: accountZero
+          })
+
+      } catch (error) {
+        console.log(`error inserting mock data: ${error}`)
+      }
+    }
+    return true
+  }
+
+  await addTasks()
+
+  return true
+}
+

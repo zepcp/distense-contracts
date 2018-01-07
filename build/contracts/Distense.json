@@ -467,7 +467,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 2497,
+          "SourceUnit": 2426,
           "absolutePath": "/Users/john/distense-contracts/contracts/lib/SafeMath.sol",
           "file": "./lib/SafeMath.sol",
           "scope": 615,
@@ -504,7 +504,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "SafeMath",
-                  "referencedDeclaration": 2496,
+                  "referencedDeclaration": 2425,
                   "type": "library SafeMath"
                 },
                 "id": 143,
@@ -3999,7 +3999,7 @@
                           "overloadedDeclarations": [
                             null
                           ],
-                          "referencedDeclaration": 2539,
+                          "referencedDeclaration": 2468,
                           "type": "msg",
                           "value": "msg"
                         },
@@ -4228,7 +4228,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2539,
+                                  "referencedDeclaration": 2468,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -4279,7 +4279,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2542,
+                              "referencedDeclaration": 2471,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -4467,7 +4467,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2542,
+                              "referencedDeclaration": 2471,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -4822,7 +4822,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2539,
+                                  "referencedDeclaration": 2468,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -5962,7 +5962,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2541,
+                              "referencedDeclaration": 2470,
                               "type": "uint256",
                               "value": "now"
                             },
@@ -6283,7 +6283,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2542,
+                              "referencedDeclaration": 2471,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -6312,7 +6312,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2541,
+                                  "referencedDeclaration": 2470,
                                   "type": "uint256",
                                   "value": "now"
                                 },
@@ -6684,7 +6684,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2542,
+                              "referencedDeclaration": 2471,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -6781,7 +6781,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 2542,
+                              "referencedDeclaration": 2471,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -6917,14 +6917,9 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0xf204a4ef082f5c04bb89f7d5e6568b796096735a"
-    },
-    "9000": {
-      "events": {},
-      "links": {},
-      "address": "0x3a06e8972ae337e7768cbce5385e8ca1608da609"
+      "address": "0x2467636bea0f3c2441227eedbffac59f11d54a80"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-06T00:47:59.580Z"
+  "updatedAt": "2018-01-07T15:28:18.942Z"
 }

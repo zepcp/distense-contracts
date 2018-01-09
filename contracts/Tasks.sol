@@ -17,7 +17,7 @@ contract Tasks is Approvable, Debuggable {
 
   bytes32[] public taskIds;
 
-  enum RewardStatus { Default, Tentative, Determined, Paid }
+  enum RewardStatus { Tentative, Determined, Paid }
 
   struct Task {
     bytes32 title;
@@ -45,15 +45,12 @@ contract Tasks is Approvable, Debuggable {
   (bool) {
 
 //    TODO check for empty _taskId
-//    bytes memory bytesTaskId = bytes(_taskId);
-//    require(bytesTaskId.length > 0);
-
     Distense distense = Distense(DistenseAddress);
 
     tasks[_taskId].createdBy = msg.sender;
     tasks[_taskId].title = _title;
     tasks[_taskId].reward = distense.getParameterValueByTitle(distense.defaultRewardParameterTitle());
-    tasks[_taskId].rewardStatus = RewardStatus.Default;
+    tasks[_taskId].rewardStatus = RewardStatus.Tentative;
 
     taskIds.push(_taskId);
     LogAddTask(_taskId);
@@ -101,14 +98,6 @@ contract Tasks is Approvable, Debuggable {
     uint256 balance = didToken.balances(msg.sender);
     Distense distense = Distense(DistenseAddress);
 
-    uint256 pctDIDVotedThreshold = distense.getParameterValueByTitle(
-      distense.proposalPctDIDToApproveParameterTitle()
-    );
-
-    uint256 minNumVoters = distense.getParameterValueByTitle(
-      distense.minNumberOfTaskRewardVotersParameterTitle()
-    );
-
     Task storage task = tasks[_taskId];
 
     require(_reward >= 0);
@@ -116,10 +105,7 @@ contract Tasks is Approvable, Debuggable {
     //  Essentially refund the remaining gas if user's vote will have no effect
     require(task.reward != _reward);
 
-    require(task.pctDIDVoted < pctDIDVotedThreshold);
-
-    // Restrict voting if enough DID or voters have voted
-    require(task.numVotes < minNumVoters);
+    require(task.rewardStatus != RewardStatus.Determined);
 
     //  Has the voter already voted on this task?
     require(!task.rewardVotes[msg.sender]);
@@ -137,19 +123,28 @@ contract Tasks is Approvable, Debuggable {
     uint256 pctDIDOwned = didToken.pctDIDOwned(msg.sender);
     task.pctDIDVoted = task.pctDIDVoted + pctDIDOwned;
 
-    uint256 update = _reward == 0 ? pctDIDOwned : (_reward * pctDIDOwned) / 100;
+    LogString('pctDIDOwned');
+    LogUInt256(pctDIDOwned);
+    LogString('task.reward');
+    LogUInt256(task.reward);
+
+    uint256 update = _reward == 0 ? ((pctDIDOwned * task.reward) / 1000) : (_reward * pctDIDOwned) / 100;
 
     if (_reward > task.reward) {
-      task.reward += update;
+      task.reward = SafeMath.add(task.reward, update);
     } else {
-      task.reward -= update;
+      task.reward = SafeMath.sub(task.reward, update);
     }
 
-    LogTaskRewardVote(_taskId, _reward, task.pctDIDVoted);
+    task.numVotes++;
 
-    if (task.rewardStatus == RewardStatus.Default)
-      task.rewardStatus = RewardStatus.Tentative;
-    task.numVotes += 1;
+    uint256 pctDIDVotedThreshold = distense.getParameterValueByTitle(
+    distense.proposalPctDIDToApproveParameterTitle()
+    );
+
+    uint256 minNumVoters = distense.getParameterValueByTitle(
+    distense.minNumberOfTaskRewardVotersParameterTitle()
+    );
 
     if (task.pctDIDVoted > pctDIDVotedThreshold || task.numVotes > minNumVoters) {
       LogTaskRewardDetermined(_taskId, task.reward);

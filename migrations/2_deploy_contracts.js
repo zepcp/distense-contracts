@@ -71,6 +71,15 @@ module.exports = (deployer, network, accounts) => {
     // .then(async(pullRequests) => {
     //   await mock.pullRequestsData(accounts[0], pullRequests)
     // })
+    .then(() => {
+      return Tasks.deployed()
+    })
+    .then(async (tasks) => {
+      await tasks.approve(PullRequests.address)
+      const isApproved = await tasks.approved.call(PullRequests.address)
+      if (isApproved) console.log(`PullRequests address now Tasks contract approved`)
+      else console.log(`Failed to approve PullRequests address`)
+    })
     .catch(err => {
       console.log(`error: ${err}`)
     })

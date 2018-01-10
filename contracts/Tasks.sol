@@ -35,13 +35,14 @@ contract Tasks is Approvable, Debuggable {
   event LogTaskRewardVote(bytes32 taskId, uint256 reward, uint256 pctDIDVoted);
   event LogTaskRewardDetermined(bytes32 taskId, uint256 reward);
 
+
   function Tasks(address _DIDTokenAddress, address _DistenseAddress) public {
     DIDTokenAddress = _DIDTokenAddress;
     DistenseAddress = _DistenseAddress;
   }
 
 
-  function addTask(bytes32 _taskId, bytes32 _title) public hasEnoughDID(msg.sender, 50) returns
+  function addTask(bytes32 _taskId, bytes32 _title) external hasEnoughDID(msg.sender, 50) returns
   (bool) {
 
 //    TODO check for empty _taskId
@@ -60,7 +61,7 @@ contract Tasks is Approvable, Debuggable {
   }
 
 
-  function getTaskById(bytes32 _taskId) public view returns (
+  function getTaskById(bytes32 _taskId) external view returns (
     bytes32,
     address,
     uint256,
@@ -82,17 +83,17 @@ contract Tasks is Approvable, Debuggable {
   }
 
 
-  function taskExists(bytes32 _taskId) public view returns (bool) {
+  function taskExists(bytes32 _taskId) external view returns (bool) {
     return tasks[_taskId].createdBy != 0;
   }
 
 
-  function getNumTasks() public view returns (uint) {
+  function getNumTasks() external view returns (uint) {
     return taskIds.length;
   }
 
 
-  function taskRewardVote(bytes32 _taskId, uint256 _reward) public returns (bool) {
+  function taskRewardVote(bytes32 _taskId, uint256 _reward) external returns (bool) {
 
     DIDToken didToken = DIDToken(DIDTokenAddress);
     uint256 balance = didToken.balances(msg.sender);
@@ -156,14 +157,21 @@ contract Tasks is Approvable, Debuggable {
   }
 
 
-  function getTaskReward(bytes32 _taskId) public view returns (uint256) {
+  function getTaskReward(bytes32 _taskId) external view returns (uint256) {
     return tasks[_taskId].reward;
   }
 
 
-  function setTaskRewardPaid(bytes32 _taskId) public onlyApproved returns (bool) {
+  function getTaskRewardAndStatus(bytes32 _taskId) external view returns (uint256, RewardStatus) {
+    return (
+      tasks[_taskId].reward,
+      tasks[_taskId].rewardStatus
+    );
+  }
+
+  function setTaskRewardPaid(bytes32 _taskId) external onlyApproved returns (RewardStatus) {
     tasks[_taskId].rewardStatus = RewardStatus.Paid;
-    return true;
+    return tasks[_taskId].rewardStatus;
   }
 
 

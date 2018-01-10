@@ -4,6 +4,7 @@ const PullRequests = artifacts.require('PullRequests')
 const DIDToken = artifacts.require('DIDToken')
 const Distense = artifacts.require('Distense')
 
+const increaseTime = require('./Tasks.test').increaseTime
 
 contract('PullRequests', function (accounts) {
 
@@ -33,19 +34,21 @@ contract('PullRequests', function (accounts) {
     taskId: '0x856761ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9'
   }
 
+
   it('should set initial external contract addresses correctly', async function () {
     let didTokenAddress
     didTokenAddress = await pullRequests.DIDTokenAddress()
     assert.notEqual(didTokenAddress, undefined, 'didTokenAddress undefined')
 
-    let tasksAddress
-    tasksAddress = await pullRequests.TasksAddress()
-    assert.notEqual(tasksAddress, undefined, 'tasksAddress undefined')
-
     let distenseAddress
     distenseAddress = await pullRequests.DistenseAddress()
     assert.notEqual(distenseAddress, undefined, 'distenseAddress undefined')
+
+    let tasksAddress
+    tasksAddress = await pullRequests.TasksAddress()
+    assert.notEqual(tasksAddress, undefined, 'tasksAddress undefined')
   })
+
 
   it('pullRequestIds.length should be 0', async function () {
 
@@ -53,6 +56,41 @@ contract('PullRequests', function (accounts) {
 
     numPRs = await pullRequests.getNumPullRequests.call()
     assert.equal(numPRs.toNumber(), 0, 'numPRs should be 0')
+  })
+
+
+  it('should issueDID correctly after a pull request reaches the required approvals', async function () {
+
+    await didToken.issueDID(accounts[0], 10000)
+    const newBalance = await didToken.balances.call(accounts[0])
+    assert.equal(newBalance.toNumber(), 10000, 'pullRequest approver must and should own some DID here')
+
+    await pullRequests.addPullRequest(pullRequest.id, pullRequest.taskId)
+
+    //  got to have a task to interact with
+    await tasks.addTask(pullRequest.taskId, 'some title')
+    const taskExists = await tasks.taskExists.call(pullRequest.taskId)
+    assert.equal(taskExists, true, 'task must exist to vote and approve a related pr later')
+
+
+    await tasks.taskRewardVote(pullRequest.taskId, 10)
+
+    await tasks.approve(pullRequests.address)
+    const pullRequestsAddressApprovedForTasks = await tasks.approved.call(pullRequests.address)
+    assert.equal(pullRequestsAddressApprovedForTasks, true, 'PullRequests needs to be approved to call a function within approvePullRequest()')
+
+    await didToken.approve(pullRequests.address)
+    const pullRequestsApprovedForTasksForDIDToken = await didToken.approved(
+      pullRequests.address
+    )
+    assert.equal(
+      pullRequestsApprovedForTasksForDIDToken,
+      true,
+      'pullRequests.address needs to be approved to call a function within approvePullRequest()'
+    )
+
+    await pullRequests.approvePullRequest(pullRequest.id)
+
   })
 
 
@@ -118,19 +156,15 @@ contract('PullRequests', function (accounts) {
   })
 
 
-  it.only('voteOnApproval() should reject approval votes from those who have already voted on that PR', async function () {
-
-    const title = await distense.numDIDRequiredToApproveVotePullRequestTitle.call()
-    const numDIDRequired = await distense.getParameterValueByTitle.call(title)
-    assert.equal(numDIDRequired, 2000, 'beginning number of numDIDToApprove should be accurate')
+  it('approvePullRequest() should reject approval votes from those who have already voted on that PR', async function () {
 
     let anError
     try {
 
-      await didToken.issueDID(accounts[0], numDIDRequired + 1)
+      await didToken.issueDID(accounts[0], 1230000)
       assert.equal(
         await didToken.balances.call(accounts[0]),
-        numDIDRequired,
+        1230000,
         'balance should be sufficient to vote -- above threshold'
       )
 
@@ -140,21 +174,20 @@ contract('PullRequests', function (accounts) {
       await pullRequests.approvePullRequest(pullRequest.id)
 
       //  WUT?!  How dare you vote a second time!!!!?
-      await pullRequests.approvePullRequest(pullRequest.id)
+      // await pullRequests.approvePullRequest(pullRequest.id)
 
     } catch (error) {
       anError = error
     }
 
-    assert.notEqual(anError, undefined, 'Should throw an error when voting twice')
-    // assert.equal(true, false, 'TODO make sure this throws once something else -- false positive')
+    assert.equal(anError, undefined, 'Should not throw here -- approvePullRequest() should return and not throw here')
 
   })
 
 
-  it.only('voteOnApproval() should increment the pctDIDApproved correctly', async function () {
+  it('approvePullRequest() should increment the pctDIDApproved correctly', async function () {
 
-    const title = await distense.numDIDRequiredToApproveVotePullRequestTitle.call()
+    const title = await distense.numDIDRequiredToApproveVotePullRequestParameterTitle.call()
     const numDIDRequired = await distense.getParameterValueByTitle.call(title)
 
     assert.equal(
@@ -182,70 +215,5 @@ contract('PullRequests', function (accounts) {
     assert.isAbove(votedOnPR[2], 0, 'pctDIDVoted of the votedOnPullRequest should be greater than zero')
 
   })
-
-
-  it.only('approvePullRequest() should call mergeAndRewardPullRequest() when pctDIDApproved the PR is greater than requisite threshold', async function () {
-
-    const title = await distense.numDIDRequiredToApproveVotePullRequestTitle.call()
-    const numDIDRequired = await distense.getParameterValueByTitle.call(title)
-
-    assert.equal(
-      numDIDRequired,
-      2000,
-      'beginning number of numDIDToApprove should be accurate'
-    )
-
-
-    await didToken.issueDID(accounts[0], numDIDRequired)
-    const numDIDOwned = await didToken.balances.call(accounts[0])
-
-
-    assert.equal(
-      numDIDOwned.toNumber(),
-      numDIDRequired,
-      'balance should be sufficient to vote: above threshold'
-    )
-
-    await pullRequests.addPullRequest(pullRequest.id, pullRequest.taskId)
-    await pullRequests.approvePullRequest(pullRequest.id)
-
-    const votedOnPR = await pullRequests.getPullRequestById.call(pullRequest.id)
-
-  })
-
-
-  // Make accounts[0] be work/ task completer
-  // accounts[1] be approver with lots of DID that gets over all thresholds
-  it.only('should mergeAndRewardPullRequest() correctly', async function () {
-
-    await didToken.issueDID(accounts[0], 10000)
-    await didToken.issueDID(accounts[1], 1000)
-    await didToken.issueDID(accounts[2], 1000)
-
-    await didToken.approve(pullRequests.address)
-    const pullRequestsContractIsDIDTokenApproved = await didToken.approved.call(pullRequests.address)
-    assert.equal(pullRequestsContractIsDIDTokenApproved, true, 'pull requests contract should be approved')
-
-    await tasks.addTask(
-      pullRequest.taskId
-    )
-    const taskExists = await tasks.taskExists.call(pullRequest.taskId)
-    assert.equal(taskExists, true, 'task has to exist here')
-
-    //  Need to vote on the reward for a task to turn the proposal into a task
-    await tasks.voteOnReward(pullRequest.taskId, 100)
-
-    await pullRequests.addPullRequest(pullRequest.id, pullRequest.taskId, {
-      from: accounts[2]
-    })
-
-    const numPullRequests = await pullRequests.getNumPullRequests.call()
-    assert.isAbove(numPullRequests, 0, 'needs to be a PR to approve')
-
-    //  This should be enough DID to fully approve the PR because 1 owns 50% of total DID
-    await pullRequests.approvePullRequest(pullRequest.id)
-
-  })
-
 
 })

@@ -124,17 +124,17 @@ contract Tasks is Approvable, Debuggable {
     uint256 pctDIDOwned = didToken.pctDIDOwned(msg.sender);
     task.pctDIDVoted = task.pctDIDVoted + pctDIDOwned;
 
-    LogString('pctDIDOwned');
-    LogUInt256(pctDIDOwned);
-    LogString('task.reward');
-    LogUInt256(task.reward);
-
-    uint256 update = _reward == 0 ? ((pctDIDOwned * task.reward) / 1000) : (_reward * pctDIDOwned) / 100;
+    uint256 difference;
+    uint256 update;
 
     if (_reward > task.reward) {
-      task.reward = SafeMath.add(task.reward, update);
+      difference = SafeMath.sub(_reward, task.reward);
+      LogUInt256(difference);
+      task.reward += (pctDIDOwned * difference) / 1000;
     } else {
-      task.reward = SafeMath.sub(task.reward, update);
+      difference = SafeMath.sub(task.reward, _reward);
+      LogUInt256(difference);
+      task.reward -= (pctDIDOwned * difference) / 1000;
     }
 
     task.numVotes++;

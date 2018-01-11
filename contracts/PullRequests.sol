@@ -40,7 +40,6 @@ contract PullRequests is Approvable, Debuggable {
   }
 
 
-  //  TODO should we require DID here?
   function addPullRequest(bytes32 _prId, bytes32 _taskId) external returns (bool) {
     pullRequests[_prId].contributor = msg.sender;
     pullRequests[_prId].taskId = _taskId;
@@ -76,9 +75,6 @@ contract PullRequests is Approvable, Debuggable {
 
     PullRequest storage _pr = pullRequests[_prId];
 
-    //  Increment pctDIDApproved by percentage ownership of voter
-    _pr.pctDIDApproved += didToken.pctDIDOwned(msg.sender);
-
     //  Record approval vote to prevent multiple voting
     _pr.voted[msg.sender] = true;
 
@@ -96,6 +92,8 @@ contract PullRequests is Approvable, Debuggable {
       LogRewardPullRequest(_pr.taskId, _prId);
     } else {
       LogPullRequestApprovalVote(_prId, _pr.pctDIDApproved);
+      //  Increment pctDIDApproved by percentage ownership of voter
+      _pr.pctDIDApproved += didToken.pctDIDOwned(msg.sender);
     }
 
     return _pr.pctDIDApproved;

@@ -45,7 +45,7 @@ module.exports.tasksData = async function (accountZero, tasksInstance) {
 
         const taskID = web3Utils.randomHex(32).toString()
 
-        const title = faker.lorem.sentence()
+        const title = web3Utils.randomHex(32).toString()
         console.log(`title: ${title}`)
 
         const issueNUM = Math.floor(Math.random() * (500 - 1 + 1)) + 1
@@ -58,21 +58,19 @@ module.exports.tasksData = async function (accountZero, tasksInstance) {
           repo: 'contracts'
         }
 
-        console.log(`account0 : ${accountZero}`)
         // await tasksInstance.addTask(task)
         await tasksInstance.addTask(
           task._taskId,
-          title,
-          task.tags,
-          issueNUM,
-          task.repo, {
+          title, {
             from: accountZero
           })
 
-        await tasksInstance.taskRewardVote(
-          task._taskId, {
-            from: accountZero
-          })
+        // const randomReward = Math.floor(Math.random() * (199 - 10 + 1)) + 1;
+        // await tasksInstance.taskRewardVote(
+        //   task._taskId,
+        //   randomReward, {
+        //     from: accountZero
+        //   })
 
       } catch (error) {
         console.log(`error inserting mock data: ${error}`)

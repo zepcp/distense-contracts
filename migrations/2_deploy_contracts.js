@@ -80,6 +80,15 @@ module.exports = (deployer, network, accounts) => {
       if (isApproved) console.log(`PullRequests address now Tasks contract approved`)
       else console.log(`Failed to approve PullRequests address`)
     })
+    .then(() => {
+      return DIDToken.deployed()
+    })
+    .then(async (didToken) => {
+      await didToken.approve(PullRequests.address)
+      const isApproved = await didToken.approved.call(PullRequests.address)
+      if (isApproved) console.log(`PullRequests address now DIDToken contract approved`)
+      else console.log(`Failed to approve PullRequests address`)
+    })
     .catch(err => {
       console.log(`error: ${err}`)
     })

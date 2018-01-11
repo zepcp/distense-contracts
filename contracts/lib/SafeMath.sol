@@ -1,4 +1,4 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.17;
 
 /**
  * @title SafeMath
@@ -6,8 +6,11 @@ pragma solidity ^0.4.11;
  */
 library SafeMath {
   function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+    if (a == 0) {
+      return 0;
+    }
     uint256 c = a * b;
-    assert(a == 0 || c / a == b);
+    assert(c / a == b);
     return c;
   }
 
@@ -28,6 +31,7 @@ library SafeMath {
     assert(c >= a);
     return c;
   }
+
 
   function percent(uint numerator, uint denominator, uint precision) public pure
   returns(uint quotient) {

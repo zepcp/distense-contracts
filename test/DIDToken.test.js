@@ -3,6 +3,8 @@ const DIDToken = artifacts.require('DIDToken')
 
 contract('DIDToken', function(accounts) {
 
+  let didToken
+
   beforeEach(async function() {
     didToken = await DIDToken.new()
   })

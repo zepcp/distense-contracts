@@ -5,6 +5,9 @@ const Approvable = artifacts.require('Approvable')
 
 contract('Approvable', function(accounts) {
 
+  let didToken
+  let approvable
+
   beforeEach(async function() {
     didToken = await DIDToken.new()
     approvable = await Approvable.new()

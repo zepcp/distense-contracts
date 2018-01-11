@@ -116,6 +116,9 @@ contract('Distense contract', function (accounts) {
   })
 
   //  Begin accounts[0] owns 200 or 100%
+  let didToken
+  let distense
+
   beforeEach(async function () {
     didToken = await DIDToken.new()
     didToken.issueDID(accounts[0], 200)

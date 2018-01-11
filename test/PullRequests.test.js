@@ -1,13 +1,14 @@
-const web3 = global.web3
 const Tasks = artifacts.require('Tasks')
 const PullRequests = artifacts.require('PullRequests')
 const DIDToken = artifacts.require('DIDToken')
 const Distense = artifacts.require('Distense')
 
-const increaseTime = require('./Tasks.test').increaseTime
-
 contract('PullRequests', function (accounts) {
 
+  let didToken
+  let distense
+  let tasks
+  let pullRequests
   beforeEach(async function () {
 
     didToken = await DIDToken.new()
@@ -97,7 +98,8 @@ contract('PullRequests', function (accounts) {
   it('should addPullRequests correctly', async function () {
     let added
 
-    numPRs = await pullRequests.getNumPullRequests.call()
+    let submitError
+    const numPRs = await pullRequests.getNumPullRequests.call()
     assert.equal(numPRs.toNumber(), 0, 'numPRs should be 0 initially')
 
     try {
@@ -174,46 +176,45 @@ contract('PullRequests', function (accounts) {
       await pullRequests.approvePullRequest(pullRequest.id)
 
       //  WUT?!  How dare you vote a second time!!!!?
-      // await pullRequests.approvePullRequest(pullRequest.id)
+      await pullRequests.approvePullRequest(pullRequest.id)
 
     } catch (error) {
       anError = error
     }
 
-    assert.equal(anError, undefined, 'Should not throw here -- approvePullRequest() should return and not throw here')
+    assert.notEqual(anError, undefined, 'Should not throw here -- approvePullRequest() should return and not throw here')
 
   })
 
 
   it('approvePullRequest() should increment the pctDIDApproved correctly', async function () {
 
-    const title = await distense.numDIDRequiredToApproveVotePullRequestParameterTitle.call()
-    const numDIDRequired = await distense.getParameterValueByTitle.call(title)
+    await didToken.issueDID(accounts[0], 12000)
 
-    assert.equal(
-      numDIDRequired,
-      2000,
-      'beginning number of numDIDToApprove should be accurate'
-    )
-
-
-    await didToken.issueDID(accounts[0], numDIDRequired)
-    const numDIDOwned = await didToken.balances.call(accounts[0])
-
-
-    assert.equal(
-      numDIDOwned.toNumber(),
-      numDIDRequired,
-      'balance should be sufficient to vote: above threshold'
-    )
 
     await pullRequests.addPullRequest(pullRequest.id, pullRequest.taskId)
     await pullRequests.approvePullRequest(pullRequest.id)
 
     const votedOnPR = await pullRequests.getPullRequestById.call(pullRequest.id)
 
-    assert.isAbove(votedOnPR[2], 0, 'pctDIDVoted of the votedOnPullRequest should be greater than zero')
+    // isAbove because we just need to make sure it's incremented, amount is less important
+    assert.isAbove(votedOnPR[2].toNumber(), 0, 'pctDIDVoted of the votedOnPullRequest should be greater than zero')
 
   })
 
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

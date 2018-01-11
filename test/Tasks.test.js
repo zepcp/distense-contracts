@@ -39,6 +39,10 @@ contract('Tasks', function (accounts) {
     title: 'Another amazing task'
   }
 
+  let didToken
+  let distense
+  let tasks
+
   beforeEach(async function () {
     didToken = await DIDToken.new()
     distense = await Distense.new(didToken.address)
@@ -326,7 +330,7 @@ contract('Tasks', function (accounts) {
       task.title
     )
 
-    testTask = await tasks.getTaskById.call(task.taskId)
+    let testTask = await tasks.getTaskById.call(task.taskId)
     assert.equal(testTask[2].toNumber(), convertIntToSolidityInt(100), 'task reward should be 100 here')
 
     await tasks.taskRewardVote(
@@ -372,7 +376,7 @@ contract('Tasks', function (accounts) {
       task.title
     )
 
-    testTask = await tasks.getTaskById.call(task.taskId)
+    let testTask = await tasks.getTaskById.call(task.taskId)
     assert.equal(testTask[2].toNumber(), convertIntToSolidityInt(100), 'task reward should be 100 here')
 
     await tasks.taskRewardVote(
@@ -409,7 +413,7 @@ contract('Tasks', function (accounts) {
       task.title
     )
 
-    testTask = await tasks.getTaskById.call(task.taskId)
+    let testTask = await tasks.getTaskById.call(task.taskId)
     assert.equal(testTask[2].toNumber(), convertIntToSolidityInt(100), 'task reward should be 100 here')
 
     await tasks.taskRewardVote(
@@ -459,7 +463,7 @@ contract('Tasks', function (accounts) {
       task.title
     )
 
-    testTask = await tasks.getTaskById.call(task.taskId)
+    let testTask = await tasks.getTaskById.call(task.taskId)
     assert.equal(testTask[2].toNumber(), convertIntToSolidityInt(100), 'task reward should be 100 here')
 
     await tasks.taskRewardVote(
@@ -505,7 +509,7 @@ contract('Tasks', function (accounts) {
       task.title
     )
 
-    testTask = await tasks.getTaskById.call(task.taskId)
+    let testTask = await tasks.getTaskById.call(task.taskId)
     assert.equal(testTask[2].toNumber(), convertIntToSolidityInt(100), 'task reward should be 100 here')
 
     await tasks.taskRewardVote(
@@ -551,7 +555,7 @@ contract('Tasks', function (accounts) {
       task.title
     )
 
-    testTask = await tasks.getTaskById.call(task.taskId)
+    let testTask = await tasks.getTaskById.call(task.taskId)
     assert.equal(testTask[2].toNumber(), convertIntToSolidityInt(100), 'task reward should be 100 here')
 
     await tasks.taskRewardVote(
@@ -598,7 +602,7 @@ contract('Tasks', function (accounts) {
       from: accounts[0]
     })
 
-    testTask = await tasks.getTaskById.call(task.taskId)
+    let testTask = await tasks.getTaskById.call(task.taskId)
 
     // assert.equal(testTask[3].toNumber(), 2, 'Reward status should be 2 or determined since one-third of DID have voted')
 

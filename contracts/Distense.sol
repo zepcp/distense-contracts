@@ -10,7 +10,7 @@ contract Distense {
 
   /*
     Distense' votable parameters
-    Parameter is the perfect word for these: "a numerical or other measurable factor forming one of a set
+    Parameter is the perfect word` for these: "a numerical or other measurable factor forming one of a set
     that defines a system or sets the conditions of its operation".
   */
 
@@ -97,8 +97,8 @@ contract Distense {
     maxRewardParameter = Parameter({
       title: maxRewardParameterTitle,
       //     Every hard-coded int in Solidity is a decimal to one decimal place
-      //     So this is 100.0
-      value: 1000
+      //     So this is 5000.0
+      value: 50000
     });
     parameters[maxRewardParameterTitle] = maxRewardParameter;
     parameterTitles.push(maxRewardParameterTitle);

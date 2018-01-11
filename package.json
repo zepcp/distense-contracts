@@ -1,6 +1,6 @@
 {
   "name": "distense-contracts",
-  "version": "0.3.6",
+  "version": "0.3.61",
   "description": "Distense Ethereum smart contracts and tests",
   "main": "",
   "scripts": {

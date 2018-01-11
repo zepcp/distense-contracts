@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.17;
 
 
 contract Approvable {
@@ -9,12 +9,12 @@ contract Approvable {
     approved[msg.sender] = true;
   }
 
-  function approve(address _address) external onlyApproved {
+  function approve(address _address) public onlyApproved {
     require(_address != address(0));
     approved[_address] = true;
   }
 
-  function revokeApproval(address _address) external onlyApproved {
+  function revokeApproval(address _address) public onlyApproved {
     require(_address != address(0));
     approved[_address] = false;
   }

@@ -24,17 +24,6 @@ contract('Distense contract', function (accounts) {
     value: 1296000 // Equal to 15 days in Solidity
   }
 
-  const numDIDRequiredToRewardVoteTask = {
-    title: 'votingInterval',
-    value: 150 // Equal to 15 days in Solidity
-  }
-
-  const numDIDRequiredToApproveVotePullRequest = {
-    title: 'votingInterval',
-    value: 300 // Equal to 15 days in Solidity
-  }
-
-
   it('should set the initial attributes correctly', async function () {
 
     let param = await distense.getParameterByTitle(

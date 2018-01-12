@@ -58,7 +58,7 @@ contract('Distense contract', function (accounts) {
       convertBytes32ToString(param[0].toString()),
       proposalPctDIDToApproveParameter.title
     )
-    assert.equal(param[1], proposalPctDIDToApproveParameter.value)
+    assert.equal(param[1].toNumber(), proposalPctDIDToApproveParameter.value)
   })
 
 

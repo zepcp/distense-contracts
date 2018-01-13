@@ -69,7 +69,7 @@ contract Distense {
     proposalPctDIDToApproveParameter = Parameter({
       title: proposalPctDIDToApproveParameterTitle,
       //     Every hard-coded int in Solidity is a decimal to one decimal place
-      //     So this is 25.0
+      //     So this is 25.0%
       value: 250
     });
     parameters[proposalPctDIDToApproveParameterTitle] = proposalPctDIDToApproveParameter;
@@ -107,8 +107,8 @@ contract Distense {
     minNumberOfTaskRewardVotersParameter = Parameter({
       title: minNumberOfTaskRewardVotersParameterTitle,
       //     Every hard-coded int in Solidity is a decimal to one decimal place
-      //     So this is 5.0
-      value: 50
+      //     So this is 7.0
+      value: 70
     });
     parameters[minNumberOfTaskRewardVotersParameterTitle] = minNumberOfTaskRewardVotersParameter;
     parameterTitles.push(minNumberOfTaskRewardVotersParameterTitle);
@@ -168,7 +168,7 @@ contract Distense {
     uint256 currentValue = getParameterValueByTitle(_title);
     require(_voteValue != currentValue);
 
-    uint updatedValue = (_voteValue * votersDIDPercent) / 100;
+    uint updatedValue = (_voteValue * votersDIDPercent) / 1000;
 
     updateParameterValue(_title, updatedValue);
     updateLastVotedOnParameter(_title, msg.sender);

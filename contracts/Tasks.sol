@@ -20,7 +20,7 @@ contract Tasks is Approvable, Debuggable {
   enum RewardStatus { Tentative, Determined, Paid }
 
   struct Task {
-    bytes32 title;
+    string title;
     address createdBy;
     uint256 reward;
     RewardStatus rewardStatus;
@@ -31,7 +31,7 @@ contract Tasks is Approvable, Debuggable {
 
   mapping (bytes32 => Task) tasks;
 
-  event LogAddTask(bytes32 taskId);
+  event LogAddTask(bytes32 taskId, string title);
   event LogTaskRewardVote(bytes32 taskId, uint256 reward, uint256 pctDIDVoted);
   event LogTaskRewardDetermined(bytes32 taskId, uint256 reward);
 
@@ -42,7 +42,7 @@ contract Tasks is Approvable, Debuggable {
   }
 
 
-  function addTask(bytes32 _taskId, bytes32 _title) external hasEnoughDID(msg.sender, 50) returns
+  function addTask(bytes32 _taskId, string _title) external hasEnoughDID(msg.sender, 50) returns
   (bool) {
 
 //    TODO check for empty _taskId
@@ -54,7 +54,7 @@ contract Tasks is Approvable, Debuggable {
     tasks[_taskId].rewardStatus = RewardStatus.Tentative;
 
     taskIds.push(_taskId);
-    LogAddTask(_taskId);
+    LogAddTask(_taskId, _title);
 
     return true;
 
@@ -62,7 +62,7 @@ contract Tasks is Approvable, Debuggable {
 
 
   function getTaskById(bytes32 _taskId) external view returns (
-    bytes32,
+    string,
     address,
     uint256,
     Tasks.RewardStatus,
@@ -125,8 +125,6 @@ contract Tasks is Approvable, Debuggable {
     task.pctDIDVoted = task.pctDIDVoted + pctDIDOwned;
 
     uint256 difference;
-    uint256 update;
-
     if (_reward > task.reward) {
       difference = SafeMath.sub(_reward, task.reward);
       LogUInt256(difference);

@@ -2,9 +2,12 @@ const web3 = global.web3
 const Tasks = artifacts.require('Tasks')
 const DIDToken = artifacts.require('DIDToken')
 const Distense = artifacts.require('Distense')
-const assertJump = require('./helpers/assertJump')
-const proposalPctDIDRequiredValue = require('./Distense.test')
 
+
+import {
+  convertIntToSolidityInt,
+  convertSolidityIntToInt
+} from './helpers/utils'
 
 
 module.exports.increaseTime = addSeconds => {
@@ -15,15 +18,6 @@ module.exports.increaseTime = addSeconds => {
   })
 }
 
-
-
-const convertIntToSolidityInt = function (integer) {
-  return integer * 10
-}
-
-const convertSolidityIntToInt = function (integer) {
-  return integer / 10
-}
 
 contract('Tasks', function (accounts) {
 

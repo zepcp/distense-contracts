@@ -27,10 +27,17 @@ module.exports = {
       port: 8555, // <-- If you change this, also set the port option in .solcover.js.
       gas: 0xfffffffffff, // <-- Use this high gas value
       gasPrice: 0x01 // <-- Use this low gas price
+    },
+    rinkeby: {
+      host: 'localhost',
+      network_id: '4',
+      port: 4000,
+      gas: 6719227,
+      gasPrice: 30000000000
     }
   },
   mocha: {
-    slow: 200,
+    slow: 500,
     useColors: true
   },
   solc: {

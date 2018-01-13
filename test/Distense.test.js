@@ -4,24 +4,30 @@ const Distense = artifacts.require('Distense')
 const convertBytes32ToString = require('./helpers/utils')
 const assertJump = require('./helpers/assertJump')
 
+import {
+  convertIntToSolidityInt,
+  convertSolidityIntToInt
+} from './helpers/utils'
 
 contract('Distense contract', function (accounts) {
 
   const proposalPctDIDToApproveParameter = {
     title: 'proposalPctDIDToApprove',
-    value: 250 // Hard coded in constructor function in contract
+    value: 25 // CLIENT VALUE (not multiplied by 10) Hard coded in constructor function in contract
   }
 
   const pullRequestPctDIDParameter = {
     title: 'pctDIDRequiredToMergePullRequest',
     // Hard coded in constructor function in contract
-    //  This is 10 because no floating point in Solidity
-    value: 100
+    // CLIENT VALUE (not multiplied by 10)
+    value: 10
   }
 
   const votingIntervalParameter = {
     title: 'votingInterval',
-    value: 1296000 // Equal to 15 days in Solidity
+    // Equal to 15 days in Solidity
+    // CLIENT VALUE (not multiplied by 10)
+    value: 1296000
   }
 
   it('should set the initial attributes correctly', async function () {
@@ -104,13 +110,13 @@ contract('Distense contract', function (accounts) {
     )
   })
 
-  //  Begin accounts[0] owns 200 or 100%
+  //  Begin accounts[0] owns 2000 or 100%
   let didToken
   let distense
 
   beforeEach(async function () {
     didToken = await DIDToken.new()
-    didToken.issueDID(accounts[0], 200)
+    didToken.issueDID(accounts[0], 2000)
     distense = await Distense.new(didToken.address)
   })
 
@@ -149,7 +155,7 @@ contract('Distense contract', function (accounts) {
   })
 
 
-  it(`should allow voting after the votingInterval has passed`, async function () {
+  it(`should allow voting only after the votingInterval has passed`, async function () {
 
     const userBalance = await didToken.balances.call(accounts[0])
     assert.isAbove(userBalance, 0, 'user should have DID here to vote')
@@ -171,13 +177,77 @@ contract('Distense contract', function (accounts) {
 
     } catch (error) {
       // assertJump(error)
-     contractError = error
+      contractError = error
     }
 
     assert.notEqual(
       contractError,
       undefined,
       'should throw an error because the voter is trying to vote twice'
+    )
+
+  })
+
+  it(`should properly update the votingInterval parameter value when voted upon with the proper requirements`, async function () {
+
+    const userBalance = await didToken.balances.call(accounts[0])
+    assert.isAbove(userBalance.toNumber(), convertSolidityIntToInt(2000), 'user should have DID here to vote')
+
+    await distense.voteOnParameter(
+      votingIntervalParameter.title,
+      votingIntervalParameter.value * 2
+    )
+
+    const newValue = await distense.getParameterValueByTitle(votingIntervalParameter.title)
+
+    assert.equal(
+      convertSolidityIntToInt(newValue.toNumber()),
+      votingIntervalParameter.value * 2,
+      'updated value should be twice the original value as the voter owns 100% of the DID'
+    )
+
+  })
+
+  it(`should properly update the pullRequestPctDIDParameter value when voted upon with the proper requirements`, async function () {
+
+    const userBalance = await didToken.balances.call(accounts[0])
+    assert.isAbove(userBalance.toNumber(), convertSolidityIntToInt(2000), 'user should have DID here to vote')
+
+    await distense.voteOnParameter(
+      pullRequestPctDIDParameter.title,
+      pullRequestPctDIDParameter.value * 1.1
+    )
+
+    const newValue = await distense.getParameterValueByTitle(pullRequestPctDIDParameter.title)
+
+    assert.equal(
+      convertSolidityIntToInt(newValue.toNumber()),
+      pullRequestPctDIDParameter.value * 1.1,
+      'updated value should be 10% greater than the original value as the voter owns 100% of the DID'
+    )
+
+  })
+
+  it.only(`should properly update the votingInterval parameter value when voted upon with the proper requirements`, async function () {
+
+    const userBalance = await didToken.balances.call(accounts[0])
+    assert.isAbove(userBalance.toNumber(), convertSolidityIntToInt(2000), 'user should have DID here to vote')
+
+    console.log(`original param value: ${proposalPctDIDToApproveParameter.value}`)
+    const voteValue = proposalPctDIDToApproveParameter.value * .47
+    await distense.voteOnParameter(
+      proposalPctDIDToApproveParameter.title,
+      voteValue
+    )
+
+    const newValue = await distense.getParameterValueByTitle(proposalPctDIDToApproveParameter.title)
+
+    console.log(`newValue.toNumber(): ${newValue.toNumber()}`)
+    console.log(`voteValue: ${voteValue}`)
+    assert.equal(
+      convertSolidityIntToInt(newValue.toNumber()),
+      voteValue,
+      'updated value should be 47% of the original value'
     )
 
   })

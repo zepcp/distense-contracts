@@ -49,9 +49,9 @@ contract PullRequests is Approvable, Debuggable {
   }
 
 
-  function getPullRequestById(bytes32 _prId) external view returns (address, bytes32, uint256) {
+  function getPullRequestById(bytes32 _prId) external view returns (address, bytes32, uint64, uint256) {
     PullRequest memory pr = pullRequests[_prId];
-    return (pr.contributor, pr.taskId, pr.pctDIDApproved);
+    return (pr.contributor, pr.taskId, pr.prNum, pr.pctDIDApproved);
   }
 
 

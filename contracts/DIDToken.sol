@@ -30,7 +30,7 @@ contract DIDToken is Token, Approvable {
   
   function pctDIDOwned(address person) external view returns (uint256) {
     uint owned = balances[person];
-    return SafeMath.percent(owned, totalSupply, 3);
+    return SafeMath.percent(owned, totalSupply, 4);
   }
 
 }

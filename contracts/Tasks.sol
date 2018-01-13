@@ -1,6 +1,5 @@
 pragma solidity ^0.4.17;
 
-
 import './DIDToken.sol';
 import './Debuggable.sol';
 import './Distense.sol';
@@ -35,12 +34,10 @@ contract Tasks is Approvable, Debuggable {
   event LogTaskRewardVote(bytes32 taskId, uint256 reward, uint256 pctDIDVoted);
   event LogTaskRewardDetermined(bytes32 taskId, uint256 reward);
 
-
   function Tasks(address _DIDTokenAddress, address _DistenseAddress) public {
     DIDTokenAddress = _DIDTokenAddress;
     DistenseAddress = _DistenseAddress;
   }
-
 
   function addTask(bytes32 _taskId, string _title) external hasEnoughDID(msg.sender, 50) returns
   (bool) {
@@ -59,7 +56,6 @@ contract Tasks is Approvable, Debuggable {
     return true;
 
   }
-
 
   function getTaskById(bytes32 _taskId) external view returns (
     string,
@@ -82,16 +78,13 @@ contract Tasks is Approvable, Debuggable {
 
   }
 
-
   function taskExists(bytes32 _taskId) external view returns (bool) {
     return tasks[_taskId].createdBy != 0;
   }
 
-
   function getNumTasks() external view returns (uint) {
     return taskIds.length;
   }
-
 
   function taskRewardVote(bytes32 _taskId, uint256 _reward) external returns (bool) {
 
@@ -154,11 +147,9 @@ contract Tasks is Approvable, Debuggable {
 
   }
 
-
   function getTaskReward(bytes32 _taskId) external view returns (uint256) {
     return tasks[_taskId].reward;
   }
-
 
   function getTaskRewardAndStatus(bytes32 _taskId) external view returns (uint256, RewardStatus) {
     return (
@@ -171,7 +162,6 @@ contract Tasks is Approvable, Debuggable {
     tasks[_taskId].rewardStatus = RewardStatus.Paid;
     return tasks[_taskId].rewardStatus;
   }
-
 
   modifier hasEnoughDID(address voter, uint256 num) {
     DIDToken didToken = DIDToken(DIDTokenAddress);

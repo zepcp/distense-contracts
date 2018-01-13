@@ -4,9 +4,9 @@ import './DIDToken.sol';
 import './lib/SafeMath.sol';
 
 contract Distense {
-  using SafeMath for uint256;
+    using SafeMath for uint256;
 
-  address public DIDTokenAddress;
+    address public DIDTokenAddress;
 
   /*
     Distense' votable parameters
@@ -14,19 +14,18 @@ contract Distense {
     that defines a system or sets the conditions of its operation".
   */
 
-  //  Titles are what uniquely define parameters, so query by titles when iterating with clients
+  //  Titles are what uniquely identify parameters, so query by titles when iterating with clients
   bytes32[] public parameterTitles;
   struct Parameter {
-    bytes32 title;
-    uint256 value;
-    mapping (address => Vote) votes;
+      bytes32 title;
+      uint256 value;
+      mapping (address => Vote) votes;
   }
 
   struct Vote {
-    address voter;
-    uint256 lastVoted;
+  address voter;
+  uint256 lastVoted;
   }
-
 
   mapping (bytes32 => Parameter) public parameters;
 
@@ -54,6 +53,8 @@ contract Distense {
   Parameter public defaultRewardParameter;
   bytes32 public defaultRewardParameterTitle = 'defaultReward';
 
+  Parameter public didPerEtherParameter;
+  bytes32 public didPerEtherParameterTitle = 'didPerEther';
 
   event LogParameterValueUpdate(bytes32 title, uint256 value);
 
@@ -64,6 +65,7 @@ contract Distense {
 
     // Launch Distense with some votable parameters
     // that can be later updated by contributors
+    // Current values can be found at https://disten.se/parameters
 
     // PCT of DID that must vote on a proposal for it to be approved and payable
     proposalPctDIDToApproveParameter = Parameter({
@@ -113,6 +115,7 @@ contract Distense {
     parameters[minNumberOfTaskRewardVotersParameterTitle] = minNumberOfTaskRewardVotersParameter;
     parameterTitles.push(minNumberOfTaskRewardVotersParameterTitle);
 
+
     // This parameter is the number of DID an account must own to vote on a task's reward
     // The task reward is the number of DID payable upon successful completion and approval of a task
 
@@ -137,27 +140,36 @@ contract Distense {
     parameters[numDIDRequiredToApproveVotePullRequestParameterTitle] = numDIDRequiredToApproveVotePullRequestParameter;
     parameterTitles.push(numDIDRequiredToApproveVotePullRequestParameterTitle);
 
+
     defaultRewardParameter = Parameter({
-    title: defaultRewardParameterTitle,
-    //     Every hard-coded int in Solidity is a decimal to one decimal place
-    //     So this is 100.0
-    value: 1000
+      title: defaultRewardParameterTitle,
+      //     Every hard-coded int in Solidity is a decimal to one decimal place
+      //     So this is 100.0
+      value: 1000
     });
     parameters[defaultRewardParameterTitle] = defaultRewardParameter;
     parameterTitles.push(defaultRewardParameterTitle);
 
-  }
 
+    didPerEtherParameter = Parameter({
+      title: didPerEtherParameterTitle,
+      //     Every hard-coded int in Solidity is a decimal to one decimal place
+      //     So this is 100.0
+      value: 12000
+    });
+    parameters[didPerEtherParameterTitle] = didPerEtherParameter;
+    parameterTitles.push(didPerEtherParameterTitle);
+
+  }
 
   function getParameterValueByTitle(bytes32 _title) public view returns (uint256) {
     return parameters[_title].value;
   }
 
-
   function voteOnParameter(bytes32 _title, uint256 _voteValue)
-  public
-  voteWithinRange(_title, _voteValue)
-  votingIntervalReached(msg.sender, _title)
+    public
+    voteWithinRange(_title, _voteValue)
+    votingIntervalReached(msg.sender, _title)
   returns
   (uint256) {
 
@@ -176,17 +188,14 @@ contract Distense {
     return updatedValue;
   }
 
-
   function getParameterByTitle(bytes32 _title) public view returns (bytes32, uint256) {
     Parameter memory param = parameters[_title];
     return (param.title, param.value);
   }
 
-
   function getNumParameters() public view returns (uint256) {
     return parameterTitles.length;
   }
-
 
   function updateParameterValue(bytes32 _title, uint256 _newValue) internal returns (uint256) {
     Parameter storage parameter = parameters[_title];
@@ -194,12 +203,10 @@ contract Distense {
     return parameter.value;
   }
 
-
   function updateLastVotedOnParameter(bytes32 _title, address voter) internal returns (bool) {
     Parameter storage parameter = parameters[_title];
     parameter.votes[voter].lastVoted = now;
   }
-
 
   modifier votingIntervalReached(address _voter, bytes32 _title) {
     Parameter storage parameter = parameters[_title];
@@ -207,7 +214,6 @@ contract Distense {
     require(now >= lastVotedOnParameter + getParameterValueByTitle(votingIntervalParameterTitle));
     _;
   }
-
 
   // Require parameter votes to be within two times the current value of the parameter.
   // Otherwise someone could vote with a very large number and skew the value however they wish

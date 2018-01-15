@@ -1,12 +1,18 @@
 const web3 = global.web3
 const DIDToken = artifacts.require('DIDToken')
+const Distense = artifacts.require('./Distense.sol')
+
+const utils = require('./helpers/utils')
+
 
 contract('DIDToken', function(accounts) {
 
   let didToken
+  let distense
 
   beforeEach(async function() {
-    didToken = await DIDToken.new()
+    distense = await Distense.new()
+    didToken = await DIDToken.new(distense.address)
   })
 
 
@@ -92,4 +98,51 @@ contract('DIDToken', function(accounts) {
     percentDID = await didToken.pctDIDOwned(accounts[1])
     assert.equal(percentDID.toString(), 500)
   })
+
+
+  it('should reduce the number of DID someone who exchanges DID for ether', async function() {
+
+    await didToken.issueDID(accounts[0], 200)
+
+    await didToken.exchangeDIDForEther(120)
+
+    const newBalance = await didToken.balances.call(accounts[0])
+    assert.equal(newBalance, 80, 'newBalance of DID should be 80 after exchanging 120')
+
+  })
+
+  it('should increase the ether balance of someone who exchanges DID for ether', async function() {
+
+    const originalEtherBalance = web3.eth.getBalance(accounts[0])
+    await didToken.issueDID(accounts[0], 200)
+
+    await didToken.exchangeDIDForEther(120)
+
+    const newBalance = await web3.eth.getBalance(accounts[0])
+
+    //  ether balance delta dependent on didPerEtherParameter value so keep this simple for now
+    assert.isBelow(newBalance, originalEtherBalance, 'new ether balance should be below the original ether balance')
+
+  })
+
+  it('should throw an error when someone tries to exchange DID for ether who doesn\'t own DID', async function() {
+
+    let exchangeError
+    try {
+
+      //  accounts[1] has no DID so this should fail/throw an error
+      assert.equal(await didToken.balances.call(accounts[1]), 0, 'accounts[1] must own 0 DID for this test to properly fail')
+
+      await didToken.exchangeDIDForEther(120, {
+        from: accounts[1]
+      })
+
+    } catch (error) {
+      exchangeError = error
+    }
+    assert.notEqual(exchangeError, undefined, 'Error should be thrown')
+
+  })
+
+
 })

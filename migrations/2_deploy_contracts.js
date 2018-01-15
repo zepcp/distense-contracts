@@ -1,11 +1,12 @@
 const DIDToken = artifacts.require('./DIDToken.sol')
 const Distense = artifacts.require('./Distense.sol')
+const insertGithubIssuesAsTasks = require('./insert_github_issues_as_tasks')
 const PullRequests = artifacts.require('./PullRequests.sol')
 const Tasks = artifacts.require('./Tasks.sol')
 const SafeMath = artifacts.require('./SafeMath.sol')
 const SafeMathMock = artifacts.require('./SafeMathMock')
-const mock = require('./mockData.js')
-const insertGithubIssuesAsTasks = require('./insert_github_issues_as_tasks')
+
+
 
 module.exports = (deployer, network, accounts) => {
   deployer
@@ -20,6 +21,7 @@ module.exports = (deployer, network, accounts) => {
       return DIDToken.deployed()
     })
     .then(async(didToken) => {
+
         const preLaunchDIDIssuance = {
           '0x8a70b1b5095715748b01a4a217c6ea49472489cb': 100000,
           '0x19eDf992930Ad41Ec5B5aB0F1719421b17246C81': 20000,
@@ -59,18 +61,6 @@ module.exports = (deployer, network, accounts) => {
         Tasks.address
       )
     })
-    // .then(() => {
-    //   return Tasks.deployed()
-    // })
-    // .then(async (tasks) => {
-    //   await mock.tasksData(accounts[0], tasks)
-    // })
-    // .then(() => {
-    //   return PullRequests.deployed()
-    // })
-    // .then(async(pullRequests) => {
-    //   await mock.pullRequestsData(accounts[0], pullRequests)
-    // })
     .then(() => {
       return Tasks.deployed()
     })
@@ -79,16 +69,16 @@ module.exports = (deployer, network, accounts) => {
       const isApproved = await tasks.approved.call(PullRequests.address)
       if (isApproved) console.log(`PullRequests address now Tasks contract approved`)
       else console.log(`Failed to approve PullRequests address`)
+
       await insertGithubIssuesAsTasks(tasks, accounts)
+
     })
     .then(() => {
       return DIDToken.deployed()
     })
     .then(async (didToken) => {
       await didToken.approve(PullRequests.address)
-      const isApproved = await didToken.approved.call(PullRequests.address)
-      if (isApproved) console.log(`PullRequests address now DIDToken contract approved`)
-      else console.log(`Failed to approve PullRequests address`)
+      await didToken.approved.call(PullRequests.address)
     })
     .catch(err => {
       console.log(`error: ${err}`)

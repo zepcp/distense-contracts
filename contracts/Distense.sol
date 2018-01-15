@@ -155,7 +155,7 @@ contract Distense {
         didPerEtherParameter = Parameter({
             title : didPerEtherParameterTitle,
             //     Every hard-coded int in Solidity is a decimal to one decimal place
-            //     So this is 100.0
+            //     So this is 1200.0
             value : 12000
             });
         parameters[didPerEtherParameterTitle] = didPerEtherParameter;

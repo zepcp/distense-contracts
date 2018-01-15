@@ -7,96 +7,99 @@ import './lib/Token.sol';
 
 contract DIDToken is Token, Approvable {
 
-  using SafeMath for uint256;
+    using SafeMath for uint256;
 
-  event LogIssueDID(address indexed to, uint256 numDID);
+    event LogIssueDID(address indexed to, uint256 numDID);
 
-  address public PullRequestsAddress;
+    address public PullRequestsAddress;
+    address public DistenseAddress;
 
-  uint256 hardDIDFromEtherDepositLimitInAggregate = 1000000;  // This is the max DID all addresses can receive from depositing ether
-  uint256 hardDIDFromEtherDepositLimitForAddress = 50000;  // This is the max DID any address can receive from Ether deposit
+    uint256 hardDIDFromEtherDepositLimitAggregate = 1000000;  // This is the max DID all addresses can receive from depositing ether
+    uint256 hardDIDFromEtherDepositLimitAddress = 50000;  // This is the max DID any address can receive from Ether deposit
+    uint256 totalDIDIssuedFromEtherDeposit = 0;
 
-  mapping (address => uint256) public numDIDExchanged;  // keep track of how much contributors have deposited to prevent over depositing
+    mapping(address => uint256) public numDIDExchangedAddress;  // keep track of how much contributors have deposited to prevent over depositing
 
-  function DIDToken (address _DistenseAddress) public payable {
-    name = "Distense DID";
-    symbol = "DID";
+    function DIDToken(address _DistenseAddress) public payable {
+        name = "Distense DID";
+        symbol = "DID";
 
-    DistenseAddress = _DistenseAddress;
-  }
+        DistenseAddress = _DistenseAddress;
+    }
 
-  function issueDID(address _recipient, uint256 _numDID) external onlyApproved returns (uint256) {
-    require(_recipient != address(0));
-    require(_numDID > 0);
+    function issueDID(address _recipient, uint256 _numDID) external onlyApproved returns (uint256) {
+        require(_recipient != address(0));
+        require(_numDID > 0);
 
-    totalSupply = SafeMath.add(totalSupply, _numDID);
-    balances[_recipient] = SafeMath.add(balances[_recipient], _numDID);
-    LogIssueDID(_recipient, _numDID);
+        totalSupply = SafeMath.add(totalSupply, _numDID);
+        balances[_recipient] = SafeMath.add(balances[_recipient], _numDID);
+        LogIssueDID(_recipient, _numDID);
 
-    return balances[_recipient];
-  }
-  
-  function pctDIDOwned(address _person) external view returns (uint256) {
-    uint owned = balances[_person];
-    return SafeMath.percent(owned, totalSupply, 3);
-  }
+        return balances[_recipient];
+    }
 
-  function exchangeDIDForEther(uint256 _numDIDToExchange)
-    hasEnoughDID(msg.sender, _numDIDToExchange) external returns
-  (uint256) {
+    function pctDIDOwned(address _person) external view returns (uint256) {
+        uint owned = balances[_person];
+        return SafeMath.percent(owned, totalSupply, 3);
+    }
 
-    Distense distense = Distense(DistenseAddress);
-    uint256 DIDPerEther = Distense.getParameterValueByTitle(distense.didPerEtherParameterTitle);
+    function exchangeDIDForEther(uint256 _numDIDToExchange)
+        hasEnoughDID(msg.sender, _numDIDToExchange)
+        external
+    returns (uint256) {
 
-    //  Adjust number of DID owned first
-    balances[msg.sender] = SafeMath.sub(balances[msg.sender], _numDIDToExchange);
-    totalSupply = SafeMath.sub(totalSupply, _numDIDToExchange);
+        Distense distense = Distense(DistenseAddress);
+        uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
 
-    //  Send contributor their ether
+        //  Adjust number of DID owned first
+        balances[msg.sender] = SafeMath.sub(balances[msg.sender], _numDIDToExchange);
+        totalSupply = SafeMath.sub(totalSupply, _numDIDToExchange);
 
-    return balances[msg.sender];
-  }
+        totalDIDIssuedFromEtherDeposit + _numDIDToExchange;
+        //  Send contributor their ether
 
-  modifier hasEnoughDID(address _contributor, uint256 num) {
-    uint256 balance = balances(msg.sender);
-    require(balance >= num);
-    _;
-  }
+        return balances[msg.sender];
+    }
 
-  function depositEtherForDID() canDepositThisManyEtherForDID(msg.sender, msg.value) external payable returns (uint256) {
+    function depositEtherForDID() canDepositThisManyEtherForDID(msg.sender, msg.value) external payable returns (uint256) {
 
-    Distense distense = Distense(DistenseAddress);
-    uint256 DIDPerEther = Distense.getParameterValueByTitle(distense.didPerEtherParameterTitle);
+        Distense distense = Distense(DistenseAddress);
+        uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
 
-    uint256 numDIDToIssue = SafeMath.div(msg.value, DIDPerEther);
+        uint256 numDIDToIssue = SafeMath.div(msg.value, DIDPerEther);
 
-    totalSupply = SafeMath.add(totalSupply, numDIDToIssue);
-    balances[_recipient] = SafeMath.add(balances[_recipient], numDIDToIssue);
+        totalSupply = SafeMath.add(totalSupply, numDIDToIssue);
+        balances[msg.sender] = SafeMath.add(balances[msg.sender], numDIDToIssue);
 
-    LogIssueDID(_recipient, _numDID);
+        LogIssueDID(msg.sender, numDIDToIssue);
 
-    return balances[_recipient];
-  }
+        return balances[msg.sender];
+    }
 
-  modifier hasEnoughDID(address _contributor, uint256 num) {
-    uint256 balance = balances(msg.sender);
-    require(balance >= num);
-    _;
-  }
+    modifier hasEnoughDID(address _contributor, uint256 _num) {
+        uint256 balance = balances[_contributor];
+        require(balance >= _num);
+        _;
+    }
 
-  modifier canDepositThisManyEtherForDID(address _contributor, uint256 _numEtherDepositing) {
+    modifier canDepositThisManyEtherForDID(address _contributor, uint256 _numEtherDepositing) {
 
-    uint256 balance = balances(msg.sender);
-    require(balance >= num);
+        //  Make sure the aggregate limit of DID that can be issued for ether hasn't been reached
+        require(totalDIDIssuedFromEtherDeposit < hardDIDFromEtherDepositLimitAggregate);
+        require(numDIDExchangedAddress[msg.sender] < hardDIDFromEtherDepositLimitAddress);
 
-    uint256 numDIDExchanged = numDIDExchanged[msg.sender];
-    Distense distense = Distense(DistenseAddress);
-    uint256 DIDPerEther = Distense.getParameterValueByTitle(distense.didPerEtherParameterTitle);
+        Distense distense = Distense(DistenseAddress);
+        uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
 
-    uint256 requiredNumDID = _numEtherDepositing / DIDPerEther;
-    require(requiredNumDID >= balances[msg.sender]);
+        uint256 desiredNumberOfDIDToExchange = SafeMath.div(_numEtherDepositing, DIDPerEther);
 
-    _;
-  }
+        //  Each address is limited to exchanging hardDIDFromEtherDepositLimitForAddress number of DID
+        //  This is the remaining number they may exchange.  Yes this is vuln to Sybil attacks
+        uint256 numDIDCanExchange = SafeMath.sub(hardDIDFromEtherDepositLimitAddress, numDIDExchangedAddress[msg.sender]);
+
+        require(desiredNumberOfDIDToExchange <= balances[msg.sender]);
+
+        _;
+    }
 
 }

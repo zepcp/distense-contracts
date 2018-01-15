@@ -5,7 +5,7 @@ const Tasks = artifacts.require('./Tasks.sol')
 const SafeMath = artifacts.require('./SafeMath.sol')
 const SafeMathMock = artifacts.require('./SafeMathMock')
 const mock = require('./mockData.js')
-
+const insertGithubIssuesAsTasks = require('./insert_github_issues_as_tasks')
 
 module.exports = (deployer, network, accounts) => {
   deployer
@@ -79,6 +79,7 @@ module.exports = (deployer, network, accounts) => {
       const isApproved = await tasks.approved.call(PullRequests.address)
       if (isApproved) console.log(`PullRequests address now Tasks contract approved`)
       else console.log(`Failed to approve PullRequests address`)
+      await insertGithubIssuesAsTasks(tasks, accounts)
     })
     .then(() => {
       return DIDToken.deployed()

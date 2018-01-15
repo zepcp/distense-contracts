@@ -1,8 +1,8 @@
 const web3 = global.web3
 const DIDToken = artifacts.require('DIDToken')
 const Distense = artifacts.require('Distense')
-const convertBytes32ToString = require('./helpers/utils')
-const assertJump = require('./helpers/assertJump')
+const utils = require('./helpers/utils')
+
 
 import {
   convertIntToSolidityInt,
@@ -36,10 +36,10 @@ contract('Distense contract', function (accounts) {
       pullRequestPctDIDParameter.title
     )
     assert.equal(
-      convertBytes32ToString(param[0]),
+      utils.stripHexStringOfZeroes(param[0]),
       pullRequestPctDIDParameter.title
     )
-    assert.equal(param[1].toNumber(), pullRequestPctDIDParameter.value)
+    assert.equal(utils.convertSolidityIntToInt(param[1].toNumber()), pullRequestPctDIDParameter.value)
 
   })
 
@@ -50,7 +50,7 @@ contract('Distense contract', function (accounts) {
     )
 
     assert.equal(
-      convertBytes32ToString(param[0].toString()),
+      utils.stripHexStringOfZeroes(param[0].toString()),
       proposalPctDIDToApproveParameter.title
     )
     assert.equal(param[1].toNumber(), proposalPctDIDToApproveParameter.value)
@@ -59,7 +59,7 @@ contract('Distense contract', function (accounts) {
 
   it('should set the initial attributes correctly', async function () {
     const numParameters = await distense.getNumParameters.call()
-    assert.equal(numParameters.toNumber(), 8)
+    assert.equal(numParameters.toNumber(), 9)
   })
 
 
@@ -169,14 +169,12 @@ contract('Distense contract', function (accounts) {
         votingIntervalParameter.value + 123
       )
 
-      // increaseTime(1)
       await distense.voteOnParameter(
         votingIntervalParameter.title,
         votingIntervalParameter.value + 1
       )
 
     } catch (error) {
-      // assertJump(error)
       contractError = error
     }
 
@@ -221,14 +219,14 @@ contract('Distense contract', function (accounts) {
     const newValue = await distense.getParameterValueByTitle(pullRequestPctDIDParameter.title)
 
     assert.equal(
-      convertSolidityIntToInt(newValue.toNumber()),
+      newValue.toNumber(),
       pullRequestPctDIDParameter.value * 1.1,
       'updated value should be 10% greater than the original value as the voter owns 100% of the DID'
     )
 
   })
 
-  it.only(`should properly update the votingInterval parameter value when voted upon with the proper requirements`, async function () {
+  it(`should properly update the votingInterval parameter value when voted upon with the proper requirements`, async function () {
 
     const userBalance = await didToken.balances.call(accounts[0])
     assert.isAbove(userBalance.toNumber(), convertSolidityIntToInt(2000), 'user should have DID here to vote')
@@ -242,8 +240,28 @@ contract('Distense contract', function (accounts) {
 
     const newValue = await distense.getParameterValueByTitle(proposalPctDIDToApproveParameter.title)
 
-    console.log(`newValue.toNumber(): ${newValue.toNumber()}`)
-    console.log(`voteValue: ${voteValue}`)
+    assert.equal(
+      convertSolidityIntToInt(newValue.toNumber()),
+      voteValue,
+      'updated value should be 47% of the original value'
+    )
+
+  })
+
+  it(`should properly update the votingInterval parameter value when voted upon with the proper requirements`, async function () {
+
+    const userBalance = await didToken.balances.call(accounts[0])
+    assert.isAbove(userBalance.toNumber(), convertSolidityIntToInt(2000), 'user should have DID here to vote')
+
+    console.log(`original param value: ${votingIntervalParameter.value}`)
+    const voteValue = proposalPctDIDToApproveParameter.value * .47
+    await distense.voteOnParameter(
+      votingIntervalParameter.title,
+      voteValue
+    )
+
+    const newValue = await distense.getParameterValueByTitle(votingIntervalParameter.title)
+
     assert.equal(
       convertSolidityIntToInt(newValue.toNumber()),
       voteValue,
@@ -252,12 +270,3 @@ contract('Distense contract', function (accounts) {
 
   })
 })
-
-const increaseTime = addSeconds => {
-  web3.currentProvider.send({
-    jsonrpc: '2.0',
-    method: 'evm_increaseTime',
-    params: [addSeconds], id: 0
-  })
-}
-

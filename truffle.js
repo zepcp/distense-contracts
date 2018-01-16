@@ -14,13 +14,6 @@ module.exports = {
       port: 7545,
       network_id: 5777
     },
-    distnet: {
-      host: '165.227.180.132',
-      port: 9000,
-      network_id: 9000,
-      from: '0x014eb296ef422debb71e43cb9c447306c536f05d',
-      gas: 4700000
-    },
     coverage: {
       host: 'localhost',
       network_id: '*',
@@ -28,10 +21,18 @@ module.exports = {
       gas: 0xfffffffffff, // <-- Use this high gas value
       gasPrice: 0x01 // <-- Use this low gas price
     },
-    rinkeby: {
+    rinkebyLocal: {
       host: 'localhost',
       network_id: '4',
       port: 4000,
+      gas: 6719227,
+      gasPrice: 50000000000
+    },
+    rinkebyRemote: {
+      host: '165.227.180.132',
+      network_id: '4',
+      port: 9000,
+      from: '0x0De5Be0E82493AcCb8E83d2aF99E72458249bBF9',
       gas: 6719227,
       gasPrice: 30000000000
     }

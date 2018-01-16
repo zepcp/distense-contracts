@@ -4,8 +4,9 @@
   "description": "Distense Ethereum smart contracts and tests",
   "main": "",
   "scripts": {
-    "test": "./node_modules/.bin/run-with-testrpc 'truffle test'",
+    "test": "TESTING=true ./node_modules/.bin/run-with-testrpc -l 8000000 'truffle test'",
     "coverage": "./node_modules/.bin/solidity-coverage"
+    "migrate local": "truffle migrate --network ganache  --reset --compile-all"
   },
   "repository": {
     "type": "git",

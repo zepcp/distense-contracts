@@ -1,6 +1,7 @@
 const web3 = global.web3
 const DIDToken = artifacts.require('DIDToken')
 const Distense = artifacts.require('./Distense.sol')
+const web3Utils = require('web3-utils')
 
 const utils = require('./helpers/utils')
 
@@ -143,6 +144,93 @@ contract('DIDToken', function(accounts) {
     assert.notEqual(exchangeError, undefined, 'Error should be thrown')
 
   })
+
+  it('should allow an address that owns sufficient DID to exchange 2 ether for DID', async function() {
+
+    let etherForDIDExchangeError
+    await didToken.issueDID(accounts[0], 20000)
+
+    try {
+
+      await didToken.depositEtherForDID({
+        from: accounts[0],
+        value: web3.toWei(2)
+      })
+
+    } catch (error) {
+      etherForDIDExchangeError = error
+      console.error(`etherForDIDExchangeError: ${etherForDIDExchangeError}`)
+    }
+
+    const tasksEtherBalance = await web3.eth.getBalance(didToken.address).toNumber()
+    assert.equal(tasksEtherBalance, web3.toWei(2), `Contracts ether balance should be 2`)
+    assert.equal(etherForDIDExchangeError, undefined, 'Error should not be thrown')
+
+  })
+
+  it('should increment the number of DID for those who invest ether', async function() {
+
+    let etherForDIDExchangeError
+    await didToken.issueDID(accounts[0], 20000)
+    const preInvestDIDBalance = await didToken.balances.call(accounts[0])
+
+    try {
+
+      await didToken.depositEtherForDID({
+        from: accounts[0],
+        value: web3.toWei(2)
+      })
+
+    } catch (error) {
+      etherForDIDExchangeError = error
+      console.error(`etherForDIDExchangeError: ${etherForDIDExchangeError}`)
+    }
+
+    const postInvestDIDBalance = await didToken.balances.call(accounts[0])
+    assert.isAbove(postInvestDIDBalance.toNumber(), preInvestDIDBalance, 'accounts[0] DID balance should be higher after investing ether')
+
+  })
+
+  it('should properly limit an address from exchanging too many etherForDID in the canDepositThisManyEtherForDID modifier', async function() {
+
+    let exchangeError
+    try {
+
+      //  accounts[1] has no DID so this should fail/throw an error
+      const didPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterValue.call())
+      await didToken.depositEtherForDID(10, {
+        from: accounts[1]
+      })
+
+    } catch (error) {
+      exchangeError = error
+    }
+    assert.notEqual(exchangeError, undefined, 'Error should be thrown')
+
+  })
+
+  /*it('should properly limit an address from exchanging too many etherForDID in the canDepositThisManyEtherForDID modifier', async function() {
+
+    let exchangeError
+
+    const hardDIDFromEtherDepositLimitAggregate = await didToken.hardEtherDepositLimitAggregate.call()
+    try {
+
+      //  accounts[1] has no DID so this should fail/throw an error
+      await didToken.depositEtherForDID({}, {
+        from: accounts[1],
+        value: 10000
+      })
+
+    } catch (error) {
+      exchangeError = error
+    }
+
+    const tasksEtherBalance = await web3.eth.getBalance(didToken.address)
+    assert.equal(tasksEtherBalance, 0, `Contracts ether balance should be 0`)
+    // assert.notEqual(exchangeError, undefined, 'Error should be thrown')
+
+  })*/
 
 
 })

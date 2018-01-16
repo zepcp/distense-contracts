@@ -4,8 +4,10 @@ import './lib/Approvable.sol';
 import './Distense.sol';
 import './lib/SafeMath.sol';
 import './lib/Token.sol';
+import './Debuggable.sol';
 
-contract DIDToken is Token, Approvable {
+
+contract DIDToken is Token, Approvable, Debuggable {
 
     using SafeMath for uint256;
 
@@ -14,11 +16,11 @@ contract DIDToken is Token, Approvable {
     address public PullRequestsAddress;
     address public DistenseAddress;
 
-    uint256 hardDIDFromEtherDepositLimitAggregate = 1000000;  // This is the max DID all addresses can receive from depositing ether
-    uint256 hardDIDFromEtherDepositLimitAddress = 50000;  // This is the max DID any address can receive from Ether deposit
-    uint256 totalDIDIssuedFromEtherDeposit = 0;
+    uint256 public hardEtherInvestedLimitAggregate = 10000;  // This is the max DID all addresses can receive from depositing ether
+    uint256 public hardEtherInvestedLimitAddress = 1000;  // This is the max DID any address can receive from Ether deposit
+    uint256 public etherInvestedAggregate = 0;
 
-    mapping(address => uint256) public numDIDExchangedAddress;  // keep track of how much contributors have deposited to prevent over depositing
+    mapping(address => uint256) public numEtherInvestedAddress;  // keep track of how much contributors have deposited to prevent over depositing
 
     function DIDToken(address _DistenseAddress) public payable {
         name = "Distense DID";
@@ -51,17 +53,16 @@ contract DIDToken is Token, Approvable {
         Distense distense = Distense(DistenseAddress);
         uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
 
-        //  Adjust number of DID owned first
+//        //  Adjust number of DID owned first
         balances[msg.sender] = SafeMath.sub(balances[msg.sender], _numDIDToExchange);
         totalSupply = SafeMath.sub(totalSupply, _numDIDToExchange);
 
-        totalDIDIssuedFromEtherDeposit + _numDIDToExchange;
-        //  Send contributor their ether
+        //  Send contributor their ether here
 
         return balances[msg.sender];
     }
 
-    function depositEtherForDID() canDepositThisManyEtherForDID(msg.sender, msg.value) external payable returns (uint256) {
+    function depositEtherForDID() /*canDepositThisManyEtherForDID(msg.sender, msg.value)*/ external payable returns (uint256) {
 
         Distense distense = Distense(DistenseAddress);
         uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
@@ -76,6 +77,10 @@ contract DIDToken is Token, Approvable {
         return balances[msg.sender];
     }
 
+    function numEtherContributorMayDeposit(address contributor) public view returns (uint256) {
+        return hardEtherInvestedLimitAddress - numEtherInvestedAddress[contributor];
+    }
+
     modifier hasEnoughDID(address _contributor, uint256 _num) {
         uint256 balance = balances[_contributor];
         require(balance >= _num);
@@ -83,23 +88,11 @@ contract DIDToken is Token, Approvable {
     }
 
     modifier canDepositThisManyEtherForDID(address _contributor, uint256 _numEtherDepositing) {
-
-        //  Make sure the aggregate limit of DID that can be issued for ether hasn't been reached
-        require(totalDIDIssuedFromEtherDeposit < hardDIDFromEtherDepositLimitAggregate);
-        require(numDIDExchangedAddress[msg.sender] < hardDIDFromEtherDepositLimitAddress);
-
-        Distense distense = Distense(DistenseAddress);
-        uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
-
-        uint256 desiredNumberOfDIDToExchange = SafeMath.div(_numEtherDepositing, DIDPerEther);
-
-        //  Each address is limited to exchanging hardDIDFromEtherDepositLimitForAddress number of DID
-        //  This is the remaining number they may exchange.  Yes this is vuln to Sybil attacks
-        uint256 numDIDCanExchange = SafeMath.sub(hardDIDFromEtherDepositLimitAddress, numDIDExchangedAddress[msg.sender]);
-
-        require(desiredNumberOfDIDToExchange <= balances[msg.sender]);
-
+        require(numEtherContributorMayDeposit(_contributor) >= _numEtherDepositing);
+        require(etherInvestedAggregate < hardEtherInvestedLimitAggregate);
         _;
     }
+
+
 
 }

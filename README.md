@@ -27,7 +27,7 @@ Once you get past the initial code->testing phase and want to view your changes 
 
 - Install `ganache`, an application that is a local Ethereum testnet: Download the appropriate version from here: https://github.com/trufflesuite/ganache/releases
 - run ganache
-- Then you need to compile and deploy your updated version of the contracts: `npm run migrate local`
+- Then you need to compile and deploy your updated version of the contracts: `npm run migrateLocal`
 - Once your contracts are migrated you can install and run the distense-ui client to interact with them:
     - `git clone https://github.com/Distense/distense-ui`
     - `cd distense-ui`

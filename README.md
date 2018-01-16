@@ -2,37 +2,48 @@
 [![codecov](https://codecov.io/gh/Distense/contracts/branch/master/graph/badge.svg)](https://codecov.io/gh/Distense/contracts)
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-> Distense Ethereum Smart Contracts
+> Distense' Ethereum Smart Contracts
 
 ## Table of Contents
 
 - [Install](#install)
 - [Usage](#usage)
-- [Maintainers](#maintainers)
 - [Contribute](#contribute)
 - [License](#license)
 
 ## Install
 
-```npm install
-```
+- clone this repo
+- make sure to have npm
+- `npm install`
 
 ## Usage
 
-You can either contribute to this repo by writing Solidity and running tests and/or clone our client from github.com/Distense/distense-ui, install that with `npm install` as well. Some of our contracts interact with the UI and some don't. 
-```testrpc``` in one shell
-```npm run test
-``` in another
+- the primary way we interact with our smart contracts is by testing, so when developing we make changes to our contracts, test, then interact in the UI
+- to test run `npm run test`
 
-## Maintainers
 
-[@JohnAllen](https://github.com/JohnAllen)
+Once you get past the initial code->testing phase and want to view your changes in the UI
+
+- Install `ganache`, an application that is a local Ethereum testnet: Download the appropriate version from here: https://github.com/trufflesuite/ganache/releases
+- run ganache
+- Then you need to compile and deploy your updated version of the contracts: `npm run migrate local`
+- Once your contracts are migrated you can install and run the distense-ui client to interact with them:
+    - `git clone https://github.com/Distense/distense-ui`
+    - `cd distense-ui`
+    - `npm install`
+- What we normally do at this point is remove the npm published version of our contracts from the distense-ui node_modules: `rm -r node_modules/distense-contracts`.
+- Then you can symlink _your_ version of our contracts into the proper location in the client:
+    - `sudo ln ~/distense-contracts ~/distense-ui/node_modules`
+- Then you can run the distense-ui with `npm run start`
+- You can interact with your version of the contracts at this point and modify the distense-ui if you want
+
 
 ## Contribute
 
-PRs accepted.
-
-Small note: If editing the README, please conform to the [standard-readme](https://github.com/RichardLitt/standard-readme) specification.
+- See #Install and #Usage
+- By contributing to this repo you will earn DID, if you choose to submit your contribution to our website at https://disten.se/pullrequests/add
+    - See instructions on how to submit your work there
 
 ## License
 

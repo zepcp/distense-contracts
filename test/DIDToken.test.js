@@ -2,30 +2,29 @@ const web3 = global.web3
 const DIDToken = artifacts.require('DIDToken')
 const Distense = artifacts.require('./Distense.sol')
 const web3Utils = require('web3-utils')
+const didPerEtherParameter = require('./Distense.test')
 
 const utils = require('./helpers/utils')
 
 
-contract('DIDToken', function(accounts) {
+contract('DIDToken', function (accounts) {
 
   let didToken
   let distense
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     distense = await Distense.new()
     didToken = await DIDToken.new(distense.address)
   })
 
-
-  it('should set the initial attributes correctly', async function() {
+  it('should set the initial attributes correctly', async function () {
     assert.equal(await didToken.totalSupply(), 0)
     assert.equal(await didToken.name(), 'Distense DID')
     assert.equal(await didToken.symbol(), 'DID')
     assert.equal(await didToken.decimals(), 18)
   })
 
-
-  it('should issueDID correctly', async function() {
+  it('should issueDID correctly', async function () {
 
     await didToken.issueDID(accounts[0], 4321)
     let newSupply = await didToken.totalSupply()
@@ -34,11 +33,10 @@ contract('DIDToken', function(accounts) {
     await didToken.issueDID(accounts[0], 112340876)
     newSupply = await didToken.totalSupply()
     assert.equal(newSupply.toNumber(), 112345197)
-  
+
   })
 
-
-  it('should disallow issueDID from an empty address', async function() {
+  it('should disallow issueDID from an empty address', async function () {
     let addError
     try {
       //contract throws error here
@@ -51,8 +49,7 @@ contract('DIDToken', function(accounts) {
     assert.notEqual(addError, undefined, 'Error must be thrown')
   })
 
-
-  it('should allow issueDID from owner', async function() {
+  it('should allow issueDID from owner', async function () {
     let addError
     try {
       //contract throws error here
@@ -66,8 +63,7 @@ contract('DIDToken', function(accounts) {
     assert.equal(await didToken.balances.call(accounts[5]), 9100)
   })
 
-
-  it('should disallow an issueDID call for === 0', async function() {
+  it('should disallow an issueDID call for === 0', async function () {
     let addError
     try {
       //contract throws error here
@@ -85,7 +81,7 @@ contract('DIDToken', function(accounts) {
     )
   })
 
-  it('should correctly calculate the percentDID someone owns', async function() {
+  it('should correctly calculate the percentDID someone owns', async function () {
     assert.equal(await didToken.totalSupply(), 0)
     await didToken.issueDID(accounts[0], 200)
     let percentDID = await didToken.pctDIDOwned(accounts[0])
@@ -100,42 +96,17 @@ contract('DIDToken', function(accounts) {
     assert.equal(percentDID.toString(), 500)
   })
 
-
-  it('should reduce the number of DID someone who exchanges DID for ether', async function() {
-
-    await didToken.issueDID(accounts[0], 200)
-
-    await didToken.exchangeDIDForEther(120)
-
-    const newBalance = await didToken.balances.call(accounts[0])
-    assert.equal(newBalance, 80, 'newBalance of DID should be 80 after exchanging 120')
-
-  })
-
-  it('should increase the ether balance of someone who exchanges DID for ether', async function() {
-
-    const originalEtherBalance = web3.eth.getBalance(accounts[0])
-    await didToken.issueDID(accounts[0], 200)
-
-    await didToken.exchangeDIDForEther(120)
-
-    const newBalance = await web3.eth.getBalance(accounts[0])
-
-    //  ether balance delta dependent on didPerEtherParameter value so keep this simple for now
-    assert.isBelow(newBalance, originalEtherBalance, 'new ether balance should be below the original ether balance')
-
-  })
-
-  it('should throw an error when someone tries to exchange DID for ether who doesn\'t own DID', async function() {
+  it('should throw an error when someone tries to exchange DID for ether who doesn\'t own DID', async function () {
 
     let exchangeError
     try {
 
       //  accounts[1] has no DID so this should fail/throw an error
       assert.equal(await didToken.balances.call(accounts[1]), 0, 'accounts[1] must own 0 DID for this test to properly fail')
-
-      await didToken.exchangeDIDForEther(120, {
-        from: accounts[1]
+      assert.equal(await didToken.balances.call(accounts[1]), 0, 'accounts[1] must own 0 DID for this test to properly fail')
+      await didToken.exchangeDIDForEther({
+        from: accounts[1],
+        value: web3.toWei(2)
       })
 
     } catch (error) {
@@ -145,7 +116,7 @@ contract('DIDToken', function(accounts) {
 
   })
 
-  it('should allow an address that owns sufficient DID to exchange 2 ether for DID', async function() {
+  it('should allow an address that owns sufficient DID to exchange 2 ether for DID', async function () {
 
     let etherForDIDExchangeError
     await didToken.issueDID(accounts[0], 20000)
@@ -168,17 +139,18 @@ contract('DIDToken', function(accounts) {
 
   })
 
-  it('should increment the number of DID for those who invest ether', async function() {
+  it('should increment the number of DID for those who invest ether', async function () {
 
     let etherForDIDExchangeError
     await didToken.issueDID(accounts[0], 20000)
     const preInvestDIDBalance = await didToken.balances.call(accounts[0])
+    const etherToInvest = 2
 
     try {
 
-      await didToken.depositEtherForDID({
+      await didToken.investEtherForDID({}, {
         from: accounts[0],
-        value: web3.toWei(2)
+        value: web3.toWei(etherToInvest, 'ether')
       })
 
     } catch (error) {
@@ -187,50 +159,15 @@ contract('DIDToken', function(accounts) {
     }
 
     const postInvestDIDBalance = await didToken.balances.call(accounts[0])
+
+    const didPerEther = await distense.getParameterValueByTitle('didPerEther')
+    assert.equal(didPerEther, 1000, 'make sure didPerEther is still 1000')
+
     assert.isAbove(postInvestDIDBalance.toNumber(), preInvestDIDBalance, 'accounts[0] DID balance should be higher after investing ether')
-
+    assert.equal(
+      postInvestDIDBalance.toNumber(),
+      preInvestDIDBalance.toNumber() + (didPerEther * etherToInvest),
+      'accounts[0] DID balance should be higher after investing ether')
   })
-
-  it('should properly limit an address from exchanging too many etherForDID in the canDepositThisManyEtherForDID modifier', async function() {
-
-    let exchangeError
-    try {
-
-      //  accounts[1] has no DID so this should fail/throw an error
-      const didPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterValue.call())
-      await didToken.depositEtherForDID(10, {
-        from: accounts[1]
-      })
-
-    } catch (error) {
-      exchangeError = error
-    }
-    assert.notEqual(exchangeError, undefined, 'Error should be thrown')
-
-  })
-
-  /*it('should properly limit an address from exchanging too many etherForDID in the canDepositThisManyEtherForDID modifier', async function() {
-
-    let exchangeError
-
-    const hardDIDFromEtherDepositLimitAggregate = await didToken.hardEtherDepositLimitAggregate.call()
-    try {
-
-      //  accounts[1] has no DID so this should fail/throw an error
-      await didToken.depositEtherForDID({}, {
-        from: accounts[1],
-        value: 10000
-      })
-
-    } catch (error) {
-      exchangeError = error
-    }
-
-    const tasksEtherBalance = await web3.eth.getBalance(didToken.address)
-    assert.equal(tasksEtherBalance, 0, `Contracts ether balance should be 0`)
-    // assert.notEqual(exchangeError, undefined, 'Error should be thrown')
-
-  })*/
-
 
 })

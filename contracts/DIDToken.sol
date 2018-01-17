@@ -16,8 +16,8 @@ contract DIDToken is Token, Approvable, Debuggable {
     address public PullRequestsAddress;
     address public DistenseAddress;
 
-    uint256 public hardEtherInvestedLimitAggregate = 10000;  // This is the max DID all addresses can receive from depositing ether
-    uint256 public hardEtherInvestedLimitAddress = 1000;  // This is the max DID any address can receive from Ether deposit
+    uint256 public hardEtherInvestedLimitAggregate = 10000 ether;  // This is the max DID all addresses can receive from depositing ether
+    uint256 public hardEtherInvestedLimitAddress = 1000 ether;  // This is the max DID any address can receive from Ether deposit
     uint256 public etherInvestedAggregate = 0;
 
     mapping(address => uint256) public numEtherInvestedAddress;  // keep track of how much contributors have deposited to prevent over depositing
@@ -53,21 +53,26 @@ contract DIDToken is Token, Approvable, Debuggable {
         Distense distense = Distense(DistenseAddress);
         uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
 
-//        //  Adjust number of DID owned first
+        uint256 numEtherToIssue = SafeMath.div(_numDIDToExchange, DIDPerEther);
+        require(this.balance > numEtherToIssue);
+
+        //  Adjust number of DID owned first
         balances[msg.sender] = SafeMath.sub(balances[msg.sender], _numDIDToExchange);
         totalSupply = SafeMath.sub(totalSupply, _numDIDToExchange);
 
-        //  Send contributor their ether here
+        msg.sender.transfer(numEtherToIssue);
 
         return balances[msg.sender];
     }
 
-    function depositEtherForDID() /*canDepositThisManyEtherForDID(msg.sender, msg.value)*/ external payable returns (uint256) {
+    function investEtherForDID() canDepositThisManyEtherForDID() external payable returns (uint256) {
 
         Distense distense = Distense(DistenseAddress);
         uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
 
-        uint256 numDIDToIssue = SafeMath.div(msg.value, DIDPerEther);
+        uint256 numEtherInvested = SafeMath.div(msg.value, 1000000000000000000);
+
+        uint256 numDIDToIssue = SafeMath.mul(DIDPerEther, numEtherInvested);
 
         totalSupply = SafeMath.add(totalSupply, numDIDToIssue);
         balances[msg.sender] = SafeMath.add(balances[msg.sender], numDIDToIssue);
@@ -77,7 +82,7 @@ contract DIDToken is Token, Approvable, Debuggable {
         return balances[msg.sender];
     }
 
-    function numEtherContributorMayDeposit(address contributor) public view returns (uint256) {
+    function numEtherContributorMayInvest(address contributor) public view returns (uint256) {
         return hardEtherInvestedLimitAddress - numEtherInvestedAddress[contributor];
     }
 
@@ -87,8 +92,11 @@ contract DIDToken is Token, Approvable, Debuggable {
         _;
     }
 
-    modifier canDepositThisManyEtherForDID(address _contributor, uint256 _numEtherDepositing) {
-        require(numEtherContributorMayDeposit(_contributor) >= _numEtherDepositing);
+    modifier canDepositThisManyEtherForDID() {
+        uint256 numEtherMayInvest = numEtherContributorMayInvest(msg.sender);
+        LogUInt256(numEtherMayInvest);
+
+        require(numEtherMayInvest >= SafeMath.div(msg.value, 1000000000000000000));
         require(etherInvestedAggregate < hardEtherInvestedLimitAggregate);
         _;
     }

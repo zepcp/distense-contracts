@@ -16,8 +16,8 @@ contract DIDToken is Token, Approvable, Debuggable {
     address public PullRequestsAddress;
     address public DistenseAddress;
 
-    uint256 public hardEtherInvestedLimitAggregate = 10000 ether;  // This is the max DID all addresses can receive from depositing ether
-    uint256 public hardEtherInvestedLimitAddress = 1000 ether;  // This is the max DID any address can receive from Ether deposit
+    uint256 public numEtherAggregateMayInvest  = 10000;  // This is the max DID all addresses can receive from depositing ether
+    uint256 public numEtherAddressMayInvest  = 1000;  // This is the max DID any address can receive from Ether deposit
     uint256 public etherInvestedAggregate = 0;
 
     mapping(address => uint256) public numEtherInvestedAddress;  // keep track of how much contributors have deposited to prevent over depositing
@@ -82,8 +82,8 @@ contract DIDToken is Token, Approvable, Debuggable {
         return balances[msg.sender];
     }
 
-    function numEtherContributorMayInvest(address contributor) public view returns (uint256) {
-        return hardEtherInvestedLimitAddress - numEtherInvestedAddress[contributor];
+    function numEtherContributorMayInvest() public view returns (uint256) {
+        return numEtherAddressMayInvest - numEtherInvestedAddress[msg.sender];
     }
 
     modifier hasEnoughDID(address _contributor, uint256 _num) {
@@ -93,11 +93,10 @@ contract DIDToken is Token, Approvable, Debuggable {
     }
 
     modifier canDepositThisManyEtherForDID() {
-        uint256 numEtherMayInvest = numEtherContributorMayInvest(msg.sender);
-        LogUInt256(numEtherMayInvest);
+        uint256 numEtherMayInvest = numEtherContributorMayInvest();
 
         require(numEtherMayInvest >= SafeMath.div(msg.value, 1000000000000000000));
-        require(etherInvestedAggregate < hardEtherInvestedLimitAggregate);
+        require(numEtherAddressMayInvest < numEtherAggregateMayInvest);
         _;
     }
 

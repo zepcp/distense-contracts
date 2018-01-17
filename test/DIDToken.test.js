@@ -170,4 +170,32 @@ contract('DIDToken', function (accounts) {
       'accounts[0] DID balance should be higher after investing ether')
   })
 
+  it('should not increment the number of DID for those who invest too much ether', async function () {
+
+    let etherForDIDExchangeError
+    await didToken.issueDID(accounts[0], 20000)
+    const preInvestDIDBalance = await didToken.balances.call(accounts[0])
+    const etherToInvest = 1001
+
+    try {
+
+      await didToken.investEtherForDID({}, {
+        from: accounts[0],
+        value: web3.toWei(etherToInvest, 'ether')
+      })
+
+    } catch (error) {
+      etherForDIDExchangeError = error
+    }
+
+    const postInvestDIDBalance = await didToken.balances.call(accounts[0])
+
+    assert.notEqual(etherForDIDExchangeError, undefined, 'Should throw an error')
+    assert.equal(
+      postInvestDIDBalance.toNumber(),
+      preInvestDIDBalance.toNumber(),
+      'accounts[0] DID balance should be the same after trying to invest too much'
+    )
+  })
+
 })

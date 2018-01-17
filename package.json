@@ -4,7 +4,7 @@
   "description": "Distense Ethereum smart contracts and tests",
   "main": "",
   "scripts": {
-    "test": "TESTING=true ./node_modules/.bin/run-with-testrpc -l 8000000 'truffle test'",
+    "test": "TESTING=true ./node_modules/.bin/run-with-testrpc -l 8000000 -e 10000 'truffle test'",
     "coverage": "./node_modules/.bin/solidity-coverage",
     "migrateLocal": "truffle migrate --network ganache  --reset --compile-all"
   },

@@ -197,8 +197,8 @@ contract('PullRequests', function (accounts) {
 
     const votedOnPR = await pullRequests.getPullRequestById.call(pullRequest.id)
 
-    // isAbove because we just need to make sure it's incremented, amount is less important
-    assert.isAbove(votedOnPR[2].toNumber(), 0, 'pctDIDVoted of the votedOnPullRequest should be greater than zero')
+    // // isAbove because we just need to make sure it's incremented, amount is less important
+    assert.isAbove(votedOnPR[3].toNumber(), 0, 'pctDIDVoted of the votedOnPullRequest should be greater than zero')
 
   })
 

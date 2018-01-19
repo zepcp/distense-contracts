@@ -19,6 +19,14 @@ contract('SafeMath', function () {
     assert.equal(result, a * b);
   })
 
+  it('multiplies by 0 correctly', async function () {
+    let a = 0;
+    let b = 1234;
+    await safeMath.multiply(a, b);
+    let result = await safeMath.result();
+    assert.equal(result, 0);
+  })
+
 
   it('adds correctly', async function () {
     let a = 5678;

@@ -3,13 +3,12 @@ const DIDToken = artifacts.require('DIDToken')
 const Distense = artifacts.require('Distense')
 const utils = require('./helpers/utils')
 
-
 import {
-  convertIntToSolidityInt,
   convertSolidityIntToInt
 } from './helpers/utils'
 
 contract('Distense contract', function (accounts) {
+
 
   const proposalPctDIDToApproveParameter = {
     title: 'proposalPctDIDToApprove',
@@ -27,7 +26,7 @@ contract('Distense contract', function (accounts) {
     title: 'votingInterval',
     // Equal to 15 days in Solidity
     // CLIENT VALUE (not multiplied by 10)
-    value: 1296000
+    value: 129600000
   }
 
   it('should set the initial attributes correctly', async function () {
@@ -39,7 +38,11 @@ contract('Distense contract', function (accounts) {
       utils.stripHexStringOfZeroes(param[0]),
       pullRequestPctDIDParameter.title
     )
-    assert.equal(utils.convertSolidityIntToInt(param[1].toNumber()), pullRequestPctDIDParameter.value)
+    assert.equal(
+      utils.convertSolidityIntToInt(param[1].toNumber()),
+      pullRequestPctDIDParameter.value,
+      'proposalPctDIDToApprove value incorrect'
+    )
 
   })
 
@@ -53,7 +56,7 @@ contract('Distense contract', function (accounts) {
       utils.stripHexStringOfZeroes(param[0].toString()),
       proposalPctDIDToApproveParameter.title
     )
-    assert.equal(param[1].toNumber(), proposalPctDIDToApproveParameter.value)
+    assert.equal(utils.convertSolidityIntToInt(param[1].toNumber()), proposalPctDIDToApproveParameter.value)
   })
 
 
@@ -82,8 +85,8 @@ contract('Distense contract', function (accounts) {
     let votingIntervalParameterError
     try {
       await distense.voteOnParameter(
-        votingIntervalParameter.title,
-        votingIntervalParameter.value
+        params[2].title,
+        params[2].value
       )
     } catch (error) {
       votingIntervalParameterError = error
@@ -193,80 +196,133 @@ contract('Distense contract', function (accounts) {
 
     await distense.voteOnParameter(
       votingIntervalParameter.title,
-      votingIntervalParameter.value * 2
+      1
     )
 
-    const newValue = await distense.getParameterValueByTitle(votingIntervalParameter.title)
+    const newValue = await distense.getParameterValueByTitle.call(votingIntervalParameter.title)
 
     assert.equal(
-      convertSolidityIntToInt(newValue.toNumber()),
-      votingIntervalParameter.value * 2,
+      newValue.toNumber(),
+      votingIntervalParameter.value * 1.25, // limited to 25% increase
       'updated value should be twice the original value as the voter owns 100% of the DID'
     )
 
   })
 
-  it(`should properly update the pullRequestPctDIDParameter value when voted upon with the proper requirements`, async function () {
+  it(`should properly update the pullRequestPctDIDParameter value when upvoted with the proper requirements`, async function () {
 
     const userBalance = await didToken.balances.call(accounts[0])
     assert.isAbove(userBalance.toNumber(), convertSolidityIntToInt(2000), 'user should have DID here to vote')
 
     await distense.voteOnParameter(
       pullRequestPctDIDParameter.title,
-      pullRequestPctDIDParameter.value * 1.1
+      -1
     )
 
     const newValue = await distense.getParameterValueByTitle(pullRequestPctDIDParameter.title)
 
     assert.equal(
-      newValue.toNumber(),
-      pullRequestPctDIDParameter.value * 1.1,
+      convertSolidityIntToInt(newValue.toNumber()),
+      pullRequestPctDIDParameter.value * .75,
       'updated value should be 10% greater than the original value as the voter owns 100% of the DID'
     )
 
   })
 
-  it(`should properly update the votingInterval parameter value when voted upon with the proper requirements`, async function () {
+  function calcCorrectUpdatedParameterValue(pctDIDOwned, originalValue, vote) {
 
-    const userBalance = await didToken.balances.call(accounts[0])
-    assert.isAbove(userBalance.toNumber(), convertSolidityIntToInt(2000), 'user should have DID here to vote')
+    const limitTo25PercentIfHigher = (pctDIDOwned > 25 ? 25 : pctDIDOwned) / 100
 
-    console.log(`original param value: ${proposalPctDIDToApproveParameter.value}`)
-    const voteValue = proposalPctDIDToApproveParameter.value * .47
+    const update = originalValue * limitTo25PercentIfHigher
+    if (vote === 1)
+      originalValue += update
+    else
+      originalValue -= update
+
+    return originalValue
+  }
+
+  it(`should properly update the proposalPctDIDToApproveParameter value`, async function () {
+
+    await didToken.issueDID(accounts[1], 2000)
+
+    let newContractValue
+    let correctValue
+    let vote
+    let pctDIDOwned
+
+    //  Downvote by 50% owner -- should be limited to 25% down from original value of 25%
+    pctDIDOwned = convertSolidityIntToInt(await didToken.pctDIDOwned(accounts[0]))
+    vote = -1
     await distense.voteOnParameter(
       proposalPctDIDToApproveParameter.title,
-      voteValue
+      vote
     )
-
-    const newValue = await distense.getParameterValueByTitle(proposalPctDIDToApproveParameter.title)
-
+    correctValue = calcCorrectUpdatedParameterValue(pctDIDOwned, proposalPctDIDToApproveParameter.value, vote)
+    newContractValue = convertSolidityIntToInt(await distense.getParameterValueByTitle(proposalPctDIDToApproveParameter.title))
     assert.equal(
-      convertSolidityIntToInt(newValue.toNumber()),
-      voteValue,
-      'updated value should be 47% of the original value'
+      newContractValue,
+      correctValue,
+      'updated value should be lower by the percentage of DID ownership of the voter'
     )
 
   })
 
-  it(`should properly update the votingInterval parameter value when voted upon with the proper requirements`, async function () {
+  it(`should properly update the proposalPctDIDToApproveParameter value`, async function () {
 
-    const userBalance = await didToken.balances.call(accounts[0])
-    assert.isAbove(userBalance.toNumber(), convertSolidityIntToInt(2000), 'user should have DID here to vote')
+    await didToken.issueDID(accounts[1], 2000)
+    await didToken.issueDID(accounts[2], 2000)
 
-    console.log(`original param value: ${votingIntervalParameter.value}`)
-    const voteValue = proposalPctDIDToApproveParameter.value * .47
+    let vote = -1
+    //  total DID at this point is 2000 + 2000 + 4321 == 8321 DID
+    //  so accounts[0], the voter owns 24%
     await distense.voteOnParameter(
-      votingIntervalParameter.title,
-      voteValue
+      proposalPctDIDToApproveParameter.title,
+      vote
     )
 
-    const newValue = await distense.getParameterValueByTitle(votingIntervalParameter.title)
-
+    let newContractValue = await distense.getParameterValueByTitle(proposalPctDIDToApproveParameter.title)
     assert.equal(
-      convertSolidityIntToInt(newValue.toNumber()),
-      voteValue,
-      'updated value should be 47% of the original value'
+      newContractValue,
+      1875,
+      'updated value should be lower by the percentage of DID ownership of the voter'
+    )
+
+    await didToken.issueDID(accounts[3], 2000)
+
+    vote = 1
+    // //  total DID at this point is 2000 + 2000 + 4321 == 8321 DID
+    // //  so accounts[0], the voter owns 24%
+    await distense.voteOnParameter(
+      proposalPctDIDToApproveParameter.title,
+      vote, {
+        from: accounts[1]
+      }
+    )
+    newContractValue = await distense.getParameterValueByTitle(proposalPctDIDToApproveParameter.title)
+    assert.equal(
+      newContractValue,
+      2343,
+      'updated value should be higher by the percentage of DID ownership of the voter'
+    )
+
+    await didToken.issueDID(accounts[4], 2000)
+    vote = 1
+    // //  total DID at this point is 2000 + 2000 + 4321 == 8321 DID
+    // //  so accounts[0], the voter owns 24%
+    await distense.voteOnParameter(
+      proposalPctDIDToApproveParameter.title,
+      vote, {
+        from: accounts[2]
+      }
+    )
+    newContractValue = await distense.getParameterValueByTitle(proposalPctDIDToApproveParameter.title)
+    assert.equal(
+      newContractValue,
+      2928,
+      'updated value should be higher by the percentage of DID ownership of the voter'
     )
 
   })
+
 })

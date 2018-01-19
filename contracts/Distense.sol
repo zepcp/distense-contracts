@@ -2,8 +2,9 @@ pragma solidity ^0.4.17;
 
 import './DIDToken.sol';
 import './lib/SafeMath.sol';
+import './Debuggable.sol';
 
-contract Distense {
+contract Distense is Debuggable {
     using SafeMath for uint256;
 
     address public DIDTokenAddress;
@@ -71,9 +72,9 @@ contract Distense {
         // PCT of DID that must vote on a proposal for it to be approved and payable
         proposalPctDIDToApproveParameter = Parameter({
             title : proposalPctDIDToApproveParameterTitle,
-            //     Every hard-coded int in Solidity is a decimal to one decimal place
-            //     So this is 25.0%
-            value : 250
+            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     So this is 25.00%
+            value : 2500
             });
         parameters[proposalPctDIDToApproveParameterTitle] = proposalPctDIDToApproveParameter;
         parameterTitles.push(proposalPctDIDToApproveParameterTitle);
@@ -81,9 +82,9 @@ contract Distense {
 
         pctDIDRequiredToMergePullRequest = Parameter({
             title : pctDIDRequiredToMergePullRequestTitle,
-            //     Every hard-coded int in Solidity is a decimal to one decimal place
-            //     So this is 10.0
-            value : 100
+            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     So this is 10.00
+            value : 1000
             });
         parameters[pctDIDRequiredToMergePullRequestTitle] = pctDIDRequiredToMergePullRequest;
         parameterTitles.push(pctDIDRequiredToMergePullRequestTitle);
@@ -91,7 +92,7 @@ contract Distense {
 
         votingIntervalParameter = Parameter({
             title : votingIntervalParameterTitle,
-            value : 15 days  // 15 * 86400 = 1.296e+6
+            value : 129600000 // 15 * 86400 = 1.296e+6
             });
         parameters[votingIntervalParameterTitle] = votingIntervalParameter;
         parameterTitles.push(votingIntervalParameterTitle);
@@ -99,9 +100,9 @@ contract Distense {
 
         maxRewardParameter = Parameter({
             title : maxRewardParameterTitle,
-            //     Every hard-coded int in Solidity is a decimal to one decimal place
+            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
             //     So this is 5000.0
-            value : 50000
+            value : 500000
             });
         parameters[maxRewardParameterTitle] = maxRewardParameter;
         parameterTitles.push(maxRewardParameterTitle);
@@ -110,8 +111,8 @@ contract Distense {
         minNumberOfTaskRewardVotersParameter = Parameter({
             title : minNumberOfTaskRewardVotersParameterTitle,
             //     Every hard-coded int in Solidity is a decimal to one decimal place
-            //     So this is 7.0
-            value : 70
+            //     So this is 7.00
+            value : 700
             });
         parameters[minNumberOfTaskRewardVotersParameterTitle] = minNumberOfTaskRewardVotersParameter;
         parameterTitles.push(minNumberOfTaskRewardVotersParameterTitle);
@@ -126,7 +127,9 @@ contract Distense {
         // This parameter also limits attacks by noobs that want to mess with Distense.
         numDIDRequiredToTaskRewardVoteParameter = Parameter({
             title : numDIDRequiredToTaskRewardVoteParameterTitle,
-            value : 1500 // 150 -> Every hard-coded int in Solidity is a decimal to one decimal place
+            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            // 150.00
+            value : 15000
             });
         parameters[numDIDRequiredToTaskRewardVoteParameterTitle] = numDIDRequiredToTaskRewardVoteParameter;
         parameterTitles.push(numDIDRequiredToTaskRewardVoteParameterTitle);
@@ -134,9 +137,9 @@ contract Distense {
 
         numDIDRequiredToApproveVotePullRequestParameter = Parameter({
             title : numDIDRequiredToApproveVotePullRequestParameterTitle,
-            //     Every hard-coded int in Solidity is a decimal to one decimal place
-            //     So this is 200.0
-            value : 2000
+            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     So this is 200.00
+            value : 20000
             });
         parameters[numDIDRequiredToApproveVotePullRequestParameterTitle] = numDIDRequiredToApproveVotePullRequestParameter;
         parameterTitles.push(numDIDRequiredToApproveVotePullRequestParameterTitle);
@@ -144,9 +147,9 @@ contract Distense {
 
         defaultRewardParameter = Parameter({
             title : defaultRewardParameterTitle,
-            //     Every hard-coded int in Solidity is a decimal to one decimal place
-            //     So this is 100.0
-            value : 1000
+            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     So this is 100.00
+            value : 10000
             });
         parameters[defaultRewardParameterTitle] = defaultRewardParameter;
         parameterTitles.push(defaultRewardParameterTitle);
@@ -154,9 +157,9 @@ contract Distense {
 
         didPerEtherParameter = Parameter({
             title : didPerEtherParameterTitle,
-            //     Every hard-coded int in Solidity is a decimal to one decimal place
-            //     So this is 1200.0
-            value : 12000
+            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     So this is 1000.00
+            value : 100000
             });
         parameters[didPerEtherParameterTitle] = didPerEtherParameter;
         parameterTitles.push(didPerEtherParameterTitle);
@@ -167,9 +170,8 @@ contract Distense {
         return parameters[_title].value;
     }
 
-    function voteOnParameter(bytes32 _title, uint256 _voteValue)
+    function voteOnParameter(bytes32 _title, int256 _voteValue)
         public
-        voteWithinRange(_title, _voteValue)
         votingIntervalReached(msg.sender, _title)
     returns
     (uint256) {
@@ -179,14 +181,21 @@ contract Distense {
         require(votersDIDPercent > 0);
 
         uint256 currentValue = getParameterValueByTitle(_title);
-        require(_voteValue != currentValue);
 
-        uint updatedValue = (_voteValue * votersDIDPercent) / 1000;
+        votersDIDPercent = votersDIDPercent > 250 ? 250 : votersDIDPercent;
 
-        updateParameterValue(_title, updatedValue);
+        uint256 update = (votersDIDPercent * currentValue) / 1000;
+
+        if (_voteValue == 1)
+            currentValue = SafeMath.add(currentValue, update);
+        else
+            currentValue = SafeMath.sub(currentValue, update);
+
+        updateParameterValue(_title, currentValue);
         updateLastVotedOnParameter(_title, msg.sender);
-        LogParameterValueUpdate(_title, updatedValue);
-        return updatedValue;
+        LogParameterValueUpdate(_title, currentValue);
+
+        return currentValue;
     }
 
     function getParameterByTitle(bytes32 _title) public view returns (bytes32, uint256) {
@@ -209,20 +218,14 @@ contract Distense {
         parameter.votes[voter].lastVoted = now;
     }
 
+    function calculateUpdate(uint256 _pctDIDOwned, uint256 _paramValue) public view returns (uint256) {
+        return SafeMath.percent(_pctDIDOwned, _paramValue, 3);
+    }
+
     modifier votingIntervalReached(address _voter, bytes32 _title) {
         Parameter storage parameter = parameters[_title];
         uint256 lastVotedOnParameter = parameter.votes[_voter].lastVoted;
         require(now >= lastVotedOnParameter + getParameterValueByTitle(votingIntervalParameterTitle));
-        _;
-    }
-
-    // Require parameter votes to be within two times the current value of the parameter.
-    // Otherwise someone could vote with a very large number and skew the value however they wish
-    modifier voteWithinRange(bytes32 _title, uint256 _newValue) {
-        Parameter storage parameter = parameters[_title];
-        uint256 currentValue = parameter.value;
-        require(_newValue >= 0);
-        require(_newValue <= 2 * currentValue);
         _;
     }
 

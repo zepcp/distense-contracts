@@ -37,10 +37,6 @@ module.exports = {
       gasPrice: 30000000000
     }
   },
-  mocha: {
-    slow: 500,
-    useColors: true
-  },
   solc: {
     optimizer: {
       enabled: true,

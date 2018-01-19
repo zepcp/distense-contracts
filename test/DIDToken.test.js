@@ -85,15 +85,15 @@ contract('DIDToken', function (accounts) {
     assert.equal(await didToken.totalSupply(), 0)
     await didToken.issueDID(accounts[0], 200)
     let percentDID = await didToken.pctDIDOwned(accounts[0])
-    assert.equal(percentDID.toString(), 1000)
+    assert.equal(percentDID.toString(), 10000)
 
     await didToken.issueDID(accounts[1], 100)
     percentDID = await didToken.pctDIDOwned(accounts[1])
-    assert.equal(percentDID.toString(), 333)
+    assert.equal(percentDID.toString(), 3333)
 
     await didToken.issueDID(accounts[1], 100)
     percentDID = await didToken.pctDIDOwned(accounts[1])
-    assert.equal(percentDID.toString(), 500)
+    assert.equal(percentDID.toString(), 5000)
   })
 
   it('should throw an error when someone tries to exchange DID for ether who doesn\'t own DID', async function () {
@@ -118,24 +118,24 @@ contract('DIDToken', function (accounts) {
 
   it('should allow an address that owns sufficient DID to exchange 2 ether for DID', async function () {
 
-    let etherForDIDExchangeError
+    let etherForDIDInvestError
     await didToken.issueDID(accounts[0], 20000)
 
     try {
 
-      await didToken.depositEtherForDID({
+      await didToken.investEtherForDID({
         from: accounts[0],
         value: web3.toWei(2)
       })
 
     } catch (error) {
-      etherForDIDExchangeError = error
-      console.error(`etherForDIDExchangeError: ${etherForDIDExchangeError}`)
+      etherForDIDInvestError = error
+      console.error(`etherForDIDInvestError: ${etherForDIDInvestError}`)
     }
 
-    const tasksEtherBalance = await web3.eth.getBalance(didToken.address).toNumber()
-    assert.equal(tasksEtherBalance, web3.toWei(2), `Contracts ether balance should be 2`)
-    assert.equal(etherForDIDExchangeError, undefined, 'Error should not be thrown')
+    const didTokenEtherBalance = await web3.eth.getBalance(didToken.address).toNumber()
+    assert.equal(didTokenEtherBalance, web3.toWei(2), `Contracts ether balance should be 2`)
+    assert.equal(etherForDIDInvestError, undefined, 'Error should not be thrown')
 
   })
 
@@ -161,7 +161,7 @@ contract('DIDToken', function (accounts) {
     const postInvestDIDBalance = await didToken.balances.call(accounts[0])
 
     const didPerEther = await distense.getParameterValueByTitle('didPerEther')
-    assert.equal(didPerEther, 1000, 'make sure didPerEther is still 1000')
+    assert.equal(didPerEther, 100000, 'make sure didPerEther is still 1000')
 
     assert.isAbove(postInvestDIDBalance.toNumber(), preInvestDIDBalance, 'accounts[0] DID balance should be higher after investing ether')
     assert.equal(

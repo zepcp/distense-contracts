@@ -42,7 +42,7 @@ contract DIDToken is Token, Approvable, Debuggable {
 
     function pctDIDOwned(address _person) external view returns (uint256) {
         uint owned = balances[_person];
-        return SafeMath.percent(owned, totalSupply, 3);
+        return SafeMath.percent(owned, totalSupply, 4);
     }
 
     function exchangeDIDForEther(uint256 _numDIDToExchange)

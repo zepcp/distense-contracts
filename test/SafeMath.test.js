@@ -1,6 +1,7 @@
 import assertRevert from './helpers/assertRevert'
 import assertJump from './helpers/assertJump'
 const SafeMathMock = artifacts.require('SafeMathMock.sol')
+const web3 = global.web3
 
 
 contract('SafeMath', function () {
@@ -16,7 +17,9 @@ contract('SafeMath', function () {
     await safeMath.multiply(a, b);
     let result = await safeMath.result();
     assert.equal(result, a * b);
-  });
+  })
+
+
   it('adds correctly', async function () {
     let a = 5678;
     let b = 1234;
@@ -58,7 +61,8 @@ contract('SafeMath', function () {
     await assertRevert(safeMath.multiply(a, b));
   })
 
-  it('calculates percentages correctly',  async () => {
+
+  it('calculates percents correctly', async function () {
 
     let num = 10
     let denom = 100
@@ -95,6 +99,24 @@ contract('SafeMath', function () {
     await safeMath.percent(num, denom, 2)
     result = await safeMath.result();
     assert.equal(result, 100)
+
+    num = 27
+    denom = 100
+    await safeMath.percent(num, denom, 2)
+    result = await safeMath.result()
+    assert.equal(result.toNumber(), 27)
+
+    num = 27
+    denom = 100
+    await safeMath.percent(num, denom, 4)
+    result = await safeMath.result()
+    assert.equal(result.toNumber(), 2700)
+
+    num = 275
+    denom = 100
+    await safeMath.percent(num, denom, 4)
+    result = await safeMath.result()
+    assert.equal(result.toNumber(), 27500)
 
   })
 });

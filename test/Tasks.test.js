@@ -115,12 +115,7 @@ contract('Tasks', function (accounts) {
 
   it('should return false when someone tries to vote twice', async function () {
 
-    const maxRewardParameterTitle = await distense.maxRewardParameterTitle.call()
-    const maxDIDRewardValue = await distense.getParameterValueByTitle.call(
-      maxRewardParameterTitle
-    )
-
-    await didToken.issueDID(accounts[0], 10000)
+    await didToken.issueDID(accounts[0], 1000000)
 
     await tasks.addTask(
       task.taskId,
@@ -128,13 +123,13 @@ contract('Tasks', function (accounts) {
     )
 
     //  Make sure vote is less than DID owned
-    await tasks.taskRewardVote(task.taskId, maxDIDRewardValue - 1, {
+    await tasks.taskRewardVote(task.taskId, 1000, {
       from: accounts[0]
     })
 
     let doubleVoteError
     try {
-      await tasks.taskRewardVote(task.taskId, maxDIDRewardValue - 1, {
+      await tasks.taskRewardVote(task.taskId, 1000, {
         from: accounts[0]
       })
     } catch (error) {
@@ -313,11 +308,11 @@ contract('Tasks', function (accounts) {
     // Issue DID such that some account owns
     // under the threshold of DID required
     // Here it's 20% each
-    await didToken.issueDID(accounts[0], 10000)
-    await didToken.issueDID(accounts[1], 10000)
-    await didToken.issueDID(accounts[2], 10000)
-    await didToken.issueDID(accounts[3], 10000)
-    await didToken.issueDID(accounts[4], 10000)
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
+    await didToken.issueDID(accounts[2], 10000000)
+    await didToken.issueDID(accounts[3], 10000000)
+    await didToken.issueDID(accounts[4], 10000000)
 
     await tasks.addTask(
       task.taskId,
@@ -325,19 +320,20 @@ contract('Tasks', function (accounts) {
     )
 
     let testTask = await tasks.getTaskById.call(task.taskId)
-    assert.equal(testTask[2].toNumber(), convertIntToSolidityInt(100), 'task reward should be 100 here')
+    assert.equal(testTask[2].toNumber(), 10000, 'task reward should be 10000 here')
 
     await tasks.taskRewardVote(
       task.taskId,
       convertIntToSolidityInt(50), {
-      from: accounts[3]
-    })
+        from: accounts[3]
+      }
+    )
 
-    testTask = await tasks.getTaskById.call(task.taskId)
+    let taskReward = await tasks.getTaskReward.call(task.taskId)
     assert.equal(
-      convertSolidityIntToInt(testTask[2].toNumber()),
-      90,
-      'task reward should now be 90: 20% of DID voted half of default reward value'
+      taskReward.toString(),
+      9000,
+      'task reward should now be 9000: 20% of DID voted half of default reward value'
     )
 
     await tasks.taskRewardVote(
@@ -345,11 +341,12 @@ contract('Tasks', function (accounts) {
       0, {
       from: accounts[4]
     })
-    testTask = await tasks.getTaskById.call(task.taskId)
+
+    taskReward = await tasks.getTaskReward.call(task.taskId)
     assert.equal(
-      convertSolidityIntToInt(testTask[2].toNumber()),
-      72,
-      'task reward should now be 72: a 20% reduction from the current value of 90'
+      taskReward.toString(),
+      7200,
+      'task reward should now be 7200: a 20% reduction from the current value of 90'
     )
 
   })
@@ -361,17 +358,14 @@ contract('Tasks', function (accounts) {
     // Issue DID such that some account owns
     // under the threshold of DID required
     // Here it's 20% each
-    await didToken.issueDID(accounts[0], 10000)
-    await didToken.issueDID(accounts[1], 10000)
-    await didToken.issueDID(accounts[2], 10000)
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
+    await didToken.issueDID(accounts[2], 10000000)
 
     await tasks.addTask(
       task.taskId,
       task.title
     )
-
-    let testTask = await tasks.getTaskById.call(task.taskId)
-    assert.equal(testTask[2].toNumber(), convertIntToSolidityInt(100), 'task reward should be 100 here')
 
     await tasks.taskRewardVote(
       task.taskId,
@@ -379,11 +373,11 @@ contract('Tasks', function (accounts) {
         from: accounts[0]
       })
 
-    testTask = await tasks.getTaskById.call(task.taskId)
+    let taskReward = await tasks.getTaskReward.call(task.taskId)
     assert.equal(
-      testTask[2].toNumber(),
-      667,
-      'task reward should now be 66: 33% of DID voted 0'
+      taskReward.toString(),
+      6667,
+      'task reward should now be 6666: 33% of DID voted 0'
     )
 
   })
@@ -394,13 +388,13 @@ contract('Tasks', function (accounts) {
     // Issue DID such that some account owns
     // under the threshold of DID required
     // Here it's 20% each
-    await didToken.issueDID(accounts[0], 10000)
-    await didToken.issueDID(accounts[1], 10000)
-    await didToken.issueDID(accounts[2], 10000)
-    await didToken.issueDID(accounts[3], 10000)
-    await didToken.issueDID(accounts[4], 10000)
-    await didToken.issueDID(accounts[5], 10000)
-    await didToken.issueDID(accounts[6], 10000)
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
+    await didToken.issueDID(accounts[2], 10000000)
+    await didToken.issueDID(accounts[3], 10000000)
+    await didToken.issueDID(accounts[4], 10000000)
+    await didToken.issueDID(accounts[5], 10000000)
+    await didToken.issueDID(accounts[6], 10000000)
 
     await tasks.addTask(
       task.taskId,
@@ -408,7 +402,7 @@ contract('Tasks', function (accounts) {
     )
 
     let testTask = await tasks.getTaskById.call(task.taskId)
-    assert.equal(testTask[2].toNumber(), convertIntToSolidityInt(100), 'task reward should be 100 here')
+    assert.equal(testTask[2].toNumber(), 10000, 'task reward should be 100 here')
 
     await tasks.taskRewardVote(
       task.taskId,
@@ -416,27 +410,12 @@ contract('Tasks', function (accounts) {
         from: accounts[0]
       })
 
-    testTask = await tasks.getTaskById.call(task.taskId)
+    let taskReward = await tasks.getTaskReward.call(task.taskId)
     assert.equal(
-      testTask[2].toNumber(),
-      857,
-      'task reward should now be 85.7'
+      taskReward.toString(),
+      8571,
+      'task reward should now be 6666: 33% of DID voted 0'
     )
-
-    await tasks.taskRewardVote(
-      task.taskId,
-      0, {
-        from: accounts[1]
-      })
-    //
-    testTask = await tasks.getTaskById.call(task.taskId)
-    assert.equal(
-      testTask[2].toNumber(),
-      735,
-      'task reward should now be 73.5'
-    )
-
-    //  Any more voting will fail as the enough  DID voted threshold has been reached
 
   })
 
@@ -445,12 +424,12 @@ contract('Tasks', function (accounts) {
     // Issue DID such that some account owns
     // under the threshold of DID required
     // Here it's 20% each
-    await didToken.issueDID(accounts[0], 10000)
-    await didToken.issueDID(accounts[1], 10000)
-    await didToken.issueDID(accounts[2], 10000)
-    await didToken.issueDID(accounts[3], 10000)
-    await didToken.issueDID(accounts[4], 10000)
-    await didToken.issueDID(accounts[5], 10000)
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
+    await didToken.issueDID(accounts[2], 10000000)
+    await didToken.issueDID(accounts[3], 10000000)
+    await didToken.issueDID(accounts[4], 10000000)
+    await didToken.issueDID(accounts[5], 10000000)
 
     await tasks.addTask(
       task.taskId,
@@ -458,7 +437,7 @@ contract('Tasks', function (accounts) {
     )
 
     let testTask = await tasks.getTaskById.call(task.taskId)
-    assert.equal(testTask[2].toNumber(), convertIntToSolidityInt(100), 'task reward should be 100 here')
+    assert.equal(testTask[2].toNumber(), 10000, 'task reward should be 100 here')
 
     await tasks.taskRewardVote(
       task.taskId,
@@ -466,11 +445,11 @@ contract('Tasks', function (accounts) {
         from: accounts[4]
       })
 
-    testTask = await tasks.getTaskById.call(task.taskId)
+    let taskReward = await tasks.getTaskReward.call(task.taskId)
     assert.equal(
-      testTask[2].toNumber(),
-      850,
-      'task reward should now be 850'
+    taskReward.toString(),
+      8500,
+      'task reward should now be 8500'
     )
 
     await tasks.taskRewardVote(
@@ -479,11 +458,11 @@ contract('Tasks', function (accounts) {
         from: accounts[5]
       })
 
-    testTask = await tasks.getTaskById.call(task.taskId)
+    taskReward = await tasks.getTaskReward.call(task.taskId)
     assert.equal(
-      testTask[2].toNumber(),
-      747,
-      'task reward should now be 747'
+      taskReward.toString(),
+      7467,
+      'task reward should now be 7467'
     )
 
   })
@@ -493,98 +472,36 @@ contract('Tasks', function (accounts) {
     // Issue DID such that some account owns
     // under the threshold of DID required
     // Here it's 20% each
-    await didToken.issueDID(accounts[0], 10000)
-    await didToken.issueDID(accounts[1], 10000)
-    await didToken.issueDID(accounts[2], 10000)
-    await didToken.issueDID(accounts[3], 10000)
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
+    await didToken.issueDID(accounts[2], 10000000)
+    await didToken.issueDID(accounts[3], 10000000)
 
     await tasks.addTask(
       task.taskId,
       task.title
     )
 
-    let testTask = await tasks.getTaskById.call(task.taskId)
-    assert.equal(testTask[2].toNumber(), convertIntToSolidityInt(100), 'task reward should be 100 here')
-
     await tasks.taskRewardVote(
       task.taskId,
-      convertIntToSolidityInt(196), {
+      convertIntToSolidityInt(200), {
         from: accounts[0]
       })
 
-    testTask = await tasks.getTaskById.call(task.taskId)
+    let taskReward = await tasks.getTaskReward.call(task.taskId)
     assert.equal(
-      testTask[2].toNumber(),
-      1240,
-      'task reward should now be 1240'
-    )
-
-    await tasks.taskRewardVote(
-      task.taskId,
-      convertIntToSolidityInt(23), {
-        from: accounts[3]
-      })
-
-    testTask = await tasks.getTaskById.call(task.taskId)
-    assert.equal(
-      testTask[2].toNumber(),
-      988,
-      'task reward should now be 988'
-    )
-
-  })
-
-  it('should determineTaskReward() correctly #6', async function () {
-
-    // Issue DID such that some account owns
-    // under the threshold of DID required
-    // Here it's 20% each
-    await didToken.issueDID(accounts[0], 10000)
-    await didToken.issueDID(accounts[1], 10000)
-    await didToken.issueDID(accounts[2], 10000)
-    await didToken.issueDID(accounts[3], 10000)
-
-    await tasks.addTask(
-      task.taskId,
-      task.title
-    )
-
-    let testTask = await tasks.getTaskById.call(task.taskId)
-    assert.equal(testTask[2].toNumber(), convertIntToSolidityInt(100), 'task reward should be 100 here')
-
-    await tasks.taskRewardVote(
-      task.taskId,
-      convertIntToSolidityInt(196), {
-        from: accounts[0]
-      })
-
-    testTask = await tasks.getTaskById.call(task.taskId)
-    assert.equal(
-      testTask[2].toNumber(),
-      1240,
-      'task reward should now be 1240'
-    )
-
-    await tasks.taskRewardVote(
-      task.taskId,
-      convertIntToSolidityInt(230) /* (2300) */, {
-        from: accounts[3]
-      })
-
-    testTask = await tasks.getTaskById.call(task.taskId)
-    assert.equal(
-      testTask[2].toNumber(),
-      1505,
-      'task reward should now be 150.5 or 1505'
+      taskReward.toString(),
+      12500,
+      'task reward should now be 12500'
     )
 
   })
 
   it('should set the reward status as determined once enough DID or voters have voted', async function () {
 
-    await didToken.issueDID(accounts[0], 10000)
-    await didToken.issueDID(accounts[1], 10000)
-    await didToken.issueDID(accounts[2], 10000)
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
+    await didToken.issueDID(accounts[2], 10000000)
 
     await tasks.addTask(
       task.taskId,
@@ -604,9 +521,9 @@ contract('Tasks', function (accounts) {
 
   it('should issueDID() once a PR has been approved', async function () {
 
-    await didToken.issueDID(accounts[0], 100000)
-    await didToken.issueDID(accounts[1], 1000)
-    await didToken.issueDID(accounts[2], 1000)
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
+    await didToken.issueDID(accounts[2], 10000000)
 
     await tasks.addTask(
       taskTwo.taskId,

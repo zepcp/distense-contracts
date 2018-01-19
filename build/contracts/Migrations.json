@@ -89,7 +89,7 @@
       },
       {
         "attributes": {
-          "SourceUnit": 2550,
+          "SourceUnit": 2553,
           "absolutePath": "/Users/john/distense-contracts/contracts/lib/Ownable.sol",
           "file": "./lib/Ownable.sol",
           "scope": 925,
@@ -105,14 +105,14 @@
       {
         "attributes": {
           "contractDependencies": [
-            2549
+            2552
           ],
           "contractKind": "contract",
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
             924,
-            2549
+            2552
           ],
           "name": "Migrations",
           "scope": 925
@@ -129,7 +129,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "Ownable",
-                  "referencedDeclaration": 2549,
+                  "referencedDeclaration": 2552,
                   "type": "contract Ownable"
                 },
                 "id": 888,
@@ -237,7 +237,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2548,
+                      "referencedDeclaration": 2551,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -383,7 +383,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 2548,
+                      "referencedDeclaration": 2551,
                       "type": "modifier ()",
                       "value": "onlyOwner"
                     },
@@ -596,9 +596,9 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0xf25186b5081ff5ce73482ad761db0eb0d25abfbf"
+      "address": "0x8cdaf0cd259887258bc13a92c0a6da92698644c0"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-19T05:55:47.669Z"
+  "updatedAt": "2018-01-19T16:45:38.997Z"
 }

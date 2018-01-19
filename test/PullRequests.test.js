@@ -62,9 +62,9 @@ contract('PullRequests', function (accounts) {
 
   it('should issueDID correctly after a pull request reaches the required approvals', async function () {
 
-    await didToken.issueDID(accounts[0], 10000)
+    await didToken.issueDID(accounts[0], 1000000)
     const newBalance = await didToken.balances.call(accounts[0])
-    assert.equal(newBalance.toNumber(), 10000, 'pullRequest approver must and should own some DID here')
+    assert.equal(newBalance.toNumber(), 1000000, 'pullRequest approver must and should own some DID here')
 
     await pullRequests.addPullRequest(pullRequest.id, pullRequest.taskId)
 
@@ -189,7 +189,7 @@ contract('PullRequests', function (accounts) {
 
   it('approvePullRequest() should increment the pctDIDApproved correctly', async function () {
 
-    await didToken.issueDID(accounts[0], 12000)
+    await didToken.issueDID(accounts[0], 1200000)
 
 
     await pullRequests.addPullRequest(pullRequest.id, pullRequest.taskId)

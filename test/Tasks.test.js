@@ -471,7 +471,7 @@ contract('Tasks', function (accounts) {
 
     // Issue DID such that some account owns
     // under the threshold of DID required
-    // Here it's 20% each
+    // Here it's 25% each
     await didToken.issueDID(accounts[0], 10000000)
     await didToken.issueDID(accounts[1], 10000000)
     await didToken.issueDID(accounts[2], 10000000)
@@ -484,14 +484,14 @@ contract('Tasks', function (accounts) {
 
     await tasks.taskRewardVote(
       task.taskId,
-      convertIntToSolidityInt(200), {
+      convertIntToSolidityInt(199), {
         from: accounts[0]
       })
 
     let taskReward = await tasks.getTaskReward.call(task.taskId)
     assert.equal(
       taskReward.toString(),
-      12500,
+      12475,
       'task reward should now be 12500'
     )
 
@@ -508,14 +508,13 @@ contract('Tasks', function (accounts) {
       task.title
     )
 
-    //  Multiply by 10 in client to save gas
     await tasks.taskRewardVote(task.taskId, convertIntToSolidityInt(50), {
       from: accounts[0]
     })
 
     let testTask = await tasks.getTaskById.call(task.taskId)
 
-    // assert.equal(testTask[3].toNumber(), 2, 'Reward status should be 2 or determined since one-third of DID have voted')
+    assert.equal(testTask[3].toNumber(), 1, 'Reward status should be 2 or determined since one-third of DID have voted')
 
   })
 

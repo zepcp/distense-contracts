@@ -518,10 +518,9 @@ contract('Tasks', function (accounts) {
 
   })
 
-  it('should issueDID() once a PR has been approved', async function () {
+  it('should correctly return the task reward and rewardStatus', async function () {
 
     await didToken.issueDID(accounts[0], 10000000)
-    await didToken.issueDID(accounts[1], 10000000)
     await didToken.issueDID(accounts[2], 10000000)
 
     await tasks.addTask(
@@ -529,7 +528,14 @@ contract('Tasks', function (accounts) {
       taskTwo.title
     )
 
+    const taskRewardAndStatus = await tasks.getTaskRewardAndStatus(taskTwo.taskId)
+
+    assert.equal(taskRewardAndStatus[0].toNumber(), 10000, 'task reward should be 10000 here (100)')
+    assert.equal(taskRewardAndStatus[1].toNumber(), 0, 'task rewardStatus should be enum DEFAULT or 0')
+
   })
+
+
 
   it('should throw an error when task reward equals current task reward to save users gas as their vote will have no effect', async function () {
 

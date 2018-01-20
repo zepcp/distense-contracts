@@ -138,7 +138,7 @@ contract Distense is Debuggable {
         numDIDRequiredToApproveVotePullRequestParameter = Parameter({
             title : numDIDRequiredToApproveVotePullRequestParameterTitle,
             //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
-            //     So this is 200.00
+            //     200.00
             value : 20000
             });
         parameters[numDIDRequiredToApproveVotePullRequestParameterTitle] = numDIDRequiredToApproveVotePullRequestParameter;
@@ -148,7 +148,7 @@ contract Distense is Debuggable {
         defaultRewardParameter = Parameter({
             title : defaultRewardParameterTitle,
             //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
-            //     So this is 100.00
+            //     100.00
             value : 10000
             });
         parameters[defaultRewardParameterTitle] = defaultRewardParameter;
@@ -158,7 +158,7 @@ contract Distense is Debuggable {
         didPerEtherParameter = Parameter({
             title : didPerEtherParameterTitle,
             //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
-            //     So this is 1000.00
+            //     1000.00
             value : 100000
             });
         parameters[didPerEtherParameterTitle] = didPerEtherParameter;
@@ -216,10 +216,6 @@ contract Distense is Debuggable {
     function updateLastVotedOnParameter(bytes32 _title, address voter) internal returns (bool) {
         Parameter storage parameter = parameters[_title];
         parameter.votes[voter].lastVoted = now;
-    }
-
-    function calculateUpdate(uint256 _pctDIDOwned, uint256 _paramValue) public view returns (uint256) {
-        return SafeMath.percent(_pctDIDOwned, _paramValue, 3);
     }
 
     modifier votingIntervalReached(address _voter, bytes32 _title) {

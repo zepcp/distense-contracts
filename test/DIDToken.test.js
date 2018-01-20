@@ -103,10 +103,8 @@ contract('DIDToken', function (accounts) {
 
       //  accounts[1] has no DID so this should fail/throw an error
       assert.equal(await didToken.balances.call(accounts[1]), 0, 'accounts[1] must own 0 DID for this test to properly fail')
-      assert.equal(await didToken.balances.call(accounts[1]), 0, 'accounts[1] must own 0 DID for this test to properly fail')
-      await didToken.exchangeDIDForEther({
-        from: accounts[1],
-        value: web3.toWei(2)
+      await didToken.exchangeDIDForEther(100, {
+        from: accounts[1]
       })
 
     } catch (error) {
@@ -197,5 +195,29 @@ contract('DIDToken', function (accounts) {
       'accounts[0] DID balance should be the same after trying to invest too much'
     )
   })
+
+  it('should decrement the balance of DID of the DID exchanger', async function () {
+
+    //  make sure the contract has ether to return for the DID or this will fail
+    await didToken.investEtherForDID({
+      from: accounts[1],
+      value: web3.toWei(2)
+    })
+
+    const numDIDToExchange = 123
+    let beginBalance = await didToken.balances.call(accounts[1])
+    assert.isAbove(beginBalance, numDIDToExchange, 'accounts[1] must own 100 DID for this test to properly fail')
+
+    await didToken.exchangeDIDForEther(
+      numDIDToExchange, {
+        from: accounts[1]
+      }
+    )
+
+    const upatedBalance = await didToken.balances.call(accounts[1])
+    assert.equal(upatedBalance, beginBalance - numDIDToExchange, 'All of the original DID received should have been exchanged')
+
+  })
+
 
 })

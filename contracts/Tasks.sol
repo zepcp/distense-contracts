@@ -16,7 +16,7 @@ contract Tasks is Approvable, Debuggable {
 
     bytes32[] public taskIds;
 
-    enum RewardStatus {Tentative, Determined, Paid}
+    enum RewardStatus { TENTATIVE, DETERMINED, PAID }
 
     struct Task {
         string title;
@@ -48,7 +48,7 @@ contract Tasks is Approvable, Debuggable {
         tasks[_taskId].createdBy = msg.sender;
         tasks[_taskId].title = _title;
         tasks[_taskId].reward = distense.getParameterValueByTitle(distense.defaultRewardParameterTitle());
-        tasks[_taskId].rewardStatus = RewardStatus.Tentative;
+        tasks[_taskId].rewardStatus = RewardStatus.TENTATIVE;
 
         taskIds.push(_taskId);
         LogAddTask(_taskId, _title);
@@ -68,12 +68,12 @@ contract Tasks is Approvable, Debuggable {
 
         Task memory task = tasks[_taskId];
         return (
-        task.title,
-        task.createdBy,
-        task.reward,
-        task.rewardStatus,
-        task.pctDIDVoted,
-        task.numVotes
+            task.title,
+            task.createdBy,
+            task.reward,
+            task.rewardStatus,
+            task.pctDIDVoted,
+            task.numVotes
         );
 
     }
@@ -99,7 +99,7 @@ contract Tasks is Approvable, Debuggable {
         //  Essentially refund the remaining gas if user's vote will have no effect
         require(task.reward != _reward);
 
-        require(task.rewardStatus != RewardStatus.Determined);
+        require(task.rewardStatus != RewardStatus.DETERMINED);
 
         //  Has the voter already voted on this task?
         require(!task.rewardVotes[msg.sender]);
@@ -141,7 +141,7 @@ contract Tasks is Approvable, Debuggable {
 
         if (task.pctDIDVoted > pctDIDVotedThreshold || task.numVotes > minNumVoters) {
             LogTaskRewardDetermined(_taskId, task.reward);
-            task.rewardStatus = RewardStatus.Determined;
+            task.rewardStatus = RewardStatus.DETERMINED;
         }
 
         return true;
@@ -154,13 +154,13 @@ contract Tasks is Approvable, Debuggable {
 
     function getTaskRewardAndStatus(bytes32 _taskId) external view returns (uint256, RewardStatus) {
         return (
-        tasks[_taskId].reward,
-        tasks[_taskId].rewardStatus
+            tasks[_taskId].reward,
+            tasks[_taskId].rewardStatus
         );
     }
 
-    function setTaskRewardPaid(bytes32 _taskId) external onlyApproved returns (RewardStatus) {
-        tasks[_taskId].rewardStatus = RewardStatus.Paid;
+    function setTaskRewardPaid(bytes32 _taskId) external /*onlyApproved*/ returns (RewardStatus) {
+        tasks[_taskId].rewardStatus = RewardStatus.PAID;
         return tasks[_taskId].rewardStatus;
     }
 

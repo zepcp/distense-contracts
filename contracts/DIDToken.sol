@@ -94,7 +94,6 @@ contract DIDToken is Token, Approvable, Debuggable {
 
     modifier canDepositThisManyEtherForDID() {
         uint256 numEtherMayInvest = numEtherContributorMayInvest();
-
         require(numEtherMayInvest >= SafeMath.div(msg.value, 1000000000000000000));
         require(numEtherAddressMayInvest < numEtherAggregateMayInvest);
         _;

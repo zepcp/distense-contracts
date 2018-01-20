@@ -26,8 +26,9 @@ contract PullRequests is Approvable, Debuggable {
 
     mapping(bytes32 => PullRequest) pullRequests;
 
-    event LogRewardPullRequest(bytes32 _prId, bytes32 taskId);
+    event LogAddPullRequest(bytes32 _prId, bytes32 taskId);
     event LogPullRequestApprovalVote(bytes32 _prId, uint256 pctDIDApproved);
+    event LogRewardPullRequest(bytes32 _prId, bytes32 taskId);
 
     function PullRequests(
         address _DIDTokenAddress,
@@ -45,6 +46,8 @@ contract PullRequests is Approvable, Debuggable {
         pullRequests[_prId].taskId = _taskId;
         pullRequestIds.push(_prId);
 
+        LogAddPullRequest(_prId, _taskId);
+
         return true;
     }
 
@@ -61,9 +64,9 @@ contract PullRequests is Approvable, Debuggable {
 
 
     function approvePullRequest(bytes32 _prId)
-    hasntVoted(_prId)
-    hasEnoughDIDToApprovePR()
-    external
+        hasntVoted(_prId)
+        hasEnoughDIDToApprovePR()
+        external
     returns (uint256) {
 
         Distense distense = Distense(DistenseAddress);
@@ -77,25 +80,24 @@ contract PullRequests is Approvable, Debuggable {
 
         //  Record approval vote to prevent multiple voting
         _pr.voted[msg.sender] = true;
+        _pr.pctDIDApproved += didToken.pctDIDOwned(msg.sender);
 
-        if (_pr.pctDIDApproved > distense.getParameterValueByTitle(
+        if (
+            _pr.pctDIDApproved > distense.getParameterValueByTitle(
             distense.pctDIDRequiredToMergePullRequestTitle()
-        )
+            )
         ) {
             Tasks tasks = Tasks(TasksAddress);
             var (reward, rewardStatus) = tasks.getTaskRewardAndStatus(_pr.taskId);
-            require(rewardStatus != Tasks.RewardStatus.Paid);
+            require(rewardStatus != Tasks.RewardStatus.PAID);
             //  Only issueDID after we confirm taskRewardPaid
             Tasks.RewardStatus updatedRewardStatus = tasks.setTaskRewardPaid(_pr.taskId);
-            require(updatedRewardStatus == Tasks.RewardStatus.Paid);
-            didToken.issueDID(_pr.contributor, reward);
-            LogRewardPullRequest(_pr.taskId, _prId);
-        } else {
-            LogPullRequestApprovalVote(_prId, _pr.pctDIDApproved);
-            //  Increment pctDIDApproved by percentage ownership of voter
-            _pr.pctDIDApproved += didToken.pctDIDOwned(msg.sender);
+            require(updatedRewardStatus == Tasks.RewardStatus.PAID);
+//            didToken.issueDID(_pr.contributor, reward);
+            LogRewardPullRequest(_prId, _pr.taskId);
         }
 
+        LogPullRequestApprovalVote(_prId, _pr.pctDIDApproved);
         return _pr.pctDIDApproved;
 
     }
@@ -120,17 +122,3 @@ contract PullRequests is Approvable, Debuggable {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

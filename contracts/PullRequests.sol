@@ -84,7 +84,7 @@ contract PullRequests is Approvable, Debuggable {
 
         if (
             _pr.pctDIDApproved > distense.getParameterValueByTitle(
-            distense.pctDIDRequiredToMergePullRequestTitle()
+                distense.pctDIDRequiredToMergePullRequestTitle()
             )
         ) {
             Tasks tasks = Tasks(TasksAddress);
@@ -93,7 +93,7 @@ contract PullRequests is Approvable, Debuggable {
             //  Only issueDID after we confirm taskRewardPaid
             Tasks.RewardStatus updatedRewardStatus = tasks.setTaskRewardPaid(_pr.taskId);
             require(updatedRewardStatus == Tasks.RewardStatus.PAID);
-//            didToken.issueDID(_pr.contributor, reward);
+            didToken.issueDID(_pr.contributor, reward);
             LogRewardPullRequest(_prId, _pr.taskId);
         }
 

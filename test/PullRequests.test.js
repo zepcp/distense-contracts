@@ -192,15 +192,24 @@ contract('PullRequests', function (accounts) {
   it('approvePullRequest() should increment the pctDIDApproved correctly', async function () {
 
     await didToken.issueDID(accounts[0], 1200000)
+    await didToken.issueDID(accounts[1], 1200000)
+    await didToken.issueDID(accounts[2], 1200000)
 
-
+    await tasks.addTask(
+      pullRequest.taskId,
+      'some amazing title'
+    )
     await pullRequests.addPullRequest(pullRequest.id, pullRequest.taskId)
+
+    await didToken.approve(pullRequests.address)
+    const pullRequestsDIDTokenApproved = await didToken.approved.call(pullRequests.address)
+    assert.equal(pullRequestsDIDTokenApproved, true, 'pullRequests has to be approved here')
+
     await pullRequests.approvePullRequest(pullRequest.id)
 
     const votedOnPR = await pullRequests.getPullRequestById.call(pullRequest.id)
 
-    // // isAbove because we just need to make sure it's incremented, amount is less important
-    assert.isAbove(votedOnPR[3].toNumber(), 0, 'pctDIDVoted of the votedOnPullRequest should be greater than zero')
+    assert.equal(votedOnPR[3].toNumber(), 3333, 'pctDIDVoted of the votedOnPullRequest should be greater than zero')
 
   })
 
@@ -226,8 +235,20 @@ contract('PullRequests', function (accounts) {
   it('should fire event "LogPullRequestApprovalVote" when approvePullRequest is appropriately called', async function () {
 
     await didToken.issueDID(accounts[5], 1200000)
+    await didToken.issueDID(accounts[0], 1200000)
+
+    await tasks.addTask(
+      pullRequest.taskId,
+      'some amazing title'
+    )
 
     await pullRequests.addPullRequest(pullRequest.id, pullRequest.taskId)
+
+    await didToken.approve(pullRequests.address)
+    const pullRequestsDIDTokenApproved = await didToken.approved.call(pullRequests.address)
+    assert.equal(pullRequestsDIDTokenApproved, true, 'pullRequests has to be approved here')
+
+
     await pullRequests.approvePullRequest(pullRequest.id, {
       from: accounts[5]
     })
@@ -241,7 +262,7 @@ contract('PullRequests', function (accounts) {
     assert.equal(approvePullRequestLog.length, 1, 'should be 1 event')
     let eventArgs = approvePullRequestLog[0].args
     assert.equal(eventArgs._prId, pullRequest.id)
-    assert.equal(eventArgs.pctDIDApproved.toString(), 10000, 'pctDIDApproved')
+    assert.equal(eventArgs.pctDIDApproved.toString(), 5000, 'pctDIDApproved')
 
   })
 
@@ -258,34 +279,25 @@ contract('PullRequests', function (accounts) {
 
     await pullRequests.addPullRequest(pullRequest.id, pullRequest.taskId)
 
-    await pullRequests.approvePullRequest(pullRequest.id, {
-      from: accounts[5]
-    })
+    await didToken.approve(pullRequests.address)
+    const pullRequestsDIDTokenApproved = await didToken.approved.call(pullRequests.address)
+    assert.equal(pullRequestsDIDTokenApproved, true, 'pullRequests has to be approved here')
 
-    // const pullRequestsTasksApproved = await tasks.approved.call(pullRequests.address)
-    // assert.equal(pullRequestsTasksApproved, true, 'pullRequests has to be approved here')
+    await pullRequests.approvePullRequest(pullRequest.id, {
+      from: accounts[0]
+    })
 
     let LogRewardPullRequestEvents = pullRequests.LogRewardPullRequest()
     let LogRewardPullRequestLog = await new Promise(
       (resolve, reject) => LogRewardPullRequestEvents.get(
         (error, log) => error ? reject(error) : resolve(log)
       ))
+
     assert.equal(LogRewardPullRequestLog.length, 1, 'should be 1 event')
     let eventArgs = LogRewardPullRequestLog[0].args
     assert.equal(eventArgs._prId, pullRequest.id)
     assert.equal(eventArgs.taskId, pullRequest.taskId)
 
-
-    let approvePullRequestEvents = pullRequests.LogPullRequestApprovalVote()
-    let approvePullRequestLog = await new Promise(
-      (resolve, reject) => approvePullRequestEvents.get(
-        (error, log) => error ? reject(error) : resolve(log)
-      ))
-
-    assert.equal(approvePullRequestLog.length, 1, 'should be 1 event')
-    eventArgs = approvePullRequestLog[0].args
-    assert.equal(eventArgs._prId, pullRequest.id)
-    assert.equal(eventArgs.pctDIDApproved.toString(), 3333, 'pctDIDApproved should be 3333')
     }
 
 

@@ -206,6 +206,7 @@ contract('DIDToken', function (accounts) {
 
     const numDIDToExchange = 123
     let beginBalance = await didToken.balances.call(accounts[1])
+
     assert.isAbove(beginBalance, numDIDToExchange, 'accounts[1] must own 100 DID for this test to properly fail')
 
     await didToken.exchangeDIDForEther(
@@ -214,8 +215,8 @@ contract('DIDToken', function (accounts) {
       }
     )
 
-    const upatedBalance = await didToken.balances.call(accounts[1])
-    assert.equal(upatedBalance, beginBalance - numDIDToExchange, 'All of the original DID received should have been exchanged')
+    const updatedBalance = await didToken.balances.call(accounts[1])
+    assert.equal(updatedBalance, beginBalance - numDIDToExchange, 'All of the original DID received should have been exchanged')
 
   })
 

@@ -14,13 +14,13 @@
 ## Install
 
 - clone this repo
-- make sure to have npm
-- `npm install`
+- install npm if you don't have it
+- `npm i`
 
 ## Usage
 
 - the primary way we interact with our smart contracts is by testing, so when developing we make changes to our contracts, test, then interact in the UI
-- to test run `npm run test`
+- to test run `npm test` (if this fails make sure you don't have another testrpc shell running)
 
 
 Once you get past the initial code->testing phase and want to view your changes in the UI

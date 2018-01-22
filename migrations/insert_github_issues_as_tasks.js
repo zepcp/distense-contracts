@@ -1,6 +1,6 @@
 const web3 = require('web3')
 const fetch = require('node-fetch')
-const tagsOptions = require('./tagsOptions')
+const tagsOptions = require('./tags_options')
 const _ = require('lodash')
 
 
@@ -23,10 +23,9 @@ module.exports = async function (tasks, accounts) {
       }).then(async function (issues) {
         console.log(issues.length);
         for (let issue of issues) {
-          // console.log(`${issue.title}`)
           const title = issue.title
           const issueNum = issue.number
-          const repoNum = repo === 'distense-ui' ? 0 : 1  //0 for frontend, 1 for contracts repo
+          const repoNum = repo.indexOf('distense-ui') > -1 ? 0 : 1  //0 for frontend, 1 for contracts repo
           const tagsString = repoNum === 0 ? 'site' : 'cts'
           const taskId = encodeTaskMetaDataToBytes32(
             {

@@ -12,6 +12,8 @@ contract DIDToken is Token, Approvable, Debuggable {
     using SafeMath for uint256;
 
     event LogIssueDID(address indexed to, uint256 numDID);
+    event LogExchangeDIDForEther(address indexed to, uint256 numDID);
+    event LogInvestEtherForDID(address indexed to, uint256 numEther);
 
     address public PullRequestsAddress;
     address public DistenseAddress;
@@ -61,6 +63,7 @@ contract DIDToken is Token, Approvable, Debuggable {
         totalSupply = SafeMath.sub(totalSupply, _numDIDToExchange);
 
         msg.sender.transfer(numEtherToIssue);
+        LogExchangeDIDForEther(msg.sender, _numDIDToExchange);
 
         return balances[msg.sender];
     }
@@ -78,6 +81,7 @@ contract DIDToken is Token, Approvable, Debuggable {
         balances[msg.sender] = SafeMath.add(balances[msg.sender], numDIDToIssue);
 
         LogIssueDID(msg.sender, numDIDToIssue);
+        LogInvestEtherForDID(msg.sender, msg.value);
 
         return balances[msg.sender];
     }

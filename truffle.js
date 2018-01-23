@@ -29,12 +29,12 @@ module.exports = {
       gasPrice: 50000000000
     },
     rinkebyRemote: {
-      host: '165.227.180.132',
+      host: '159.89.135.56',
       network_id: '4',
-      port: 9000,
+      port: 4000,
       from: '0x0De5Be0E82493AcCb8E83d2aF99E72458249bBF9',
       gas: 6719227,
-      gasPrice: 30000000000
+      gasPrice: 50000000000
     }
   },
   solc: {

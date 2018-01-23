@@ -6,7 +6,6 @@ const _ = require('lodash')
 
 module.exports = async function (tasks, accounts) {
 
-
   const repos = [
     'Distense/distense-ui/issues',
     'Distense/contracts/issues'
@@ -21,7 +20,6 @@ module.exports = async function (tasks, accounts) {
       .then(function (res) {
         return res.json()
       }).then(async function (issues) {
-        console.log(issues.length);
         for (let issue of issues) {
           const title = issue.title
           const issueNum = issue.number

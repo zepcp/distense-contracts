@@ -220,5 +220,41 @@ contract('DIDToken', function (accounts) {
 
   })
 
+  it('should fire event "LogIssueDID" and "LogInvestEtherForDID investEtherForDID is called', async function () {
+
+      await didToken.issueDID(accounts[5], 1200000)
+
+      await didToken.investEtherForDID(
+        {}, {
+          from: accounts[0],
+          value: web3.toWei(2, 'ether')
+        }
+      )
+
+      let LogIssueDIDEvents = didToken.LogIssueDID()
+      let LogIssueDIDLog = await new Promise(
+        (resolve, reject) => LogIssueDIDEvents.get(
+          (error, log) => error ? reject(error) : resolve(log)
+        ))
+
+      assert.equal(LogIssueDIDLog.length, 1, 'should be 1 event')
+      let eventArgs = LogIssueDIDLog[0].args
+      assert.equal(eventArgs.to, accounts[0])
+      assert.isAbove(eventArgs.numDID, 0)
+
+      let LogInvestEtherForDIDEvents = didToken.LogInvestEtherForDID()
+      let LogInvestEtherForDID = await new Promise(
+        (resolve, reject) => LogInvestEtherForDIDEvents.get(
+          (error, log) => error ? reject(error) : resolve(log)
+        ))
+
+      assert.equal(LogInvestEtherForDID.length, 1, 'should be 1 event')
+      eventArgs = LogInvestEtherForDID[0].args
+      assert.equal(eventArgs.to, accounts[0])
+      assert.isAbove(eventArgs.numEther, 2)
+
+    }
+  )
+
 
 })

@@ -245,6 +245,22 @@ contract('DIDToken', function (accounts) {
 
   })
 
+  it('should increment weiInvestedAggregate', async function () {
+
+    //  make sure the contract has ether to return for the DID or this will fail
+    await didToken.issueDID(accounts[1], 1000000)
+
+    await didToken.investEtherForDID({
+      from: accounts[1],
+      value: web3.toWei(2)
+    })
+
+    let weiInvestedAggregate = await didToken.weiInvestedAggregate.call()
+
+    assert.isAbove(weiInvestedAggregate, web3.toWei(0), 'weiInvestedAggregate should be higher by 2 ether')
+
+
+  })
 
   it('should fire event "LogIssueDID" and "LogInvestEtherForDID investEtherForDID is called', async function () {
 

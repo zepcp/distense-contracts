@@ -1161,16 +1161,10 @@
     "4": {
       "events": {},
       "links": {
-        "SafeMath": "0x95ed4491700a390b3864b91552aa3cf3ec4d772f"
-      }
-    },
-    "5777": {
-      "events": {},
-      "links": {
-        "SafeMath": "0x345ca3e014aaf5dca488057592ee47305d9b3e10"
+        "SafeMath": "0x0d79218298f52cf6c97d27cf52e42330ed512d85"
       }
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-23T20:30:52.012Z"
+  "updatedAt": "2018-01-23T23:14:58.841Z"
 }

@@ -5281,14 +5281,9 @@
     "4": {
       "events": {},
       "links": {},
-      "address": "0xc989f82c13312f3be3172bafbfc1d280cccf442a"
-    },
-    "5777": {
-      "events": {},
-      "links": {},
-      "address": "0x75c35c980c0d37ef46df04d31a140b65503c0eed"
+      "address": "0x64ad1ca3b5faf7798b7aea6652b21d83c837fe77"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-23T20:30:51.988Z"
+  "updatedAt": "2018-01-23T23:14:58.818Z"
 }

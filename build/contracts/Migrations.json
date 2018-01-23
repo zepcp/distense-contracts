@@ -596,14 +596,9 @@
     "4": {
       "events": {},
       "links": {},
-      "address": "0x26607a8103050a8245fa2993fa82bc0269c70276"
-    },
-    "5777": {
-      "events": {},
-      "links": {},
-      "address": "0x8cdaf0cd259887258bc13a92c0a6da92698644c0"
+      "address": "0x66bb10324c3d102b057a4c8ccd89cd50b623e504"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-23T20:30:52.018Z"
+  "updatedAt": "2018-01-23T23:14:58.827Z"
 }

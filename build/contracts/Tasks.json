@@ -7885,14 +7885,9 @@
         }
       },
       "links": {},
-      "address": "0x3d54171a2e855dd97eb9522fdde8a0868060b8e9"
-    },
-    "5777": {
-      "events": {},
-      "links": {},
-      "address": "0xf204a4ef082f5c04bb89f7d5e6568b796096735a"
+      "address": "0x04cf225ea81ebd0378695a8b4ee8d6016bf5833a"
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-23T20:30:52.032Z"
+  "updatedAt": "2018-01-23T23:14:58.837Z"
 }

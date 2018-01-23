@@ -7,7 +7,7 @@ import './lib/Token.sol';
 import './Debuggable.sol';
 
 
-contract DIDToken is Token, Approvable, Debuggable {
+contract DIDToken is Token, Approvable {
 
     using SafeMath for uint256;
 
@@ -18,11 +18,11 @@ contract DIDToken is Token, Approvable, Debuggable {
     address public PullRequestsAddress;
     address public DistenseAddress;
 
-    uint256 public numEtherAggregateMayInvest  = 10000;  // This is the max DID all addresses can receive from depositing ether
-    uint256 public numEtherAddressMayInvest  = 1000;  // This is the max DID any address can receive from Ether deposit
-    uint256 public etherInvestedAggregate = 0;
+    uint256 public numWeiAggregateMayInvest  = 10000 ether;  // This is the max DID all addresses can receive from depositing ether
+    uint256 public numWeiAddressMayInvest   = 1000 ether;  // This is the max DID any address can receive from Ether deposit
+    uint256 public weiInvestedAggregate = 0 ether;
 
-    mapping(address => uint256) public numEtherInvestedAddress;  // keep track of how much contributors have deposited to prevent over depositing
+    mapping(address => uint256) public numWeiInvestedAddress    ;  // keep track of how much contributors have deposited to prevent over depositing
 
     function DIDToken(address _DistenseAddress) public payable {
         name = "Distense DID";
@@ -80,14 +80,21 @@ contract DIDToken is Token, Approvable, Debuggable {
         totalSupply = SafeMath.add(totalSupply, numDIDToIssue);
         balances[msg.sender] = SafeMath.add(balances[msg.sender], numDIDToIssue);
 
+        numWeiInvestedAddress[msg.sender] += msg.value;
+        weiInvestedAggregate += msg.value;
+
         LogIssueDID(msg.sender, numDIDToIssue);
         LogInvestEtherForDID(msg.sender, msg.value);
 
         return balances[msg.sender];
     }
 
-    function numEtherContributorMayInvest() public view returns (uint256) {
-        return numEtherAddressMayInvest - numEtherInvestedAddress[msg.sender];
+    function numWeiContributorMayInvest(address contributor) public view returns (uint256) {
+        return numWeiAddressMayInvest - numWeiInvestedAddress[contributor];
+    }
+
+    function remainingWeiAggregateMayInvest() public view returns (uint256) {
+        return numWeiAggregateMayInvest - weiInvestedAggregate;
     }
 
     modifier hasEnoughDID(address _contributor, uint256 _num) {
@@ -97,9 +104,9 @@ contract DIDToken is Token, Approvable, Debuggable {
     }
 
     modifier canDepositThisManyEtherForDID() {
-        uint256 numEtherMayInvest = numEtherContributorMayInvest();
-        require(numEtherMayInvest >= SafeMath.div(msg.value, 1000000000000000000));
-        require(numEtherAddressMayInvest < numEtherAggregateMayInvest);
+        uint256 numWeiMayInvest = numWeiContributorMayInvest(msg.sender);
+        require(numWeiMayInvest >= msg.value);
+        require(weiInvestedAggregate < numWeiAggregateMayInvest);
         _;
     }
 

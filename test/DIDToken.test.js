@@ -18,10 +18,10 @@ contract('DIDToken', function (accounts) {
   })
 
   it('should set the initial attributes correctly', async function () {
-    assert.equal(await didToken.totalSupply(), 0)
-    assert.equal(await didToken.name(), 'Distense DID')
-    assert.equal(await didToken.symbol(), 'DID')
-    assert.equal(await didToken.decimals(), 18)
+    assert.equal(await didToken.totalSupply(), 0, 'totalSupply incorrect')
+    assert.equal(await didToken.name(), 'Distense DID', 'incorrect')
+    assert.equal(await didToken.symbol(), 'DID', 'incorrect')
+    assert.equal(await didToken.decimals(), 18, 'incorrect')
   })
 
   it('should issueDID correctly', async function () {
@@ -219,6 +219,32 @@ contract('DIDToken', function (accounts) {
     assert.equal(updatedBalance, beginBalance - numDIDToExchange, 'All of the original DID received should have been exchanged')
 
   })
+
+  it('should increment the numWeiInvestedAddress of an address', async function () {
+
+    //  make sure the contract has ether to return for the DID or this will fail
+    await didToken.issueDID(accounts[5], 1000000)
+
+    await didToken.investEtherForDID({
+      from: accounts[1],
+      value: web3.toWei(2)
+    })
+
+    let numWeiInvested = await didToken.numWeiInvestedAddress .call(accounts[1])
+
+    assert.equal(numWeiInvested, web3.toWei(2), 'accounts[1] invested 2 ether at this point')
+
+    await didToken.investEtherForDID({
+      from: accounts[1],
+      value: web3.toWei(3.3)
+    })
+
+    numWeiInvested = await didToken.numWeiInvestedAddress .call(accounts[1])
+
+    assert.equal(numWeiInvested.toString(), web3.toWei(5.3), 'accounts[1] invested 25 ether at this point')
+
+  })
+
 
   it('should fire event "LogIssueDID" and "LogInvestEtherForDID investEtherForDID is called', async function () {
 

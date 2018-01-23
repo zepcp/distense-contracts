@@ -262,6 +262,26 @@ contract('DIDToken', function (accounts) {
 
   })
 
+  it('remainingWeiAggregateMayInvest should returns correct values', async function () {
+
+    //  make sure the contract has ether to return for the DID or this will fail
+    await didToken.issueDID(accounts[1], 1000000)
+
+    const aggregateWeiCanInvest = await didToken.numWeiAggregateMayInvest.call()
+
+    const etherToInvest = web3.toWei(10.543)
+    const expected = web3.toWei(aggregateWeiCanInvest - etherToInvest)
+
+    await didToken.investEtherForDID({
+      from: accounts[1],
+      value: etherToInvest
+    })
+
+    const remainingWei = await didToken.remainingWeiAggregateMayInvest.call()
+    assert.equal (web3.toWei(remainingWei.toString()), expected, 'should have reduced remainingWeiAggregateMayInvest by amount of wei invested')
+
+  })
+
   it('should fire event "LogIssueDID" and "LogInvestEtherForDID investEtherForDID is called', async function () {
 
       await didToken.issueDID(accounts[5], 1200000)
@@ -293,10 +313,9 @@ contract('DIDToken', function (accounts) {
       assert.equal(LogInvestEtherForDID.length, 1, 'should be 1 event')
       eventArgs = LogInvestEtherForDID[0].args
       assert.equal(eventArgs.to, accounts[0])
-      assert.isAbove(eventArgs.numEther, 2)
+      assert.isAbove(web3.toWei(eventArgs.numWei), web3.toWei(2))
 
     }
   )
-
 
 })

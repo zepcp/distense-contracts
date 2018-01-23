@@ -13,7 +13,7 @@ contract DIDToken is Token, Approvable {
 
     event LogIssueDID(address indexed to, uint256 numDID);
     event LogExchangeDIDForEther(address indexed to, uint256 numDID);
-    event LogInvestEtherForDID(address indexed to, uint256 numEther);
+    event LogInvestEtherForDID(address indexed to, uint256 numWei);
 
     address public PullRequestsAddress;
     address public DistenseAddress;

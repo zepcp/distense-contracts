@@ -24,9 +24,12 @@ module.exports = (deployer, network, accounts) => {
       if (!process.env.TESTING) {
 
         const preLaunchDIDIssuance = {
+          //  'JOHN': 153700,
+          //  'CONNER': ?
           '0x19eDf992930Ad41Ec5B5aB0F1719421b17246C81': 20000,
-          '0x0735b34a9eb4d4CbE656919146D6B7a8807F789C': 1000,
-          '0xDf4D6296E697B9B9204b5FAf63a53c6e5f02d42B': 500
+          '0x0735b34a9eb4d4CbE656919146D6B7a8807F789C': 650,
+          '0xDf4D6296E697B9B9204b5FAf63a53c6e5f02d42B': 50,
+          '0x3f521dd5f87d098430b784a849b4d9797a6b9a86': 1000
         }
 
         Object.keys(preLaunchDIDIssuance).forEach(async (account) => {

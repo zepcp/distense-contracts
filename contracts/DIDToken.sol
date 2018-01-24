@@ -22,13 +22,11 @@ contract DIDToken is Token, Approvable {
     uint256 public numWeiAddressMayInvest   = 1000 ether;  // This is the max DID any address can receive from Ether deposit
     uint256 public weiInvestedAggregate = 0 ether;
 
-    mapping(address => uint256) public numWeiInvestedAddress    ;  // keep track of how much contributors have deposited to prevent over depositing
+    mapping(address => uint256) public weiInvestedAddress;  // keep track of how much contributors have deposited to prevent over depositing
 
-    function DIDToken(address _DistenseAddress) public payable {
+    function DIDToken() public {
         name = "Distense DID";
         symbol = "DID";
-
-        DistenseAddress = _DistenseAddress;
     }
 
     function issueDID(address _recipient, uint256 _numDID) external onlyApproved returns (uint256) {
@@ -80,7 +78,7 @@ contract DIDToken is Token, Approvable {
         totalSupply = SafeMath.add(totalSupply, numDIDToIssue);
         balances[msg.sender] = SafeMath.add(balances[msg.sender], numDIDToIssue);
 
-        numWeiInvestedAddress[msg.sender] += msg.value;
+        weiInvestedAddress[msg.sender] += msg.value;
         weiInvestedAggregate += msg.value;
 
         LogIssueDID(msg.sender, numDIDToIssue);
@@ -90,11 +88,15 @@ contract DIDToken is Token, Approvable {
     }
 
     function numWeiContributorMayInvest(address contributor) public view returns (uint256) {
-        return numWeiAddressMayInvest - numWeiInvestedAddress[contributor];
+        return numWeiAddressMayInvest - weiInvestedAddress[contributor];
     }
 
     function remainingWeiAggregateMayInvest() public view returns (uint256) {
         return numWeiAggregateMayInvest - weiInvestedAggregate;
+    }
+
+    function setDistenseAddress(address _distenseAddress) public onlyApproved {
+        DistenseAddress = _distenseAddress;
     }
 
     modifier hasEnoughDID(address _contributor, uint256 _num) {

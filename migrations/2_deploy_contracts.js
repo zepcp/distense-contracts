@@ -8,7 +8,6 @@ const SafeMathMock = artifacts.require('./SafeMathMock')
 
 
 module.exports = (deployer, network, accounts) => {
-  // web3.personal.unlockAccount(accounts[0], 'usbb31810', 36000);
   deployer
     .deploy(SafeMath)
     .then(() => {
@@ -22,13 +21,14 @@ module.exports = (deployer, network, accounts) => {
     })
     .then(async (didToken) => {
 
-      const preLaunchDIDIssuance = {
-        '0x8a70b1b5095715748b01a4a217c6ea49472489cb': 100000,
-        '0x19eDf992930Ad41Ec5B5aB0F1719421b17246C81': 20000,
-        '0x0735b34a9eb4d4CbE656919146D6B7a8807F789C': 1000,
-        '0xDf4D6296E697B9B9204b5FAf63a53c6e5f02d42B': 500
-      }
       if (!process.env.TESTING) {
+
+        const preLaunchDIDIssuance = {
+          '0x19eDf992930Ad41Ec5B5aB0F1719421b17246C81': 20000,
+          '0x0735b34a9eb4d4CbE656919146D6B7a8807F789C': 1000,
+          '0xDf4D6296E697B9B9204b5FAf63a53c6e5f02d42B': 500
+        }
+
         Object.keys(preLaunchDIDIssuance).forEach(async (account) => {
           const numDID = preLaunchDIDIssuance[account]
           console.log(`Issuing ${numDID} mock DID to contributor: ${account}`)
@@ -44,7 +44,6 @@ module.exports = (deployer, network, accounts) => {
           await didToken.issueDID(accounts[0], 23512)
         }
       }
-
     })
     .then(() => {
       return deployer.deploy(Distense, DIDToken.address)
@@ -76,15 +75,22 @@ module.exports = (deployer, network, accounts) => {
         console.log(`Not testing so will insert Github issues as Distense tasks`)
         await insertGithubIssuesAsTasks(tasks, accounts)
       }
-
-
     })
     .then(() => {
       return DIDToken.deployed()
     })
     .then(async (didToken) => {
-      await didToken.approve(PullRequests.address)
-      await didToken.approved.call(PullRequests.address)
+
+      const pullRequests = await PullRequests.deployed()
+      await didToken.approve(pullRequests.address)
+      await didToken.approved.call(pullRequests.address)
+      await didToken.setDistenseAddress(Distense.address)
+
+      await didToken.investEtherForDID({}, {
+        from: accounts[0],
+        value: web3.toWei(5, 'ether')
+      })
+
     })
     .catch(err => {
       console.log(`error: ${err}`)

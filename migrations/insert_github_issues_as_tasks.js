@@ -16,34 +16,34 @@ module.exports = async function (tasks, accounts) {
     const url = 'https://api.github.com/repos/' + repo
 
     console.log(`Getting issues from: ${url}`)
-    fetch(url, {body: 'u: JohnAllen'})
+    fetch(url, { body: 'u: JohnAllen' })
       .then(function (res) {
         return res.json()
       }).then(async function (issues) {
-        for (let issue of issues) {
-          const title = issue.title
-          const issueNum = issue.number
-          const repoNum = repo.indexOf('distense-ui') > -1 ? 0 : 1  //0 for frontend, 1 for contracts repo
-          const tagsString = repoNum === 0 ? 'site' : 'cts'
-          const taskId = encodeTaskMetaDataToBytes32(
-            {
-              title,
-              issueNum,
-              repoNum,
-              tagsString
-            }
-          )
+      for (let issue of issues) {
+        const title = issue.title
+        const issueNum = issue.number
+        const repoNum = repo.indexOf('distense-ui') > -1 ? 0 : 1  //0 for frontend, 1 for contracts repo
+        const tagsString = repoNum === 0 ? 'site' : 'cts'
+        const taskId = encodeTaskMetaDataToBytes32(
+          {
+            title,
+            issueNum,
+            repoNum,
+            tagsString
+          }
+        )
 
-          const added = await tasks.addTask(
-            taskId,
-            title, {
-              from: accounts[0],
-              gasPrice: 20000000000
-            }
-          )
-          if (added) console.log(`added github issue as task`)
+        const added = await tasks.addTask(
+          taskId,
+          title, {
+            from: accounts[0],
+            gasPrice: 20000000000
+          }
+        )
+        if (added) console.log(`added github issue as task`)
 
-        }
+      }
     }).catch(err => {
       console.log(`error: ${err}`)
     })

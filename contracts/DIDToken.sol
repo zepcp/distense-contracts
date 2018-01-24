@@ -69,7 +69,7 @@ contract DIDToken is Token, Approvable {
     function investEtherForDID() canDepositThisManyEtherForDID() external payable returns (uint256) {
 
         Distense distense = Distense(DistenseAddress);
-        uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
+        uint256 DIDPerEther = SafeMath.div(distense.getParameterValueByTitle(distense.didPerEtherParameterTitle()), 100);
 
         uint256 numEtherInvested = SafeMath.div(msg.value, 1000000000000000000);
 

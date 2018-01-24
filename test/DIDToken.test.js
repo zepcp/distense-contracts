@@ -166,7 +166,7 @@ contract('DIDToken', function (accounts) {
     assert.isAbove(postInvestDIDBalance.toNumber(), preInvestDIDBalance, 'accounts[0] DID balance should be higher after investing ether')
     assert.equal(
       postInvestDIDBalance.toNumber(),
-      preInvestDIDBalance.toNumber() + (didPerEther * etherToInvest),
+      22000,
       'accounts[0] DID balance should be higher after investing ether')
   })
 

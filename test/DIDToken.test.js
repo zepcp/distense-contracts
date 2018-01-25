@@ -222,7 +222,7 @@ contract('DIDToken', function (accounts) {
 
   })
 
-  it('should increment the weiInvestedAddress of an address', async function () {
+  it('should increment the investedAddress of an address', async function () {
 
     //  make sure the contract has ether to return for the DID or this will fail
     await didToken.issueDID(accounts[5], 1000000)
@@ -232,7 +232,7 @@ contract('DIDToken', function (accounts) {
       value: web3.toWei(2)
     })
 
-    let weiInvested = await didToken.weiInvestedAddress.call(accounts[1])
+    let weiInvested = await didToken.investedAddress.call(accounts[1])
 
     assert.equal(weiInvested, web3.toWei(2), 'accounts[1] invested 2 ether at this point')
 
@@ -241,45 +241,66 @@ contract('DIDToken', function (accounts) {
       value: web3.toWei(3.3)
     })
 
-    weiInvested = await didToken.weiInvestedAddress.call(accounts[1])
+    weiInvested = await didToken.investedAddress.call(accounts[1])
 
     assert.equal(weiInvested.toString(), web3.toWei(5.3), 'accounts[1] invested 25 ether at this point')
 
   })
 
-  it('should increment weiInvestedAggregate', async function () {
+  it('should increment investedAggregate', async function () {
 
     //  make sure the contract has ether to return for the DID or this will fail
     await didToken.issueDID(accounts[1], 1000000)
 
-    await didToken.investEtherForDID({
+    await didToken.investEtherForDID({ }, {
       from: accounts[1],
       value: web3.toWei(2)
     })
 
-    let weiInvestedAggregate = await didToken.weiInvestedAggregate.call()
+    let investedAggregate = await didToken.investedAggregate.call()
 
-    assert.isAbove(weiInvestedAggregate, web3.toWei(0), 'weiInvestedAggregate should be higher by 2 ether')
+    assert.isAbove(investedAggregate, web3.toWei(0), 'investedAggregate should be higher by 2 ether')
 
 
   })
 
-  it('remainingWeiAggregateMayInvest should returns correct values', async function () {
+  it('remainingWeiAggregateMayInvest should return correct values', async function () {
 
     //  make sure the contract has ether to return for the DID or this will fail
     await didToken.issueDID(accounts[1], 1000000)
 
-    const aggregateWeiCanInvest = await didToken.numWeiAggregateMayInvest.call()
+    const aggregateWeiCanInvest = await didToken.investmentLimitAggregate.call()
 
     const etherToInvest = web3.toWei(10.543)
     const expected = web3.toWei(aggregateWeiCanInvest - etherToInvest)
 
-    await didToken.investEtherForDID({
+    await didToken.investEtherForDID({}, {
       from: accounts[1],
       value: etherToInvest
     })
 
-    const remainingWei = await didToken.remainingWeiAggregateMayInvest.call()
+    const remainingWei = await didToken.getWeiAggregateMayInvest.call()
+    assert.equal (web3.toWei(remainingWei.toString()), expected, 'should have reduced remainingWeiAggregateMayInvest by amount of wei invested')
+
+  })
+
+  it('numWeiAddressMayInvest should return correct values', async function () {
+
+    //  make sure the contract has ether to return for the DID or this will fail
+    await didToken.issueDID(accounts[0], 1000000)
+
+    const numWeiAddressMayInvest = await didToken.getNumWeiAddressMayInvest(accounts[0])
+
+    const etherToInvest = web3.toWei(10.543)
+    const expected = web3.toWei(numWeiAddressMayInvest - etherToInvest)
+
+    await didToken.investEtherForDID({}, {
+      from: accounts[0],
+      value: etherToInvest,
+      gas: 3000000
+    })
+
+    const remainingWei = await didToken.getNumWeiAddressMayInvest.call(accounts[0])
     assert.equal (web3.toWei(remainingWei.toString()), expected, 'should have reduced remainingWeiAggregateMayInvest by amount of wei invested')
 
   })

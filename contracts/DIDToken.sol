@@ -18,11 +18,11 @@ contract DIDToken is Token, Approvable {
     address public PullRequestsAddress;
     address public DistenseAddress;
 
-    uint256 public numWeiAggregateMayInvest  = 10000 ether;  // This is the max DID all addresses can receive from depositing ether
-    uint256 public numWeiAddressMayInvest   = 1000 ether;  // This is the max DID any address can receive from Ether deposit
-    uint256 public weiInvestedAggregate = 0 ether;
+    uint256 public investmentLimitAggregate  = 1000 ether;  // This is the max DID all addresses can receive from depositing ether
+    uint256 public investmentLimitAddress = 50 ether;  // This is the max DID any address can receive from Ether deposit
+    uint256 public investedAggregate = 0 ether;
 
-    mapping(address => uint256) public weiInvestedAddress;  // keep track of how much contributors have deposited to prevent over depositing
+    mapping(address => uint256) public investedAddress;  // keep track of how much contributors have deposited to prevent over depositing
 
     function DIDToken() public {
         name = "Distense DID";
@@ -78,8 +78,8 @@ contract DIDToken is Token, Approvable {
         totalSupply = SafeMath.add(totalSupply, numDIDToIssue);
         balances[msg.sender] = SafeMath.add(balances[msg.sender], numDIDToIssue);
 
-        weiInvestedAddress[msg.sender] += msg.value;
-        weiInvestedAggregate += msg.value;
+        investedAddress[msg.sender] += msg.value;
+        investedAggregate += msg.value;
 
         LogIssueDID(msg.sender, numDIDToIssue);
         LogInvestEtherForDID(msg.sender, msg.value);
@@ -87,12 +87,12 @@ contract DIDToken is Token, Approvable {
         return balances[msg.sender];
     }
 
-    function numWeiContributorMayInvest(address contributor) public view returns (uint256) {
-        return numWeiAddressMayInvest - weiInvestedAddress[contributor];
+    function getNumWeiAddressMayInvest(address contributor) public view returns (uint256) {
+        return investmentLimitAddress - investedAddress[contributor];
     }
 
-    function remainingWeiAggregateMayInvest() public view returns (uint256) {
-        return numWeiAggregateMayInvest - weiInvestedAggregate;
+    function getWeiAggregateMayInvest() public view returns (uint256) {
+        return investmentLimitAggregate - investedAggregate;
     }
 
     function setDistenseAddress(address _distenseAddress) public onlyApproved {
@@ -106,9 +106,9 @@ contract DIDToken is Token, Approvable {
     }
 
     modifier canDepositThisManyEtherForDID() {
-        uint256 numWeiMayInvest = numWeiContributorMayInvest(msg.sender);
+        uint256 numWeiMayInvest = getNumWeiAddressMayInvest(msg.sender);
         require(numWeiMayInvest >= msg.value);
-        require(weiInvestedAggregate < numWeiAggregateMayInvest);
+        require(investedAggregate < investmentLimitAggregate);
         _;
     }
 

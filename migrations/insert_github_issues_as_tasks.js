@@ -38,7 +38,7 @@ module.exports = async function (tasks, accounts) {
           taskId,
           title, {
             from: accounts[0],
-            gasPrice: 20000000000
+            gasPrice: 10000000000
           }
         )
         if (added) console.log(`added github issue as task`)
@@ -82,6 +82,7 @@ const taskIdHasBeenDecoded = taskId => {
   return taskId
 }
 
+//  TODO import this from distense-ui to maintain consistency and use tested code instead
 const decodeTaskBytes32ToMetaData = taskId => {
 
   //  example taskId: 1515514023593a1f4b21c0

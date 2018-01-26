@@ -24,8 +24,7 @@ module.exports = (deployer, network, accounts) => {
       if (!process.env.TESTING) {
 
         const preLaunchDIDIssuance = {
-          //  'JOHN': 153700,
-          //  'CONNER': ?
+           [accounts[0]]: 153700,
           '0x19eDf992930Ad41Ec5B5aB0F1719421b17246C81': 20000,
           '0x0735b34a9eb4d4CbE656919146D6B7a8807F789C': 650,
           '0xDf4D6296E697B9B9204b5FAf63a53c6e5f02d42B': 50,
@@ -70,14 +69,6 @@ module.exports = (deployer, network, accounts) => {
       const isApproved = await tasks.approved.call(PullRequests.address)
       if (isApproved) console.log(`PullRequests address now Tasks contract approved`)
       else console.log(`Failed to approve PullRequests address`)
-
-      if (process.env.TESTING) {
-        console.log(`Testing so not inserting Github issues as tasks`)
-      }
-      else {
-        console.log(`Not testing so will insert Github issues as Distense tasks`)
-        await insertGithubIssuesAsTasks(tasks, accounts)
-      }
     })
     .then(() => {
       return DIDToken.deployed()

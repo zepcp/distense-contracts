@@ -76,7 +76,6 @@ const encodeTaskMetaDataToBytes32 = task => {
 }
 
 const taskIdHasBeenDecoded = taskId => {
-
   if (taskId.length > 32)
     return web3.toAscii(taskId).replace(/\0/g, '')
   return taskId

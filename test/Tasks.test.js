@@ -302,6 +302,23 @@ contract('Tasks', function (accounts) {
 
   })
 
+  it('should set task rewards as DETERMINED correctly', async function () {
+
+    // await didToken.issueDID(accounts[0], 10000)
+    //
+    // await tasks.addTask(
+    //   task.taskId,
+    //   task.title
+    // )
+    //
+    // await tasks.setTaskRewardPaid(task.taskId)
+    //
+    // const testTask = await tasks.getTaskById.call(task.taskId)
+    // assert.equal(testTask[3].toNumber(), 2, 'task reward should now be marked as true')
+    assert.equal(false, true, 'TODO')
+
+  })
+
 
   it('should determineTaskReward() correctly #1', async function () {
 
@@ -339,8 +356,8 @@ contract('Tasks', function (accounts) {
     await tasks.taskRewardVote(
       task.taskId,
       0, {
-      from: accounts[4]
-    })
+        from: accounts[4]
+      })
 
     taskReward = await tasks.getTaskReward.call(task.taskId)
     assert.equal(
@@ -447,7 +464,7 @@ contract('Tasks', function (accounts) {
 
     let taskReward = await tasks.getTaskReward.call(task.taskId)
     assert.equal(
-    taskReward.toString(),
+      taskReward.toString(),
       8500,
       'task reward should now be 8500'
     )
@@ -536,7 +553,6 @@ contract('Tasks', function (accounts) {
   })
 
 
-
   it('should throw an error when task reward equals current task reward to save users gas as their vote will have no effect', async function () {
 
     let anError
@@ -557,6 +573,53 @@ contract('Tasks', function (accounts) {
     }
 
     assert.notEqual(anError, undefined, 'should throw an error because vote was equal to default reward')
+
+  })
+
+  it.only(`should not delete tasks that haven't been paid`, async function () {
+
+    await didToken.issueDID(accounts[0], 10000000)
+
+    await tasks.addTask(
+      task.taskId,
+      task.title
+    )
+
+    await tasks.taskRewardVote(
+      task.taskId,
+      convertIntToSolidityInt(50), {
+        from: accounts[0]
+      }
+    )
+
+    let index = await tasks.getIndexOfTaskId.call(task.taskId)
+    assert.isAbove(index.toNumber(), 0, 'index should be above 0 to begin with for this test to be valid')
+    // await tasks.deleteTaskId(task.taskId)
+    //
+    // index = await tasks.getIndexOfTaskId.call(task.taskId)
+    //
+    // assert.isAbove(index.toNumber(), 0, 'Should not have deleted a task whose reward status is not paid')
+
+  })
+
+  it.only(`should delete tasks that have been paid by approved contributors`, async function () {
+
+    await didToken.issueDID(accounts[0], 10000000)
+
+    await tasks.addTask(
+      task.taskId,
+      task.title
+    )
+
+    await tasks.taskRewardVote(task.taskId, convertIntToSolidityInt(50), {
+      from: accounts[0]
+    })
+
+    await tasks.deleteTaskId(task.taskId)
+
+    const index = await tasks.getIndexOfTaskId.call(task.taskId)
+
+    assert.isAbove(index.toNumber(), 0, 'Should not have deleted a task whose reward status is not paid')
 
   })
 

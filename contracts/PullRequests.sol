@@ -41,9 +41,10 @@ contract PullRequests is Approvable, Debuggable {
     }
 
 
-    function addPullRequest(bytes32 _prId, bytes32 _taskId) external returns (bool) {
+    function addPullRequest(bytes32 _prId, bytes32 _taskId, uint256 _prNum) external returns (bool) {
         pullRequests[_prId].contributor = msg.sender;
         pullRequests[_prId].taskId = _taskId;
+        pullRequests[_prId].prNum = _prNum;
         pullRequestIds.push(_prId);
 
         LogAddPullRequest(_prId, _taskId);

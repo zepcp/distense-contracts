@@ -17,7 +17,7 @@ contract PullRequests is Approvable, Debuggable {
     struct PullRequest {
         address contributor;
         bytes32 taskId;
-        uint64 prNum;
+        uint128 prNum;
         uint256 pctDIDApproved;
         mapping(address => bool) voted;
     }
@@ -26,9 +26,9 @@ contract PullRequests is Approvable, Debuggable {
 
     mapping(bytes32 => PullRequest) pullRequests;
 
-    event LogAddPullRequest(bytes32 _prId, bytes32 taskId);
+    event LogAddPullRequest(bytes32 _prId, bytes32 taskId, uint128 prNum);
     event LogPullRequestApprovalVote(bytes32 _prId, uint256 pctDIDApproved);
-    event LogRewardPullRequest(bytes32 _prId, bytes32 taskId);
+    event LogRewardPullRequest(bytes32 _prId, bytes32 taskId, uint128 prNum);
 
     function PullRequests(
         address _DIDTokenAddress,
@@ -41,19 +41,19 @@ contract PullRequests is Approvable, Debuggable {
     }
 
 
-    function addPullRequest(bytes32 _prId, bytes32 _taskId, uint256 _prNum) external returns (bool) {
+    function addPullRequest(bytes32 _prId, bytes32 _taskId, uint128 _prNum) external returns (bool) {
         pullRequests[_prId].contributor = msg.sender;
         pullRequests[_prId].taskId = _taskId;
         pullRequests[_prId].prNum = _prNum;
         pullRequestIds.push(_prId);
 
-        LogAddPullRequest(_prId, _taskId);
+        LogAddPullRequest(_prId, _taskId, _prNum);
 
         return true;
     }
 
 
-    function getPullRequestById(bytes32 _prId) external view returns (address, bytes32, uint64, uint256) {
+    function getPullRequestById(bytes32 _prId) external view returns (address, bytes32, uint128, uint256) {
         PullRequest memory pr = pullRequests[_prId];
         return (pr.contributor, pr.taskId, pr.prNum, pr.pctDIDApproved);
     }
@@ -95,7 +95,7 @@ contract PullRequests is Approvable, Debuggable {
             Tasks.RewardStatus updatedRewardStatus = tasks.setTaskRewardPaid(_pr.taskId);
             require(updatedRewardStatus == Tasks.RewardStatus.PAID);
             didToken.issueDID(_pr.contributor, reward);
-            LogRewardPullRequest(_prId, _pr.taskId);
+            LogRewardPullRequest(_prId, _pr.taskId, _pr.prNum);
         }
 
         LogPullRequestApprovalVote(_prId, _pr.pctDIDApproved);

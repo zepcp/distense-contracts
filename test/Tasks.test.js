@@ -683,5 +683,6 @@ contract('Tasks', function(accounts) {
 
     index = await tasks.getIndexOfTaskId.call(task.taskId)
     assert.equal(index.toString(), numTaskIds, 'index should be 1 here')
+    assert.equal(true, false, 'TODO')
   })
 })

@@ -1,6 +1,6 @@
 {
   "name": "distense-contracts",
-  "version": "0.3.68",
+  "version": "0.3.70",
   "description": "Distense Ethereum smart contracts and tests",
   "main": "",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/Distense/contracts.git"
+    "url": "git+ssh://git@github.com/Distense/distense-contracts.git"
   },
   "keywords": [
     "Distense",
@@ -19,11 +19,19 @@
     "truffle"
   ],
   "author": "The Distense Contributors",
-  "license": "All rights reserved 2017",
+  "license": "All rights reserved 2018",
   "bugs": {
-    "url": "https://github.com/Distense/contracts/issues"
+    "url": "https://github.com/Distense/distense-contracts/issues"
   },
-  "homepage": "https://github.com/Distense/contracts#readme",
+  "homepage": "https://github.com/Distense/distense-contracts#readme",
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "node-fetch": "^1.7.3",
+    "prettier": "^1.10.2",
+    "truffle": "^4.0.4",
+    "truffle-contract": "^3.0.0",
+    "web3-utils": "^1.0.0-beta.27"
+  },
   "devDependencies": {
     "babel-preset-es2015": "^6.18.0",
     "babel-preset-stage-2": "^6.24.1",
@@ -33,12 +41,5 @@
     "mocha": "^4.0.1",
     "run-with-testrpc": "^0.3.0",
     "solidity-coverage": "^0.4.8"
-  },
-  "dependencies": {
-    "babel-polyfill": "^6.26.0",
-    "node-fetch": "^1.7.3",
-    "truffle": "^4.0.4",
-    "truffle-contract": "^3.0.0",
-    "web3-utils": "^1.0.0-beta.27"
   }
 }

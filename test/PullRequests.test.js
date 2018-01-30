@@ -57,12 +57,6 @@ contract('PullRequests', function(accounts) {
 
   it('should issueDID correctly after a pull request reaches the required approvals', async function() {
     await didToken.issueDID(accounts[0], 1000000)
-    const newBalance = await didToken.balances.call(accounts[0])
-    assert.equal(
-      newBalance.toNumber(),
-      1000000,
-      'pullRequest approver must and should own some DID here'
-    )
 
     await pullRequests.addPullRequest(
       pullRequest.id,
@@ -101,9 +95,14 @@ contract('PullRequests', function(accounts) {
       'pullRequests.address needs to be approved to call a function within approvePullRequest()'
     )
 
+    const beginTotalSupply = await didToken.totalSupply.call()
     await pullRequests.approvePullRequest(pullRequest.id)
-
-    assert.equal(true, false, 'TODO')
+    const afterTotalSupply = await didToken.totalSupply.call()
+    assert.isAbove(
+      afterTotalSupply,
+      beginTotalSupply,
+      'after total supply should be higher than the beginning one'
+    )
   })
 
   it('should addPullRequests correctly', async function() {

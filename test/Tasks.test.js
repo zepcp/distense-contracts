@@ -673,6 +673,15 @@ contract('Tasks', function(accounts) {
       'index should be above 0 to begin with for this test to be valid'
     )
     //  crux of test
+
+    let numTaskIds = await tasks.getNumTasks.call()
+    numTaskIds++
     await tasks.deleteTaskId(task.taskId)
+
+    numTaskIds = await tasks.getNumTasks.call()
+    numTaskIds++
+
+    index = await tasks.getIndexOfTaskId.call(task.taskId)
+    assert.equal(index.toString(), numTaskIds, 'index should be 1 here')
   })
 })

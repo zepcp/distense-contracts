@@ -102,6 +102,8 @@ contract('PullRequests', function(accounts) {
     )
 
     await pullRequests.approvePullRequest(pullRequest.id)
+
+    assert.equal(true, false, 'TODO')
   })
 
   it('should addPullRequests correctly', async function() {

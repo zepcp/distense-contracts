@@ -559,7 +559,69 @@ contract('Tasks', function(accounts) {
     assert.equal(index.toString(), numTaskIds, 'index should be 1 here')
   })
 
-  it(`should not delete tasks that have been paid`, async function() {
+  it(`should delete tasks that have been paid by approved contributors`, async function() {
+    await didToken.issueDID(accounts[0], 10000000)
+
+    tasks = await Tasks.new(didToken.address, distense.address)
+    await tasks.addTask(taskTwo.taskId, taskTwo.title)
+    await tasks.addTask(task.taskId, task.title)
+
+    await tasks.taskRewardVote(task.taskId, 3000, {
+      from: accounts[0]
+    })
+
+    const pullRequests = await PullRequests.new(
+      didToken.address,
+      distense.address,
+      tasks.address
+    )
+    await pullRequests.addPullRequest(
+      pullRequest.id,
+      pullRequest.taskId,
+      pullRequest.prNum
+    )
+
+    await didToken.approve(pullRequests.address)
+    const pullRequestsDIDTokenApproved = await didToken.approved.call(
+      pullRequests.address
+    )
+    assert.equal(
+      pullRequestsDIDTokenApproved,
+      true,
+      'pullRequests has to be approved here'
+    )
+
+    await tasks.approve(pullRequests.address)
+    const pullRequestsTasksApproved = await tasks.approved.call(
+      pullRequests.address
+    )
+    assert.equal(
+      pullRequestsTasksApproved,
+      true,
+      'pullRequests has to be tasks approved here'
+    )
+
+    await pullRequests.approvePullRequest(pullRequest.id)
+
+    let index = await tasks.getIndexOfTaskId.call(task.taskId)
+    assert.equal(index.toString(), '1', 'index should be 1')
+    await tasks.deleteTaskId(task.taskId)
+
+    let numTaskIds = await tasks.getNumTasks.call()
+    numTaskIds++
+
+    index = await tasks.getIndexOfTaskId.call(task.taskId)
+    assert.equal(index.toString(), numTaskIds, 'index should be 1 here')
+
+    const updatedNumTasks = await tasks.getNumTasks.call()
+    assert.equal(
+      updatedNumTasks.toString(),
+      1,
+      'sanity check making sure there are 1 taskIds'
+    )
+  })
+
+  it(`should not delete tasks that have not been paid`, async function() {
     didToken = await DIDToken.new()
     distense = await Distense.new()
     tasks = await Tasks.new(didToken.address, distense.address)
@@ -610,35 +672,7 @@ contract('Tasks', function(accounts) {
       0,
       'index should be above 0 to begin with for this test to be valid'
     )
-
-    // //  crux of test
+    //  crux of test
     await tasks.deleteTaskId(task.taskId)
-    //
-    // index = await tasks.getIndexOfTaskId.call(task.taskId)
-    // assert.equal(
-    //   index,
-    //   0,
-    //   'index should be above 0 to begin with for this test to be valid'
-    // )
-  })
-
-  it(`should delete tasks that have been paid by approved contributors`, async function() {
-    await didToken.issueDID(accounts[0], 10000000)
-
-    await tasks.addTask(task.taskId, task.title)
-
-    await tasks.taskRewardVote(task.taskId, convertIntToSolidityInt(50), {
-      from: accounts[0]
-    })
-
-    await tasks.deleteTaskId(task.taskId)
-
-    const index = await tasks.getIndexOfTaskId.call(task.taskId)
-
-    assert.isAbove(
-      index.toNumber(),
-      0,
-      'Should not have deleted a task whose reward status is not paid'
-    )
   })
 })

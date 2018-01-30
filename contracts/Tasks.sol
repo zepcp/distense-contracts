@@ -16,7 +16,7 @@ contract Tasks is Approvable, Debuggable {
 
     bytes32[] public taskIds;
 
-    enum RewardStatus { TENTATIVE, DETERMINED, PAID }
+    enum RewardStatus {TENTATIVE, DETERMINED, PAID}
 
     struct Task {
         string title;
@@ -42,7 +42,6 @@ contract Tasks is Approvable, Debuggable {
     function addTask(bytes32 _taskId, string _title) external hasEnoughDID(msg.sender, 50) returns
     (bool) {
 
-        //    TODO check for empty _taskId
         Distense distense = Distense(DistenseAddress);
 
         tasks[_taskId].createdBy = msg.sender;
@@ -82,7 +81,7 @@ contract Tasks is Approvable, Debuggable {
         return tasks[_taskId].createdBy != 0;
     }
 
-    function getNumTasks() external view returns (uint) {
+    function getNumTasks() external view returns (uint256) {
         return taskIds.length;
     }
 
@@ -159,9 +158,45 @@ contract Tasks is Approvable, Debuggable {
         );
     }
 
-    function setTaskRewardPaid(bytes32 _taskId) external /*onlyApproved*/ returns (RewardStatus) {
+    function setTaskRewardPaid(bytes32 _taskId) external onlyApproved returns (RewardStatus) {
         tasks[_taskId].rewardStatus = RewardStatus.PAID;
         return tasks[_taskId].rewardStatus;
+    }
+
+    function getIndexOfTaskId(bytes32 _taskId) public returns (uint256) {
+        uint256 numTaskIds = taskIds.length;
+        if (numTaskIds > 0) {
+            uint256 i = numTaskIds - 1;
+            while (taskIds[i] != _taskId && i >= 0) {
+                i--;
+                if (i == 0)
+                    if (taskIds[i] != _taskId) // save some global electricity by nesting this condition
+                        return numTaskIds + 1;
+            }
+            return i;
+        } else return numTaskIds + 1;
+
+    }
+
+    //  Allow deleting of paid taskIds to minimize blockchain query time on client
+    //  taskIds are memorialized in the form of events/logs, so this doesn't delete them really,
+    //  it just prevents them from slowing down query times
+    function deleteTaskId(bytes32 _taskId) external onlyApproved returns (bool) {
+        Task memory task = tasks[_taskId];
+
+        if (task.rewardStatus == RewardStatus.PAID) {
+            uint256 index = getIndexOfTaskId(_taskId);
+            uint256 originalLength = taskIds.length;
+            if (index <= originalLength) {
+                delete taskIds[index];
+                bytes32 tempTaskId = taskIds[originalLength - 1];
+                taskIds[index] = tempTaskId;
+                delete taskIds[originalLength - 1];
+                taskIds.length = originalLength - 1;
+                return true;
+            }
+        }
+        return false;
     }
 
     modifier hasEnoughDID(address voter, uint256 num) {

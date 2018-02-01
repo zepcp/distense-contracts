@@ -6,7 +6,7 @@
 
 ## Table of Contents
 
-- [What is Distense?](#What is Distense?)
+- [What is Distense?](#what-is-distense?)
 - [Install](#install)
 - [Usage](#usage)
 - [Contribute](#contribute)

@@ -6,10 +6,20 @@
 
 ## Table of Contents
 
+- [What is Distense?](#What is Distense?)
 - [Install](#install)
 - [Usage](#usage)
 - [Contribute](#contribute)
 - [License](#license)
+
+## What is Distense?
+
+Distense is a decentralized code cooperative: a company without executives, offices, meetings and bosses.  Every contributor to Distense earns DID, an Ethereum token.  There's no ICO, but code contributors may invest small amounts, initially.  Hodlers of DID govern Distense on a one-vote-per-DID basis.
+
+- Follow us on [Twitter](https://twitter.com/distenseorg)
+- Join our [Slack](https://join.slack.com/t/distense/shared_invite/enQtMzA4ODM5MzI5NzY2LWFmZDBhYTJjYzkzYmZjMjg0Y2I1YWZkYmU3NGIwYjE5NjA1Y2I0MDEzYjcyYjRmNGQzZmRhZjM1YmY0ZmY0OWY)
+- Star this repo
+- If you're interested in Solidity development, see our [frontend repo](https://github.com/Distense/distense-ui)
 
 ## Install
 
@@ -41,7 +51,6 @@ Once you get past the initial code->testing phase and want to view your changes 
 
 ## Contribute
 
-- See #Install and #Usage
 - By contributing to this repo you will earn DID an Ethereum token that gives you governance and economic rights to Distense
     - See instructions on how to submit your work there
 

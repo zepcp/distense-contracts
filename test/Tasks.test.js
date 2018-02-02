@@ -65,16 +65,16 @@ contract('Tasks', function(accounts) {
   it(`shouldn't let those who don\'t own DID to add tasks`, async function() {
     let addError
 
-    try {
-      const userBalance = await didToken.balances.call(accounts[1])
-      assert.equal(userBalance, 0, `user's DID balance should be 0 here`)
+    await didToken.issueDID(accounts[1], 99)
 
+    try {
       await tasks.addTask(task.taskId, task.title, {
-        from: accounts[1] // accounts[1] has no DID
+        from: accounts[1]
       })
     } catch (error) {
       addError = error
     }
+
     assert.notEqual(
       addError,
       undefined,
@@ -249,7 +249,7 @@ contract('Tasks', function(accounts) {
   it(`should fire event LogAddTask when addTask is called`, async function() {
     let LogAddTaskEventListener = tasks.LogAddTask()
 
-    await didToken.issueDID(accounts[0], 90)
+    await didToken.issueDID(accounts[0], 190)
 
     await tasks.addTask(task.taskId, task.title)
 

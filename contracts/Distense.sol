@@ -58,6 +58,9 @@ contract Distense is Debuggable {
     Parameter public didPerEtherParameter;
     bytes32 public didPerEtherParameterTitle = 'didPerEther';
 
+    Parameter public numDIDRequiredToAddTaskParameter;
+    bytes32 public numDIDRequiredToAddTaskParameterTitle = 'numDIDRequiredToAddTask';
+
     event LogParameterValueUpdate(bytes32 title, uint256 value);
 
 
@@ -163,6 +166,16 @@ contract Distense is Debuggable {
             });
         parameters[didPerEtherParameterTitle] = didPerEtherParameter;
         parameterTitles.push(didPerEtherParameterTitle);
+
+        numDIDRequiredToAddTaskParameter = Parameter({
+            title : numDIDRequiredToTaskRewardVoteParameterTitle,
+            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     So this is 100.00
+            value : 10000
+            });
+        parameters[numDIDRequiredToTaskRewardVoteParameterTitle] = numDIDRequiredToAddTaskParameter;
+        parameterTitles.push(numDIDRequiredToTaskRewardVoteParameterTitle);
+
 
     }
 

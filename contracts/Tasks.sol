@@ -39,7 +39,7 @@ contract Tasks is Approvable, Debuggable {
         DistenseAddress = _DistenseAddress;
     }
 
-    function addTask(bytes32 _taskId, string _title) external hasEnoughDID(msg.sender, 50) returns
+    function addTask(bytes32 _taskId, string _title) external hasEnoughDIDToAddTask() returns
     (bool) {
 
         Distense distense = Distense(DistenseAddress);
@@ -199,11 +199,16 @@ contract Tasks is Approvable, Debuggable {
         return false;
     }
 
-    modifier hasEnoughDID(address voter, uint256 num) {
+    modifier hasEnoughDIDToAddTask() {
         DIDToken didToken = DIDToken(DIDTokenAddress);
         uint256 balance = didToken.balances(msg.sender);
-        require(balance > num);
+
+        Distense distense = Distense(DistenseAddress);
+        uint256 numDIDRequiredToAddTask = distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle());
+        numDIDRequiredToAddTask = SafeMath.div(numDIDRequiredToAddTask, 100);
+        require(balance >= numDIDRequiredToAddTask);
         _;
     }
+
 
 }

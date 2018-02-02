@@ -52,14 +52,14 @@ contract Distense is Debuggable {
     Parameter public minNumberOfTaskRewardVotersParameter;
     bytes32 public minNumberOfTaskRewardVotersParameterTitle = 'minNumberOfTaskRewardVoters';
 
+    Parameter public numDIDRequiredToAddTaskParameter;
+    bytes32 public numDIDRequiredToAddTaskParameterTitle = 'numDIDRequiredToAddTask';
+
     Parameter public defaultRewardParameter;
     bytes32 public defaultRewardParameterTitle = 'defaultReward';
 
     Parameter public didPerEtherParameter;
     bytes32 public didPerEtherParameterTitle = 'didPerEther';
-
-    Parameter public numDIDRequiredToAddTaskParameter;
-    bytes32 public numDIDRequiredToAddTaskParameterTitle = 'numDIDRequiredToAddTask';
 
     event LogParameterValueUpdate(bytes32 title, uint256 value);
 
@@ -111,14 +111,14 @@ contract Distense is Debuggable {
         parameterTitles.push(maxRewardParameterTitle);
 
 
-        minNumberOfTaskRewardVotersParameter = Parameter({
-            title : minNumberOfTaskRewardVotersParameterTitle,
-            //     Every hard-coded int in Solidity is a decimal to one decimal place
-            //     So this is 7.00
-            value : 700
+        numDIDRequiredToApproveVotePullRequestParameter = Parameter({
+            title : numDIDRequiredToApproveVotePullRequestParameterTitle,
+            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     200.00
+            value : 20000
             });
-        parameters[minNumberOfTaskRewardVotersParameterTitle] = minNumberOfTaskRewardVotersParameter;
-        parameterTitles.push(minNumberOfTaskRewardVotersParameterTitle);
+        parameters[numDIDRequiredToApproveVotePullRequestParameterTitle] = numDIDRequiredToApproveVotePullRequestParameter;
+        parameterTitles.push(numDIDRequiredToApproveVotePullRequestParameterTitle);
 
 
         // This parameter is the number of DID an account must own to vote on a task's reward
@@ -138,14 +138,24 @@ contract Distense is Debuggable {
         parameterTitles.push(numDIDRequiredToTaskRewardVoteParameterTitle);
 
 
-        numDIDRequiredToApproveVotePullRequestParameter = Parameter({
-            title : numDIDRequiredToApproveVotePullRequestParameterTitle,
-            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
-            //     200.00
-            value : 20000
+        minNumberOfTaskRewardVotersParameter = Parameter({
+            title : minNumberOfTaskRewardVotersParameterTitle,
+            //     Every hard-coded int in Solidity is a decimal to one decimal place
+            //     So this is 7.00
+            value : 700
             });
-        parameters[numDIDRequiredToApproveVotePullRequestParameterTitle] = numDIDRequiredToApproveVotePullRequestParameter;
-        parameterTitles.push(numDIDRequiredToApproveVotePullRequestParameterTitle);
+        parameters[minNumberOfTaskRewardVotersParameterTitle] = minNumberOfTaskRewardVotersParameter;
+        parameterTitles.push(minNumberOfTaskRewardVotersParameterTitle);
+
+
+        numDIDRequiredToAddTaskParameter = Parameter({
+            title : numDIDRequiredToAddTaskParameterTitle,
+            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     So this is 100.00
+            value : 10000
+            });
+        parameters[numDIDRequiredToAddTaskParameterTitle] = numDIDRequiredToAddTaskParameter;
+        parameterTitles.push(numDIDRequiredToAddTaskParameterTitle);
 
 
         defaultRewardParameter = Parameter({
@@ -166,16 +176,6 @@ contract Distense is Debuggable {
             });
         parameters[didPerEtherParameterTitle] = didPerEtherParameter;
         parameterTitles.push(didPerEtherParameterTitle);
-
-        numDIDRequiredToAddTaskParameter = Parameter({
-            title : numDIDRequiredToTaskRewardVoteParameterTitle,
-            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
-            //     So this is 100.00
-            value : 10000
-            });
-        parameters[numDIDRequiredToTaskRewardVoteParameterTitle] = numDIDRequiredToAddTaskParameter;
-        parameterTitles.push(numDIDRequiredToTaskRewardVoteParameterTitle);
-
 
     }
 

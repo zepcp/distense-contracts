@@ -8,50 +8,195 @@ import { convertSolidityIntToInt } from './helpers/utils'
 contract('Distense contract', function(accounts) {
   const proposalPctDIDToApproveParameter = {
     title: 'proposalPctDIDToApprove',
-    value: 25 // CLIENT VALUE (not multiplied by 10) Hard coded in constructor function in contract
+    value: 2500
   }
 
-  const pullRequestPctDIDParameter = {
+  const pctDIDRequiredToMergePullRequest = {
     title: 'pctDIDRequiredToMergePullRequest',
     // Hard coded in constructor function in contract
     // CLIENT VALUE (not multiplied by 10)
-    value: 10
+    value: 1000
   }
 
   const votingIntervalParameter = {
     title: 'votingInterval',
     // Equal to 15 days in Solidity
-    // CLIENT VALUE (not multiplied by 10)
     value: 129600000
   }
 
-  it('should set the initial attributes correctly', async function() {
+  const maxRewardParameter = {
+    title: 'maxReward',
+    value: 500000
+  }
+
+  const numDIDRequiredToApproveVotePullRequestParameter = {
+    title: 'numDIDReqApproveVotePullRequest',
+    value: 20000
+  }
+
+  const numDIDRequiredToTaskRewardVoteParameter = {
+    title: 'numDIDRequiredToTaskRewardVote',
+    value: 15000
+  }
+
+  const minNumberOfTaskRewardVotersParameter = {
+    title: 'minNumberOfTaskRewardVoters',
+    value: 700
+  }
+
+  const numDIDRequiredToAddTaskParameter = {
+    title: 'numDIDRequiredToAddTask',
+    value: 10000
+  }
+
+  const defaultRewardParameter = {
+    title: 'defaultReward',
+    value: 10000
+  }
+
+  const didPerEtherParameter = {
+    title: 'didPerEther',
+    value: 100000
+  }
+
+  it('should have the correct proposalPctDIDToApproveParameter title and value', async () => {
     let param = await distense.getParameterByTitle(
-      pullRequestPctDIDParameter.title
+      proposalPctDIDToApproveParameter.title
     )
     assert.equal(
       utils.stripHexStringOfZeroes(param[0]),
-      pullRequestPctDIDParameter.title
+      proposalPctDIDToApproveParameter.title
     )
     assert.equal(
-      utils.convertSolidityIntToInt(param[1].toNumber()),
-      pullRequestPctDIDParameter.value,
-      'proposalPctDIDToApprove value incorrect'
+      param[1].toNumber(),
+      proposalPctDIDToApproveParameter.value,
+      'proposalPctDIDToApproveParameter value incorrect'
     )
   })
 
-  it('should set the proposalPctDIDApprovalParameter correctly', async function() {
+  it('should have the correct pctDIDRequiredToMergePullRequest title and value', async () => {
     let param = await distense.getParameterByTitle(
-      proposalPctDIDToApproveParameter.title
+      pctDIDRequiredToMergePullRequest.title
+    )
+    assert.equal(
+      utils.stripHexStringOfZeroes(param[0]),
+      pctDIDRequiredToMergePullRequest.title
+    )
+    assert.equal(
+      param[1].toNumber(),
+      pctDIDRequiredToMergePullRequest.value,
+      'pctDIDRequiredToMergePullRequest value incorrect'
+    )
+  })
+
+  it('should have the correct votingIntervalParameter title and value', async () => {
+    let param = await distense.getParameterByTitle(
+      votingIntervalParameter.title
+    )
+    assert.equal(
+      utils.stripHexStringOfZeroes(param[0]),
+      votingIntervalParameter.title
+    )
+    assert.equal(
+      param[1].toNumber(),
+      votingIntervalParameter.value,
+      ' value incorrect'
+    )
+  })
+
+  it('should have the correct maxRewardParameter title and value', async () => {
+    let param = await distense.getParameterByTitle(maxRewardParameter.title)
+    assert.equal(
+      utils.stripHexStringOfZeroes(param[0]),
+      maxRewardParameter.title
+    )
+    assert.equal(
+      param[1].toNumber(),
+      maxRewardParameter.value,
+      'maxRewardParameter value incorrect'
+    )
+  })
+
+  it('should have the correct numDIDRequiredToApproveVotePullRequestParameter title and value', async () => {
+    let param = await distense.getParameterByTitle(
+      numDIDRequiredToApproveVotePullRequestParameter.title
+    )
+    assert.equal(
+      utils.stripHexStringOfZeroes(param[0]),
+      numDIDRequiredToApproveVotePullRequestParameter.title
+    )
+    assert.equal(
+      param[1].toNumber(),
+      numDIDRequiredToApproveVotePullRequestParameter.value,
+      'numDIDRequiredToApproveVotePullRequestParameter value incorrect'
+    )
+  })
+
+  it('should have the correct numDIDRequiredToTaskRewardVoteParameter title and value', async () => {
+    let param = await distense.getParameterByTitle(
+      numDIDRequiredToTaskRewardVoteParameter.title
+    )
+    assert.equal(
+      utils.stripHexStringOfZeroes(param[0]),
+      numDIDRequiredToTaskRewardVoteParameter.title
+    )
+    assert.equal(
+      param[1].toNumber(),
+      numDIDRequiredToTaskRewardVoteParameter.value,
+      'numDIDRequiredToTaskRewardVoteParameter value incorrect'
+    )
+  })
+
+  it('should have the correct minNumberOfTaskRewardVotersParameter title and value', async () => {
+    let param = await distense.getParameterByTitle(
+      minNumberOfTaskRewardVotersParameter.title
+    )
+    assert.equal(
+      utils.stripHexStringOfZeroes(param[0]),
+      minNumberOfTaskRewardVotersParameter.title
+    )
+    assert.equal(
+      param[1].toNumber(),
+      minNumberOfTaskRewardVotersParameter.value,
+      'minNumberOfTaskRewardVotersParameter value incorrect'
+    )
+  })
+
+  it('should have the correct numDIDRequiredToAddTaskParameter correctly', async function() {
+    let param = await distense.getParameterByTitle(
+      numDIDRequiredToAddTaskParameter.title
     )
 
     assert.equal(
-      utils.stripHexStringOfZeroes(param[0].toString()),
-      proposalPctDIDToApproveParameter.title
+      utils.stripHexStringOfZeroes(param[0]),
+      numDIDRequiredToAddTaskParameter.title
+    )
+    assert.equal(param[1].toNumber(), numDIDRequiredToAddTaskParameter.value)
+  })
+
+  it('should have the correct defaultRewardParameter title and value', async () => {
+    let param = await distense.getParameterByTitle(defaultRewardParameter.title)
+    assert.equal(
+      utils.stripHexStringOfZeroes(param[0]),
+      defaultRewardParameter.title
     )
     assert.equal(
-      utils.convertSolidityIntToInt(param[1].toNumber()),
-      proposalPctDIDToApproveParameter.value
+      param[1].toNumber(),
+      defaultRewardParameter.value,
+      'defaultRewardParameter value incorrect'
+    )
+  })
+
+  it('should have the correct didPerEtherParameter title and value', async () => {
+    let param = await distense.getParameterByTitle(didPerEtherParameter.title)
+    assert.equal(
+      utils.stripHexStringOfZeroes(param[0]),
+      didPerEtherParameter.title
+    )
+    assert.equal(
+      param[1].toNumber(),
+      didPerEtherParameter.value,
+      'didPerEtherParameter value incorrect'
     )
   })
 
@@ -189,24 +334,24 @@ contract('Distense contract', function(accounts) {
     )
   })
 
-  it(`should properly update the pullRequestPctDIDParameter value when upvoted with the proper requirements`, async function() {
+  it(`should properly update the pctDIDRequiredToMergePullRequest value when upvoted with the proper requirements`, async function() {
     const userBalance = await didToken.balances.call(accounts[0])
-    assert.isAbove(
+    assert.equal(
       userBalance.toNumber(),
-      convertSolidityIntToInt(2000),
+      2000,
       'user should have DID here to vote'
     )
 
-    await distense.voteOnParameter(pullRequestPctDIDParameter.title, -1)
+    await distense.voteOnParameter(pctDIDRequiredToMergePullRequest.title, -1)
 
     const newValue = await distense.getParameterValueByTitle(
-      pullRequestPctDIDParameter.title
+      pctDIDRequiredToMergePullRequest.title
     )
 
     assert.equal(
-      convertSolidityIntToInt(newValue.toNumber()),
-      pullRequestPctDIDParameter.value * 0.75,
-      'updated value should be 10% greater than the original value as the voter owns 100% of the DID'
+      newValue.toNumber(),
+      pctDIDRequiredToMergePullRequest.value * 0.75,
+      'updated value should be 25% less than the original value'
     )
   })
 
@@ -239,11 +384,11 @@ contract('Distense contract', function(accounts) {
       proposalPctDIDToApproveParameter.value,
       vote
     )
-    newContractValue = convertSolidityIntToInt(
-      await distense.getParameterValueByTitle(
-        proposalPctDIDToApproveParameter.title
-      )
+
+    newContractValue = await distense.getParameterValueByTitle(
+      proposalPctDIDToApproveParameter.title
     )
+
     assert.equal(
       newContractValue,
       correctValue,

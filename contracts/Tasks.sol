@@ -163,7 +163,7 @@ contract Tasks is Approvable, Debuggable {
         return tasks[_taskId].rewardStatus;
     }
 
-    function getIndexOfTaskId(bytes32 _taskId) public returns (uint256) {
+    function getIndexOfTaskId(bytes32 _taskId) public view returns (uint256) {
         uint256 numTaskIds = taskIds.length;
         if (numTaskIds > 0) {
             uint256 i = numTaskIds - 1;
@@ -204,8 +204,16 @@ contract Tasks is Approvable, Debuggable {
         uint256 balance = didToken.balances(msg.sender);
 
         Distense distense = Distense(DistenseAddress);
-        uint256 numDIDRequiredToAddTask = distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle());
+        uint256 numDIDRequiredToAddTask = distense.getParameterValueByTitle(
+            distense.numDIDRequiredToAddTaskParameterTitle()
+        );
+        LogString('numDIDRequiredToAddTask');
+        LogUInt256(numDIDRequiredToAddTask);
         numDIDRequiredToAddTask = SafeMath.div(numDIDRequiredToAddTask, 100);
+        LogString('numDIDRequiredToAddTask');
+        LogUInt256(numDIDRequiredToAddTask);
+        LogString('balance');
+        LogUInt256(balance);
         require(balance >= numDIDRequiredToAddTask);
         _;
     }

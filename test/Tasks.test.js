@@ -3,8 +3,12 @@ const Tasks = artifacts.require('Tasks')
 const DIDToken = artifacts.require('DIDToken')
 const Distense = artifacts.require('Distense')
 const PullRequests = artifacts.require('PullRequests')
+const numDIDRequiredToAddTask = require('./Distense.test')
 
-import { convertIntToSolidityInt } from './helpers/utils'
+import {
+  convertIntToSolidityInt,
+  convertSolidityIntToInt
+} from './helpers/utils'
 
 module.exports.increaseTime = addSeconds => {
   web3.currentProvider.send({
@@ -55,8 +59,7 @@ contract('Tasks', function(accounts) {
   })
 
   it('should let those who own DID add tasks', async function() {
-    await didToken.issueDID(accounts[0], 1234)
-    //  addTask from default accounts[0]
+    await didToken.issueDID(accounts[0], 101)
     await tasks.addTask(task.taskId, task.title)
     let numTasks = await tasks.getNumTasks.call()
     assert.equal(numTasks, 1, 'numTasks should be 1')
@@ -215,12 +218,18 @@ contract('Tasks', function(accounts) {
     )
   })
 
-  it('should correctly determine reachedProposalApprovalThreshold', async function() {
+  it('should correctly addTask', async function() {
     //  User must have DID to addTask()
     await didToken.issueDID(accounts[0], 100)
 
-    const added = await tasks.addTask(task.taskId, task.title)
-    assert(added, true, 'should have added a task here')
+    let numTasks = await tasks.getNumTasks.call()
+    assert.equal(numTasks, 0, 'should have 0 tasks to begin with')
+
+    await tasks.addTask(task.taskId, task.title)
+
+    numTasks = await tasks.getNumTasks.call()
+    assert.equal(numTasks, 1, 'should have added a task')
+    // assert.equal(false, true)
   })
 
   it('should not add tasks with empty bytes32', async function() {

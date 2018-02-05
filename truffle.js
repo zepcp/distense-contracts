@@ -32,9 +32,17 @@ module.exports = {
       host: '159.89.135.56',
       network_id: '4',
       port: 4000,
-      from: '0x0De5Be0E82493AcCb8E83d2aF99E72458249bBF9',
+      from: '0x0de5be0e82493accb8e83d2af99e72458249bbf9',
       gas: 6719227,
-      gasPrice: 70000000000
+      gasPrice: 100000000000
+    },
+    ropstenRemote: {
+      host: '159.89.135.56',
+      network_id: '3',
+      port: 8545,
+      from: '0x80e774718b3781d4527f0ecb0751074778870800',
+      gas: 6719227,
+      gasPrice: 2000000000000
     }
   },
   solc: {

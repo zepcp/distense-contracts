@@ -1,6 +1,5 @@
 const DIDToken = artifacts.require('./DIDToken.sol')
 const Distense = artifacts.require('./Distense.sol')
-const insertGithubIssuesAsTasks = require('./insert_github_issues_as_tasks')
 const PullRequests = artifacts.require('./PullRequests.sol')
 const Tasks = artifacts.require('./Tasks.sol')
 const SafeMath = artifacts.require('./SafeMath.sol')

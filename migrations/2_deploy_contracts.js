@@ -26,7 +26,7 @@ module.exports = (deployer, network, accounts) => {
           '0xDf4D6296E697B9B9204b5FAf63a53c6e5f02d42B': 50,
           '0x3f521dd5f87d098430b784a849b4d9797a6b9a86': 1000,
           '0x4276a3a29df04cd912317d4df305f8143c82d701': 150, // Tanmay
-          '0x42661f8593C3172Ae923A4951569831ACb091719': 100 // Anonymous man
+          '0x42661f8593C3172Ae923A4951569831ACb091719': 100, // Anonymous man
           '0xaefe3a22DEC89354576355f11b0E9D417371775C': 50 // anon Twitter
         }
 

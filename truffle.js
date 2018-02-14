@@ -41,7 +41,7 @@ module.exports = {
       network_id: '3',
       port: 8545,
       from: '0x80e774718b3781d4527f0ecb0751074778870800',
-      gas: 470420,
+      gas: 4704201,
       gasPrice: 10000000000000
     }
   },

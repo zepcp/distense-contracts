@@ -62,7 +62,7 @@ module.exports = (deployer, network, accounts) => {
     .then(() => {
       const network = web3.version.network
       console.log(`Using network: ${network}`)
-      if (network === '3' || network === '5777') {
+      if (network === '3' || network === '5777' || network > '100000000') {
         console.log(`Deploying Ropsten faucet`)
         return deployer.deploy(Faucet)
       } else {
@@ -73,16 +73,18 @@ module.exports = (deployer, network, accounts) => {
     })
     .then(async () => {
       //  Ropsten faucet
-      const faucet = await Faucet.deployed()
-      const network = web3.version.network
-      console.log(`Using network: ${network}`)
-      const numEtherToSendToFaucet = network === '3' ? '1000' : '5'
-      console.log(`Sending ${numEtherToSendToFaucet} ether to faucet`)
-      await web3.eth.sendTransaction({
-        from: accounts[0],
-        to: faucet.address,
-        value: web3.toWei(numEtherToSendToFaucet, 'ether')
-      })
+      if (network === '3' || network === '5777' || network > '100000000') {
+        const faucet = await Faucet.deployed()
+        const network = web3.version.network
+        console.log(`Using network: ${network}`)
+        const numEtherToSendToFaucet = network === '3' ? '1000' : '5'
+        console.log(`Sending ${numEtherToSendToFaucet} ether to faucet`)
+        await web3.eth.sendTransaction({
+          from: accounts[0],
+          to: faucet.address,
+          value: web3.toWei(numEtherToSendToFaucet, 'ether')
+        })
+      }
     })
     .catch(err => {
       console.log(`error: ${err}`)

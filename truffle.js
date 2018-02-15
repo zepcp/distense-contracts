@@ -37,12 +37,12 @@ module.exports = {
       gasPrice: 100000000000
     },
     ropstenRemote: {
-      host: '159.89.135.56',
+      host: '192.168.1.104',
       network_id: '3',
       port: 8545,
       from: '0x80e774718b3781d4527f0ecb0751074778870800',
-      gas: 6719227,
-      gasPrice: 2000000000000
+      gas: 4704201,
+      gasPrice: 10000000000000
     }
   },
   solc: {

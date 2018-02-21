@@ -13,7 +13,7 @@ module.exports = (deployer, network, accounts) => {
         '0x42661f8593C3172Ae923A4951569831ACb091719': 100,
         '0xd3a5b00da240e374f0278eb0f34a4fa2b71e24b8': 120,
         '0x29B4530Afa9C524344Aa6eAdffE79faC9Ad8B48f': 100, // Brad
-        '':
+        '0x23bB837Fe8661f401F5a3462B108A120B45bA6bD': 100 //  Vikas
       }
 
       Object.keys(initialDIDIssuances).forEach(async account => {

@@ -1,12 +1,11 @@
 pragma solidity ^0.4.17;
 
 import './DIDToken.sol';
-import './Debuggable.sol';
 import './Distense.sol';
 import './lib/SafeMath.sol';
 
 
-contract Tasks is Approvable, Debuggable {
+contract Tasks is Approvable {
 
     using SafeMath for uint256;
 
@@ -26,6 +25,7 @@ contract Tasks is Approvable, Debuggable {
         uint256 pctDIDVoted;
         uint64 numVotes;
         mapping(address => bool) rewardVotes;
+        uint256 taskIdsIndex;   // for easy later deletion to minimize query time and blockchain size
     }
 
     mapping(bytes32 => Task) tasks;
@@ -50,6 +50,7 @@ contract Tasks is Approvable, Debuggable {
         tasks[_taskId].rewardStatus = RewardStatus.TENTATIVE;
 
         taskIds.push(_taskId);
+        tasks[_taskId].taskIdsIndex = taskIds.length - 1;
         LogAddTask(_taskId, _title);
 
         return true;
@@ -116,15 +117,20 @@ contract Tasks is Approvable, Debuggable {
         uint256 pctDIDOwned = didToken.pctDIDOwned(msg.sender);
         task.pctDIDVoted = task.pctDIDVoted + pctDIDOwned;
 
+        //  Get the current votingPowerLimit
+        uint256 votingPowerLimit = distense.getParameterValueByTitle(distense.votingPowerLimitParameterTitle());
+        //  For voting purposes, limit the pctDIDOwned
+        uint256 limitedVotingPower = pctDIDOwned > votingPowerLimit ? votingPowerLimit : pctDIDOwned;
+
         uint256 difference;
         uint256 update;
         if (_reward > task.reward) {
             difference = SafeMath.sub(_reward, task.reward);
-            update = (pctDIDOwned * difference) / 10000;
+            update = (limitedVotingPower * difference) / 10000;
             task.reward += update;
         } else {
             difference = SafeMath.sub(task.reward, _reward);
-            update = (pctDIDOwned * difference) / 10000;
+            update = (limitedVotingPower * difference) / 10000;
             task.reward -= update;
         }
 
@@ -153,8 +159,8 @@ contract Tasks is Approvable, Debuggable {
 
     function getTaskRewardAndStatus(bytes32 _taskId) external view returns (uint256, RewardStatus) {
         return (
-            tasks[_taskId].reward,
-            tasks[_taskId].rewardStatus
+        tasks[_taskId].reward,
+        tasks[_taskId].rewardStatus
         );
     }
 
@@ -163,38 +169,26 @@ contract Tasks is Approvable, Debuggable {
         return tasks[_taskId].rewardStatus;
     }
 
-    function getIndexOfTaskId(bytes32 _taskId) public view returns (uint256) {
-        uint256 numTaskIds = taskIds.length;
-        if (numTaskIds > 0) {
-            uint256 i = numTaskIds - 1;
-            while (taskIds[i] != _taskId && i >= 0) {
-                i--;
-                if (i == 0)
-                    if (taskIds[i] != _taskId) // save some global electricity by nesting this condition
-                        return numTaskIds + 1;
-            }
-            return i;
-        } else return numTaskIds + 1;
-
-    }
-
-    //  Allow deleting of paid taskIds to minimize blockchain query time on client
-    //  taskIds are memorialized in the form of events/logs, so this doesn't delete them really,
+    //  Allow deleting of PAID taskIds to minimize blockchain size & query time on client
+    //  taskIds are memorialized in the form of events/logs, so this doesn't truly delete them,
     //  it just prevents them from slowing down query times
-    function deleteTaskId(bytes32 _taskId) external onlyApproved returns (bool) {
-        Task memory task = tasks[_taskId];
+    function deleteTask(bytes32 _taskId) external onlyApproved returns (bool) {
+        Task storage task = tasks[_taskId];
 
         if (task.rewardStatus == RewardStatus.PAID) {
-            uint256 index = getIndexOfTaskId(_taskId);
-            uint256 originalLength = taskIds.length;
-            if (index <= originalLength) {
-                delete taskIds[index];
-                bytes32 tempTaskId = taskIds[originalLength - 1];
-                taskIds[index] = tempTaskId;
-                delete taskIds[originalLength - 1];
-                taskIds.length = originalLength - 1;
-                return true;
+            uint256 index = tasks[_taskId].taskIdsIndex;
+            delete taskIds[index];
+            delete tasks[_taskId];
+
+            // Move the last element to the deleted index.  If we don't do this there are no efficiencies and the index will still still be
+            // iterated over on the client
+            uint256 taskIdsLength = taskIds.length;
+            if (taskIdsLength > 1) {
+                bytes32 lastElement = taskIds[taskIdsLength - 1];
+                taskIds[index] = lastElement;
+                taskIds.length--;
             }
+            return true;
         }
         return false;
     }
@@ -207,13 +201,7 @@ contract Tasks is Approvable, Debuggable {
         uint256 numDIDRequiredToAddTask = distense.getParameterValueByTitle(
             distense.numDIDRequiredToAddTaskParameterTitle()
         );
-        LogString('numDIDRequiredToAddTask');
-        LogUInt256(numDIDRequiredToAddTask);
         numDIDRequiredToAddTask = SafeMath.div(numDIDRequiredToAddTask, 100);
-        LogString('numDIDRequiredToAddTask');
-        LogUInt256(numDIDRequiredToAddTask);
-        LogString('balance');
-        LogUInt256(balance);
         require(balance >= numDIDRequiredToAddTask);
         _;
     }

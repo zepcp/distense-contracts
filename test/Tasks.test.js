@@ -32,6 +32,12 @@ contract('Tasks', function(accounts) {
     title: 'Another amazing task'
   }
 
+  const taskThree = {
+    taskId:
+      '0x4246123ab87f7b123dc438fb62e937c62aa3afe97740462295efa335ef7b75ec9',
+    title: 'Yet another amazing task'
+  }
+
   const pullRequest = {
     id: '0x163383955592153e645ab6dc0664d33698b9207459e9abbfece1535d02511234',
     taskId:
@@ -368,7 +374,7 @@ contract('Tasks', function(accounts) {
   it('should determineTaskReward() correctly #2', async function() {
     // Issue DID such that some account owns
     // under the threshold of DID required
-    // Here it's 20% each
+    // Here it's 33% each
     await didToken.issueDID(accounts[0], 10000000)
     await didToken.issueDID(accounts[1], 10000000)
     await didToken.issueDID(accounts[2], 10000000)
@@ -382,8 +388,8 @@ contract('Tasks', function(accounts) {
     let taskReward = await tasks.getTaskReward.call(task.taskId)
     assert.equal(
       taskReward.toString(),
-      6667,
-      'task reward should now be 6666: 33% of DID voted 0'
+      7500,
+      'task reward should now be 7500: 33% of DID voted 0 but the votingPowerLimit initial value is 25%'
     )
   })
 
@@ -542,38 +548,15 @@ contract('Tasks', function(accounts) {
     )
   })
 
-  it(`getIndexOfTaskId should return the proper index #1`, async function() {
-    await didToken.issueDID(accounts[0], 100000)
-    await tasks.addTask('0x1234', task.title)
-    await tasks.addTask(task.taskId, task.title)
-
-    const index = await tasks.getIndexOfTaskId.call(task.taskId)
-    assert.equal(index, 1, 'index should be 2 here')
-  })
-
-  it(`getIndexOfTaskId should return the proper index #2`, async function() {
-    await didToken.issueDID(accounts[0], 100000)
-    await tasks.addTask('0x1234', task.title)
-    await tasks.addTask(taskTwo.taskId, taskTwo.title)
-    await tasks.addTask(task.taskId, task.title)
-
-    const index = await tasks.getIndexOfTaskId.call(task.taskId)
-    assert.equal(index, 2, 'index should be 2 here')
-  })
-
-  it(`getIndexOfTaskId should return the proper index #3`, async function() {
-    const index = await tasks.getIndexOfTaskId.call(task.taskId)
-    let numTaskIds = await tasks.getNumTasks.call()
-    numTaskIds++
-    assert.equal(index.toString(), numTaskIds, 'index should be 1 here')
-  })
-
-  /*it(`should delete tasks that have been paid by approved contributors`, async function() {
+  it(`should delete tasks that have been paid and reposition the last array element into the deleted index`, async function() {
     await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
 
     tasks = await Tasks.new(didToken.address, distense.address)
     await tasks.addTask(taskTwo.taskId, taskTwo.title)
     await tasks.addTask(task.taskId, task.title)
+    await tasks.addTask(task.taskId, task.title)
+    await tasks.addTask(taskThree.taskId, taskThree.title)
 
     await tasks.taskRewardVote(task.taskId, 3000, {
       from: accounts[0]
@@ -612,45 +595,47 @@ contract('Tasks', function(accounts) {
 
     await pullRequests.approvePullRequest(pullRequest.id)
 
-    let index = await tasks.getIndexOfTaskId.call(task.taskId)
-    assert.equal(index.toString(), '1', 'index should be 1')
-    await tasks.deleteTaskId(task.taskId)
-
     let numTaskIds = await tasks.getNumTasks.call()
-    numTaskIds++
+    assert.equal(numTaskIds.toString(), '4', 'should be 4 tasks')
 
-    index = await tasks.getIndexOfTaskId.call(task.taskId)
-    assert.equal(index.toString(), numTaskIds, 'index should be 1 here')
+    await tasks.deleteTask(task.taskId)
 
-    const updatedNumTasks = await tasks.getNumTasks.call()
+    numTaskIds = await tasks.getNumTasks.call()
+    assert.equal(numTaskIds.toString(), '3', 'double check there are 2 taskIds')
+
+    const taskExists = await tasks.getTaskById.call(task.taskId)
     assert.equal(
-      updatedNumTasks.toString(),
-      1,
-      'sanity check making sure there are 1 taskIds'
+      taskExists[0].toString(),
+      '',
+      'deleted task title should now be empty string'
     )
   })
 
-  it(`should not delete tasks that have not been paid`, async function() {
-    didToken = await DIDToken.new()
-    distense = await Distense.new()
+  it(`should not delete tasks that haven't been paid`, async function() {
+    await didToken.issueDID(accounts[0], 10000000)
+    await didToken.issueDID(accounts[1], 10000000)
+
     tasks = await Tasks.new(didToken.address, distense.address)
+    await tasks.addTask(taskTwo.taskId, taskTwo.title)
+    await tasks.addTask(task.taskId, task.title)
+    await tasks.addTask(task.taskId, task.title)
+    await tasks.addTask(taskThree.taskId, taskThree.title)
+
+    await tasks.taskRewardVote(task.taskId, 3000, {
+      from: accounts[0]
+    })
+
     const pullRequests = await PullRequests.new(
       didToken.address,
       distense.address,
       tasks.address
     )
-
-    await didToken.issueDID(accounts[0], 10000000)
-
-    await tasks.addTask(task.taskId, task.title)
-
     await pullRequests.addPullRequest(
       pullRequest.id,
       pullRequest.taskId,
       pullRequest.prNum
     )
 
-    //  contract address approvals
     await didToken.approve(pullRequests.address)
     const pullRequestsDIDTokenApproved = await didToken.approved.call(
       pullRequests.address
@@ -671,26 +656,19 @@ contract('Tasks', function(accounts) {
       'pullRequests has to be tasks approved here'
     )
 
-    await pullRequests.approvePullRequest(pullRequest.id, {
-      from: accounts[0]
-    })
-
-    let index = await tasks.getIndexOfTaskId.call(task.taskId)
-    assert.equal(
-      index.toString(),
-      0,
-      'index should be above 0 to begin with for this test to be valid'
-    )
-    //  crux of test
-
     let numTaskIds = await tasks.getNumTasks.call()
-    numTaskIds++
-    await tasks.deleteTaskId(task.taskId)
+    assert.equal(numTaskIds.toString(), '4', 'should be 4 tasks')
+
+    await tasks.deleteTask(task.taskId)
 
     numTaskIds = await tasks.getNumTasks.call()
-    numTaskIds++
+    assert.equal(numTaskIds.toString(), '4', 'double check there are 2 taskIds')
 
-    index = await tasks.getIndexOfTaskId.call(task.taskId)
-    assert.equal(index.toString(), numTaskIds, 'index should be 1 here')
-  })*/
+    const taskExists = await tasks.getTaskById.call(task.taskId)
+    assert.equal(
+      taskExists[0].toString(),
+      task.title,
+      'deleted task title should be the original title'
+    )
+  })
 })

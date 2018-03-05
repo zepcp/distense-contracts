@@ -61,6 +61,10 @@ contract Distense is Debuggable {
     Parameter public didPerEtherParameter;
     bytes32 public didPerEtherParameterTitle = 'didPerEther';
 
+    Parameter public votingPowerLimitParameter;
+    bytes32 public votingPowerLimitParameterTitle = 'votingPowerLimit';
+
+
     event LogParameterValueUpdate(bytes32 title, uint256 value);
 
 
@@ -74,49 +78,49 @@ contract Distense is Debuggable {
 
         // PCT of DID that must vote on a proposal for it to be approved and payable
         proposalPctDIDToApproveParameter = Parameter({
-            title : proposalPctDIDToApproveParameterTitle,
+            title: proposalPctDIDToApproveParameterTitle,
             //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
             //     So this is 25.00%
-            value : 2500
-            });
+            value: 2500
+        });
         parameters[proposalPctDIDToApproveParameterTitle] = proposalPctDIDToApproveParameter;
         parameterTitles.push(proposalPctDIDToApproveParameterTitle);
 
 
         pctDIDRequiredToMergePullRequest = Parameter({
-            title : pctDIDRequiredToMergePullRequestTitle,
+            title: pctDIDRequiredToMergePullRequestTitle,
             //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
             //     So this is 10.00
-            value : 1000
-            });
+            value: 1000
+        });
         parameters[pctDIDRequiredToMergePullRequestTitle] = pctDIDRequiredToMergePullRequest;
         parameterTitles.push(pctDIDRequiredToMergePullRequestTitle);
 
 
         votingIntervalParameter = Parameter({
-            title : votingIntervalParameterTitle,
-            value : 129600000 // 15 * 86400 = 1.296e+6
-            });
+            title: votingIntervalParameterTitle,
+            value: 129600000 // 15 * 86400 = 1.296e+6
+        });
         parameters[votingIntervalParameterTitle] = votingIntervalParameter;
         parameterTitles.push(votingIntervalParameterTitle);
 
 
         maxRewardParameter = Parameter({
-            title : maxRewardParameterTitle,
+            title: maxRewardParameterTitle,
             //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
             //     So this is 5000.0
-            value : 500000
-            });
+            value: 500000
+        });
         parameters[maxRewardParameterTitle] = maxRewardParameter;
         parameterTitles.push(maxRewardParameterTitle);
 
 
         numDIDRequiredToApproveVotePullRequestParameter = Parameter({
-            title : numDIDRequiredToApproveVotePullRequestParameterTitle,
+            title: numDIDRequiredToApproveVotePullRequestParameterTitle,
             //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
             //     200.00
-            value : 20000
-            });
+            value: 20000
+        });
         parameters[numDIDRequiredToApproveVotePullRequestParameterTitle] = numDIDRequiredToApproveVotePullRequestParameter;
         parameterTitles.push(numDIDRequiredToApproveVotePullRequestParameterTitle);
 
@@ -129,53 +133,62 @@ contract Distense is Debuggable {
 
         // This parameter also limits attacks by noobs that want to mess with Distense.
         numDIDRequiredToTaskRewardVoteParameter = Parameter({
-            title : numDIDRequiredToTaskRewardVoteParameterTitle,
+            title: numDIDRequiredToTaskRewardVoteParameterTitle,
             //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
             // 150.00
-            value : 15000
-            });
+            value: 15000
+        });
         parameters[numDIDRequiredToTaskRewardVoteParameterTitle] = numDIDRequiredToTaskRewardVoteParameter;
         parameterTitles.push(numDIDRequiredToTaskRewardVoteParameterTitle);
 
 
         minNumberOfTaskRewardVotersParameter = Parameter({
-            title : minNumberOfTaskRewardVotersParameterTitle,
+            title: minNumberOfTaskRewardVotersParameterTitle,
             //     Every hard-coded int in Solidity is a decimal to one decimal place
             //     So this is 7.00
-            value : 700
-            });
+            value: 700
+        });
         parameters[minNumberOfTaskRewardVotersParameterTitle] = minNumberOfTaskRewardVotersParameter;
         parameterTitles.push(minNumberOfTaskRewardVotersParameterTitle);
 
 
         numDIDRequiredToAddTaskParameter = Parameter({
-            title : numDIDRequiredToAddTaskParameterTitle,
+            title: numDIDRequiredToAddTaskParameterTitle,
             //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
             //     So this is 100.00
-            value : 10000
-            });
+            value: 10000
+        });
         parameters[numDIDRequiredToAddTaskParameterTitle] = numDIDRequiredToAddTaskParameter;
         parameterTitles.push(numDIDRequiredToAddTaskParameterTitle);
 
 
         defaultRewardParameter = Parameter({
-            title : defaultRewardParameterTitle,
+            title: defaultRewardParameterTitle,
             //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
             //     100.00
-            value : 10000
-            });
+            value: 10000
+        });
         parameters[defaultRewardParameterTitle] = defaultRewardParameter;
         parameterTitles.push(defaultRewardParameterTitle);
 
 
         didPerEtherParameter = Parameter({
-            title : didPerEtherParameterTitle,
+            title: didPerEtherParameterTitle,
             //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
             //     1000.00
-            value : 100000
-            });
+            value: 100000
+        });
         parameters[didPerEtherParameterTitle] = didPerEtherParameter;
         parameterTitles.push(didPerEtherParameterTitle);
+
+        votingPowerLimitParameter = Parameter({
+            title: votingPowerLimitParameterTitle,
+            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     25.00%
+            value: 2500
+        });
+        parameters[votingPowerLimitParameterTitle] = votingPowerLimitParameter;
+        parameterTitles.push(votingPowerLimitParameterTitle);
 
     }
 

@@ -59,6 +59,11 @@ contract('Distense contract', function(accounts) {
     value: 100000
   }
 
+  const votingPowerLimitParameter = {
+    title: 'votingPowerLimit',
+    value: 2500
+  }
+
   it('should have the correct proposalPctDIDToApproveParameter title and value', async () => {
     let param = await distense.getParameterByTitle(
       proposalPctDIDToApproveParameter.title
@@ -202,7 +207,7 @@ contract('Distense contract', function(accounts) {
 
   it('should set the initial attributes correctly', async function() {
     const numParameters = await distense.getNumParameters.call()
-    assert.equal(numParameters.toNumber(), 10)
+    assert.equal(numParameters.toNumber(), 11)
   })
 
   it('should reject parameter votes with values equal to the current value', async function() {

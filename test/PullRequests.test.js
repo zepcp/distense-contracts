@@ -4,6 +4,11 @@ const PullRequests = artifacts.require('PullRequests')
 const DIDToken = artifacts.require('DIDToken')
 const Distense = artifacts.require('Distense')
 
+import {
+  convertIntToSolidityInt,
+  convertSolidityIntToInt
+} from './helpers/utils'
+
 contract('PullRequests', function(accounts) {
   let didToken
   let distense
@@ -55,14 +60,8 @@ contract('PullRequests', function(accounts) {
     assert.equal(numPRs.toNumber(), 0, 'numPRs should be 0')
   })
 
-  it('should issueDID correctly after a pull request reaches the required approvals', async function() {
+  it.only('should issueDID correctly after a pull request reaches the required approvals', async function() {
     await didToken.issueDID(accounts[0], 1000000)
-
-    await pullRequests.addPullRequest(
-      pullRequest.id,
-      pullRequest.taskId,
-      pullRequest.prNum
-    )
 
     //  got to have a task to interact with
     await tasks.addTask(pullRequest.taskId, 'some title')
@@ -73,7 +72,10 @@ contract('PullRequests', function(accounts) {
       'task must exist to vote and approve a related pr later'
     )
 
-    await tasks.taskRewardVote(pullRequest.taskId, 10)
+    await tasks.taskRewardVote(
+      pullRequest.taskId,
+      convertIntToSolidityInt(1000)
+    )
 
     await tasks.approve(pullRequests.address)
     const pullRequestsAddressApprovedForTasks = await tasks.approved.call(
@@ -95,14 +97,25 @@ contract('PullRequests', function(accounts) {
       'pullRequests.address needs to be approved to call a function within approvePullRequest()'
     )
 
-    const beginTotalSupply = await didToken.totalSupply.call()
-    await pullRequests.approvePullRequest(pullRequest.id)
-    const afterTotalSupply = await didToken.totalSupply.call()
-    assert.isAbove(
-      afterTotalSupply,
-      beginTotalSupply,
-      'after total supply should be higher than the beginning one'
+    await pullRequests.addPullRequest(
+      pullRequest.id,
+      pullRequest.taskId,
+      pullRequest.prNum
     )
+
+    let adjustedTotalSupply = await didToken.totalSupply.call()
+    const testTask = await tasks.getTaskById.call(pullRequest.taskId)
+
+    await pullRequests.approvePullRequest(pullRequest.id)
+    adjustedTotalSupply = +adjustedTotalSupply + +testTask[2]
+
+    const postTotalSupply = await didToken.totalSupply.call()
+    assert.equal(
+      adjustedTotalSupply,
+      postTotalSupply.toString(),
+      'after total supply should be correctly higher than the beginning one'
+    )
+    assert.equal(true, false)
   })
 
   it('should addPullRequests correctly', async function() {

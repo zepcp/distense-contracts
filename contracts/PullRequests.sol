@@ -90,6 +90,8 @@ contract PullRequests is Approvable, Debuggable {
         ) {
             Tasks tasks = Tasks(TasksAddress);
             var (reward, rewardStatus) = tasks.getTaskRewardAndStatus(_pr.taskId);
+            LogString('reward');
+            LogUInt256(reward);
             require(rewardStatus != Tasks.RewardStatus.PAID);
             //  Only issueDID after we confirm taskRewardPaid
             Tasks.RewardStatus updatedRewardStatus = tasks.setTaskRewardPaid(_pr.taskId);

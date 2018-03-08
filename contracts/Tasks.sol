@@ -5,7 +5,7 @@ import './Distense.sol';
 import './lib/SafeMath.sol';
 
 
-contract Tasks is Approvable {
+contract Tasks is Approvable, Debuggable {
 
     using SafeMath for uint256;
 
@@ -134,6 +134,7 @@ contract Tasks is Approvable {
             task.reward -= update;
         }
 
+        task.reward = task.reward.div(100);
         task.numVotes++;
 
         uint256 pctDIDVotedThreshold = distense.getParameterValueByTitle(

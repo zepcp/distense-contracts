@@ -137,7 +137,7 @@ contract Tasks is Approvable {
         task.numVotes++;
 
         uint256 pctDIDVotedThreshold = distense.getParameterValueByTitle(
-            distense.proposalPctDIDToApproveParameterTitle()
+            distense.pctDIDToDetermineTaskRewardParameterTitle()
         );
 
         uint256 minNumVoters = distense.getParameterValueByTitle(
@@ -159,8 +159,8 @@ contract Tasks is Approvable {
 
     function getTaskRewardAndStatus(bytes32 _taskId) external view returns (uint256, RewardStatus) {
         return (
-        tasks[_taskId].reward,
-        tasks[_taskId].rewardStatus
+            tasks[_taskId].reward,
+            tasks[_taskId].rewardStatus
         );
     }
 

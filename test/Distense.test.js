@@ -6,8 +6,8 @@ const utils = require('./helpers/utils')
 import { convertSolidityIntToInt } from './helpers/utils'
 
 contract('Distense contract', function(accounts) {
-  const proposalPctDIDToApproveParameter = {
-    title: 'proposalPctDIDToApprove',
+  const pctDIDToDetermineTaskRewardParameter = {
+    title: 'pctDIDToDetermineTaskReward',
     value: 2500
   }
 
@@ -36,7 +36,7 @@ contract('Distense contract', function(accounts) {
 
   const numDIDRequiredToTaskRewardVoteParameter = {
     title: 'numDIDRequiredToTaskRewardVote',
-    value: 15000
+    value: 10000
   }
 
   const minNumberOfTaskRewardVotersParameter = {
@@ -64,17 +64,17 @@ contract('Distense contract', function(accounts) {
     value: 2500
   }
 
-  it('should have the correct proposalPctDIDToApproveParameter title and value', async () => {
-    let param = await distense.getParameterByTitle(
-      proposalPctDIDToApproveParameter.title
+  it('should have the correct pctDIDToDetermineTaskRewardParameter title and value', async () => {
+    const param = await distense.getParameterByTitle(
+      pctDIDToDetermineTaskRewardParameter.title
     )
     assert.equal(
       utils.stripHexStringOfZeroes(param[0]),
-      proposalPctDIDToApproveParameter.title
+      pctDIDToDetermineTaskRewardParameter.title
     )
     assert.equal(
       param[1].toNumber(),
-      proposalPctDIDToApproveParameter.value,
+      pctDIDToDetermineTaskRewardParameter.value,
       'proposalPctDIDToApproveParameter value incorrect'
     )
   })
@@ -383,15 +383,18 @@ contract('Distense contract', function(accounts) {
       await didToken.pctDIDOwned(accounts[0])
     )
     vote = -1
-    await distense.voteOnParameter(proposalPctDIDToApproveParameter.title, vote)
+    await distense.voteOnParameter(
+      pctDIDToDetermineTaskRewardParameter.title,
+      vote
+    )
     correctValue = calcCorrectUpdatedParameterValue(
       pctDIDOwned,
-      proposalPctDIDToApproveParameter.value,
+      pctDIDToDetermineTaskRewardParameter.value,
       vote
     )
 
     newContractValue = await distense.getParameterValueByTitle(
-      proposalPctDIDToApproveParameter.title
+      pctDIDToDetermineTaskRewardParameter.title
     )
 
     assert.equal(
@@ -401,17 +404,20 @@ contract('Distense contract', function(accounts) {
     )
   })
 
-  it(`should properly update the proposalPctDIDToApproveParameter value`, async function() {
+  it(`should properly update the pctDIDToDetermineTaskRewardParameter value`, async function() {
     await didToken.issueDID(accounts[1], 2000)
     await didToken.issueDID(accounts[2], 2000)
 
     let vote = -1
     //  total DID at this point is 2000 + 2000 + 4321 == 8321 DID
     //  so accounts[0], the voter owns 24%
-    await distense.voteOnParameter(proposalPctDIDToApproveParameter.title, vote)
+    await distense.voteOnParameter(
+      pctDIDToDetermineTaskRewardParameter.title,
+      vote
+    )
 
     let newContractValue = await distense.getParameterValueByTitle(
-      proposalPctDIDToApproveParameter.title
+      pctDIDToDetermineTaskRewardParameter.title
     )
     assert.equal(
       newContractValue,
@@ -425,14 +431,14 @@ contract('Distense contract', function(accounts) {
     // //  total DID at this point is 2000 + 2000 + 4321 == 8321 DID
     // //  so accounts[0], the voter owns 24%
     await distense.voteOnParameter(
-      proposalPctDIDToApproveParameter.title,
+      pctDIDToDetermineTaskRewardParameter.title,
       vote,
       {
         from: accounts[1]
       }
     )
     newContractValue = await distense.getParameterValueByTitle(
-      proposalPctDIDToApproveParameter.title
+      pctDIDToDetermineTaskRewardParameter.title
     )
     assert.equal(
       newContractValue,
@@ -445,14 +451,14 @@ contract('Distense contract', function(accounts) {
     // //  total DID at this point is 2000 + 2000 + 4321 == 8321 DID
     // //  so accounts[0], the voter owns 24%
     await distense.voteOnParameter(
-      proposalPctDIDToApproveParameter.title,
+      pctDIDToDetermineTaskRewardParameter.title,
       vote,
       {
         from: accounts[2]
       }
     )
     newContractValue = await distense.getParameterValueByTitle(
-      proposalPctDIDToApproveParameter.title
+      pctDIDToDetermineTaskRewardParameter.title
     )
     assert.equal(
       newContractValue,

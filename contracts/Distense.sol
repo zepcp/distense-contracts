@@ -31,8 +31,8 @@ contract Distense is Debuggable {
 
     mapping(bytes32 => Parameter) public parameters;
 
-    Parameter public proposalPctDIDToApproveParameter;
-    bytes32 public proposalPctDIDToApproveParameterTitle = 'proposalPctDIDToApprove';
+    Parameter public pctDIDToDetermineTaskRewardParameter;
+    bytes32 public pctDIDToDetermineTaskRewardParameterTitle = 'pctDIDToDetermineTaskReward';
 
     Parameter public pctDIDRequiredToMergePullRequest;
     bytes32 public pctDIDRequiredToMergePullRequestTitle = 'pctDIDRequiredToMergePullRequest';
@@ -76,15 +76,15 @@ contract Distense is Debuggable {
         // that can be later updated by contributors
         // Current values can be found at https://disten.se/parameters
 
-        // PCT of DID that must vote on a proposal for it to be approved and payable
-        proposalPctDIDToApproveParameter = Parameter({
-            title: proposalPctDIDToApproveParameterTitle,
+        // Percentage of DID that must vote on a proposal for it to be approved and payable
+        pctDIDToDetermineTaskRewardParameter = Parameter({
+            title: pctDIDToDetermineTaskRewardParameterTitle,
             //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
             //     So this is 25.00%
             value: 2500
         });
-        parameters[proposalPctDIDToApproveParameterTitle] = proposalPctDIDToApproveParameter;
-        parameterTitles.push(proposalPctDIDToApproveParameterTitle);
+        parameters[pctDIDToDetermineTaskRewardParameterTitle] = pctDIDToDetermineTaskRewardParameter;
+        parameterTitles.push(pctDIDToDetermineTaskRewardParameterTitle);
 
 
         pctDIDRequiredToMergePullRequest = Parameter({
@@ -135,8 +135,8 @@ contract Distense is Debuggable {
         numDIDRequiredToTaskRewardVoteParameter = Parameter({
             title: numDIDRequiredToTaskRewardVoteParameterTitle,
             //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
-            // 150.00
-            value: 15000
+            // 100.00
+            value: 10000
         });
         parameters[numDIDRequiredToTaskRewardVoteParameterTitle] = numDIDRequiredToTaskRewardVoteParameter;
         parameterTitles.push(numDIDRequiredToTaskRewardVoteParameterTitle);

@@ -79,7 +79,7 @@ contract Distense is Debuggable {
         // Percentage of DID that must vote on a proposal for it to be approved and payable
         pctDIDToDetermineTaskRewardParameter = Parameter({
             title: pctDIDToDetermineTaskRewardParameterTitle,
-            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 25.00%
             value: 2500
         });
@@ -89,7 +89,7 @@ contract Distense is Debuggable {
 
         pctDIDRequiredToMergePullRequest = Parameter({
             title: pctDIDRequiredToMergePullRequestTitle,
-            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 10.00
             value: 1000
         });
@@ -107,9 +107,9 @@ contract Distense is Debuggable {
 
         maxRewardParameter = Parameter({
             title: maxRewardParameterTitle,
-            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 5000.0
-            value: 500000
+            value: 5000
         });
         parameters[maxRewardParameterTitle] = maxRewardParameter;
         parameterTitles.push(maxRewardParameterTitle);
@@ -117,9 +117,9 @@ contract Distense is Debuggable {
 
         numDIDRequiredToApproveVotePullRequestParameter = Parameter({
             title: numDIDRequiredToApproveVotePullRequestParameterTitle,
-            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     200.00
-            value: 20000
+            value: 200
         });
         parameters[numDIDRequiredToApproveVotePullRequestParameterTitle] = numDIDRequiredToApproveVotePullRequestParameter;
         parameterTitles.push(numDIDRequiredToApproveVotePullRequestParameterTitle);
@@ -134,9 +134,9 @@ contract Distense is Debuggable {
         // This parameter also limits attacks by noobs that want to mess with Distense.
         numDIDRequiredToTaskRewardVoteParameter = Parameter({
             title: numDIDRequiredToTaskRewardVoteParameterTitle,
-            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             // 100.00
-            value: 10000
+            value: 100
         });
         parameters[numDIDRequiredToTaskRewardVoteParameterTitle] = numDIDRequiredToTaskRewardVoteParameter;
         parameterTitles.push(numDIDRequiredToTaskRewardVoteParameterTitle);
@@ -144,7 +144,7 @@ contract Distense is Debuggable {
 
         minNumberOfTaskRewardVotersParameter = Parameter({
             title: minNumberOfTaskRewardVotersParameterTitle,
-            //     Every hard-coded int in Solidity is a decimal to one decimal place
+            //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 7.00
             value: 700
         });
@@ -154,7 +154,7 @@ contract Distense is Debuggable {
 
         numDIDRequiredToAddTaskParameter = Parameter({
             title: numDIDRequiredToAddTaskParameterTitle,
-            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 100.00
             value: 10000
         });
@@ -164,9 +164,9 @@ contract Distense is Debuggable {
 
         defaultRewardParameter = Parameter({
             title: defaultRewardParameterTitle,
-            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     Every hard-coded int EXCEPT for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     100.00
-            value: 10000
+            value: 100
         });
         parameters[defaultRewardParameterTitle] = defaultRewardParameter;
         parameterTitles.push(defaultRewardParameterTitle);
@@ -174,16 +174,16 @@ contract Distense is Debuggable {
 
         didPerEtherParameter = Parameter({
             title: didPerEtherParameterTitle,
-            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     1000.00
-            value: 100000
+            value: 1000
         });
         parameters[didPerEtherParameterTitle] = didPerEtherParameter;
         parameterTitles.push(didPerEtherParameterTitle);
 
         votingPowerLimitParameter = Parameter({
             title: votingPowerLimitParameterTitle,
-            //     Every hard-coded int except for dates and numbers pertaining to ether or DID are decimals to two decimal places
+            //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     25.00%
             value: 2500
         });

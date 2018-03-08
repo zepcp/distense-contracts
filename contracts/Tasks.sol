@@ -134,7 +134,6 @@ contract Tasks is Approvable, Debuggable {
             task.reward -= update;
         }
 
-        task.reward = task.reward.div(100);
         task.numVotes++;
 
         uint256 pctDIDVotedThreshold = distense.getParameterValueByTitle(

@@ -60,7 +60,7 @@ contract('PullRequests', function(accounts) {
     assert.equal(numPRs.toNumber(), 0, 'numPRs should be 0')
   })
 
-  it.only('should issueDID correctly after a pull request reaches the required approvals', async function() {
+  it('should issueDID correctly after a pull request reaches the required approvals', async function() {
     await didToken.issueDID(accounts[0], 1000000)
 
     //  got to have a task to interact with
@@ -72,10 +72,7 @@ contract('PullRequests', function(accounts) {
       'task must exist to vote and approve a related pr later'
     )
 
-    await tasks.taskRewardVote(
-      pullRequest.taskId,
-      convertIntToSolidityInt(1000)
-    )
+    await tasks.taskRewardVote(pullRequest.taskId, 1000)
 
     await tasks.approve(pullRequests.address)
     const pullRequestsAddressApprovedForTasks = await tasks.approved.call(
@@ -115,7 +112,6 @@ contract('PullRequests', function(accounts) {
       postTotalSupply.toString(),
       'after total supply should be correctly higher than the beginning one'
     )
-    assert.equal(true, false)
   })
 
   it('should addPullRequests correctly', async function() {

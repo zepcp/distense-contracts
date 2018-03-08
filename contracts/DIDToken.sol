@@ -18,8 +18,8 @@ contract DIDToken is Token, Approvable {
     address public PullRequestsAddress;
     address public DistenseAddress;
 
-    uint256 public investmentLimitAggregate  = 1000 ether;  // This is the max DID all addresses can receive from depositing ether
-    uint256 public investmentLimitAddress = 50 ether;  // This is the max DID any address can receive from Ether deposit
+    uint256 public investmentLimitAggregate  = 10000 ether;  // This is the max DID all addresses can receive from depositing ether
+    uint256 public investmentLimitAddress = 500 ether;  // This is the max DID any address can receive from Ether deposit
     uint256 public investedAggregate = 0 ether;
 
     mapping(address => uint256) public investedAddress;  // keep track of how much contributors have deposited to prevent over depositing
@@ -69,7 +69,7 @@ contract DIDToken is Token, Approvable {
     function investEtherForDID() canDepositThisManyEtherForDID() external payable returns (uint256) {
 
         Distense distense = Distense(DistenseAddress);
-        uint256 DIDPerEther = SafeMath.div(distense.getParameterValueByTitle(distense.didPerEtherParameterTitle()), 100);
+        uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
 
         uint256 numEtherInvested = SafeMath.div(msg.value, 1000000000000000000);
 

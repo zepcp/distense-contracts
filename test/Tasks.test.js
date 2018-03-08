@@ -341,21 +341,17 @@ contract('Tasks', function(accounts) {
     await tasks.addTask(task.taskId, task.title)
 
     let testTask = await tasks.getTaskById.call(task.taskId)
-    assert.equal(
-      testTask[2].toNumber(),
-      10000,
-      'task reward should be 10000 here'
-    )
+    assert.equal(testTask[2].toNumber(), 100, 'task reward should be 100 here')
 
-    await tasks.taskRewardVote(task.taskId, convertIntToSolidityInt(50), {
+    await tasks.taskRewardVote(task.taskId, 50, {
       from: accounts[3]
     })
 
     let taskReward = await tasks.getTaskReward.call(task.taskId)
     assert.equal(
       taskReward.toString(),
-      9000,
-      'task reward should now be 9000: 20% of DID voted half of default reward value'
+      90,
+      'task reward should now be 90: 20% of DID voted half of default reward value'
     )
 
     await tasks.taskRewardVote(task.taskId, 0, {
@@ -365,8 +361,8 @@ contract('Tasks', function(accounts) {
     taskReward = await tasks.getTaskReward.call(task.taskId)
     assert.equal(
       taskReward.toString(),
-      7200,
-      'task reward should now be 7200: a 20% reduction from the current value of 90'
+      72,
+      'task reward should now be 72: a 20% reduction from the current value of 90'
     )
   })
 
@@ -388,8 +384,8 @@ contract('Tasks', function(accounts) {
     let taskReward = await tasks.getTaskReward.call(task.taskId)
     assert.equal(
       taskReward.toString(),
-      7500,
-      'task reward should now be 7500: 33% of DID voted 0 but the votingPowerLimit initial value is 25%'
+      75,
+      'task reward should now be 75: 33% of DID voted 0 but the votingPowerLimit initial value is 25%'
     )
   })
 
@@ -409,20 +405,16 @@ contract('Tasks', function(accounts) {
     await tasks.addTask(task.taskId, task.title)
 
     let testTask = await tasks.getTaskById.call(task.taskId)
-    assert.equal(
-      testTask[2].toNumber(),
-      10000,
-      'task reward should be 100 here'
-    )
+    assert.equal(testTask[2].toNumber(), 100, 'task reward should be 100 here')
 
     await tasks.taskRewardVote(task.taskId, 0, {
       from: accounts[0]
     })
 
-    let taskReward = await tasks.getTaskReward.call(task.taskId)
+    const taskReward = await tasks.getTaskReward.call(task.taskId)
     assert.equal(
       taskReward.toString(),
-      8571,
+      86,
       'task reward should now be 6666: 33% of DID voted 0'
     )
   })
@@ -440,26 +432,22 @@ contract('Tasks', function(accounts) {
 
     await tasks.addTask(task.taskId, task.title)
 
-    let testTask = await tasks.getTaskById.call(task.taskId)
-    assert.equal(
-      testTask[2].toNumber(),
-      10000,
-      'task reward should be 100 here'
-    )
+    const testTask = await tasks.getTaskById.call(task.taskId)
+    assert.equal(testTask[2].toNumber(), 100, 'task reward should be 100 here')
 
-    await tasks.taskRewardVote(task.taskId, convertIntToSolidityInt(10), {
+    await tasks.taskRewardVote(task.taskId, 10, {
       from: accounts[4]
     })
 
     let taskReward = await tasks.getTaskReward.call(task.taskId)
-    assert.equal(taskReward.toString(), 8500, 'task reward should now be 8500')
+    assert.equal(taskReward.toString(), 85, 'task reward should now be 85')
 
-    await tasks.taskRewardVote(task.taskId, convertIntToSolidityInt(23), {
+    await tasks.taskRewardVote(task.taskId, 23, {
       from: accounts[5]
     })
 
     taskReward = await tasks.getTaskReward.call(task.taskId)
-    assert.equal(taskReward.toString(), 7467, 'task reward should now be 7467')
+    assert.equal(taskReward.toString(), 75, 'task reward should now be 75')
   })
 
   it('should determineTaskReward() correctly #5', async function() {
@@ -473,16 +461,12 @@ contract('Tasks', function(accounts) {
 
     await tasks.addTask(task.taskId, task.title)
 
-    await tasks.taskRewardVote(task.taskId, convertIntToSolidityInt(199), {
+    await tasks.taskRewardVote(task.taskId, 199, {
       from: accounts[0]
     })
 
-    let taskReward = await tasks.getTaskReward.call(task.taskId)
-    assert.equal(
-      taskReward.toString(),
-      12475,
-      'task reward should now be 12500'
-    )
+    const taskReward = await tasks.getTaskReward.call(task.taskId)
+    assert.equal(taskReward.toString(), 124, 'task reward should now be 124')
   })
 
   it('should set the reward status as determined once enough DID or voters have voted', async function() {
@@ -492,11 +476,11 @@ contract('Tasks', function(accounts) {
 
     await tasks.addTask(task.taskId, task.title)
 
-    await tasks.taskRewardVote(task.taskId, convertIntToSolidityInt(50), {
+    await tasks.taskRewardVote(task.taskId, 50, {
       from: accounts[0]
     })
 
-    let testTask = await tasks.getTaskById.call(task.taskId)
+    const testTask = await tasks.getTaskById.call(task.taskId)
 
     assert.equal(
       testTask[3].toNumber(),
@@ -517,8 +501,8 @@ contract('Tasks', function(accounts) {
 
     assert.equal(
       taskRewardAndStatus[0].toNumber(),
-      10000,
-      'task reward should be 10000 here (100)'
+      100,
+      'task reward should be 100'
     )
     assert.equal(
       taskRewardAndStatus[1].toNumber(),

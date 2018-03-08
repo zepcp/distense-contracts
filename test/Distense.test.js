@@ -26,17 +26,17 @@ contract('Distense contract', function(accounts) {
 
   const maxRewardParameter = {
     title: 'maxReward',
-    value: 500000
+    value: 5000
   }
 
   const numDIDRequiredToApproveVotePullRequestParameter = {
     title: 'numDIDReqApproveVotePullRequest',
-    value: 20000
+    value: 200
   }
 
   const numDIDRequiredToTaskRewardVoteParameter = {
     title: 'numDIDRequiredToTaskRewardVote',
-    value: 10000
+    value: 100
   }
 
   const minNumberOfTaskRewardVotersParameter = {
@@ -51,12 +51,12 @@ contract('Distense contract', function(accounts) {
 
   const defaultRewardParameter = {
     title: 'defaultReward',
-    value: 10000
+    value: 100
   }
 
   const didPerEtherParameter = {
     title: 'didPerEther',
-    value: 100000
+    value: 1000
   }
 
   const votingPowerLimitParameter = {

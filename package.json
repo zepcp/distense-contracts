@@ -1,6 +1,6 @@
 {
   "name": "distense-contracts",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Distense Ethereum smart contracts and tests",
   "main": "",
   "scripts": {
@@ -26,6 +26,7 @@
   "homepage": "https://github.com/Distense/distense-contracts#readme",
   "dependencies": {
     "babel-polyfill": "^6.26.0",
+    "bignumber.js": "git+https://github.com/debris/bignumber.js.git#94d7146671b9719e00a09c29b01a691bc85048c2",
     "node-fetch": "^1.7.3",
     "prettier": "^1.10.2",
     "truffle": "^4.0.4",

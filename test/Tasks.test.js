@@ -5,10 +5,7 @@ const Distense = artifacts.require('Distense')
 const PullRequests = artifacts.require('PullRequests')
 const numDIDRequiredToAddTask = require('./Distense.test')
 
-import {
-  convertIntToSolidityInt,
-  convertSolidityIntToInt
-} from './helpers/utils'
+import { convertIntToSolidityInt } from './helpers/utils'
 
 module.exports.increaseTime = addSeconds => {
   web3.currentProvider.send({

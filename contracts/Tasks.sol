@@ -201,7 +201,6 @@ contract Tasks is Approvable, Debuggable {
         uint256 numDIDRequiredToAddTask = distense.getParameterValueByTitle(
             distense.numDIDRequiredToAddTaskParameterTitle()
         );
-        numDIDRequiredToAddTask = SafeMath.div(numDIDRequiredToAddTask, 100);
         require(balance >= numDIDRequiredToAddTask);
         _;
     }

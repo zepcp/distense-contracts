@@ -21,7 +21,7 @@ contract('Distense contract', function(accounts) {
   const votingIntervalParameter = {
     title: 'votingInterval',
     // Equal to 15 days in Solidity
-    value: 129600000
+    value: 1296000
   }
 
   const maxRewardParameter = {
@@ -41,12 +41,12 @@ contract('Distense contract', function(accounts) {
 
   const minNumberOfTaskRewardVotersParameter = {
     title: 'minNumberOfTaskRewardVoters',
-    value: 700
+    value: 7
   }
 
   const numDIDRequiredToAddTaskParameter = {
     title: 'numDIDRequiredToAddTask',
-    value: 10000
+    value: 100
   }
 
   const defaultRewardParameter = {

@@ -31,14 +31,14 @@ contract Distense is Debuggable {
 
     mapping(bytes32 => Parameter) public parameters;
 
+    Parameter public votingIntervalParameter;
+    bytes32 public votingIntervalParameterTitle = 'votingInterval';
+
     Parameter public pctDIDToDetermineTaskRewardParameter;
     bytes32 public pctDIDToDetermineTaskRewardParameterTitle = 'pctDIDToDetermineTaskReward';
 
     Parameter public pctDIDRequiredToMergePullRequest;
     bytes32 public pctDIDRequiredToMergePullRequestTitle = 'pctDIDRequiredToMergePullRequest';
-
-    Parameter public votingIntervalParameter;
-    bytes32 public votingIntervalParameterTitle = 'votingInterval';
 
     Parameter public maxRewardParameter;
     bytes32 public maxRewardParameterTitle = 'maxReward';
@@ -99,7 +99,7 @@ contract Distense is Debuggable {
 
         votingIntervalParameter = Parameter({
             title: votingIntervalParameterTitle,
-            value: 129600000 // 15 * 86400 = 1.296e+6
+            value: 1296000 // 15 * 86400 = 1.296e+6
         });
         parameters[votingIntervalParameterTitle] = votingIntervalParameter;
         parameterTitles.push(votingIntervalParameterTitle);
@@ -146,7 +146,7 @@ contract Distense is Debuggable {
             title: minNumberOfTaskRewardVotersParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 7.00
-            value: 700
+            value: 7
         });
         parameters[minNumberOfTaskRewardVotersParameterTitle] = minNumberOfTaskRewardVotersParameter;
         parameterTitles.push(minNumberOfTaskRewardVotersParameterTitle);
@@ -156,7 +156,7 @@ contract Distense is Debuggable {
             title: numDIDRequiredToAddTaskParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 100.00
-            value: 10000
+            value: 100
         });
         parameters[numDIDRequiredToAddTaskParameterTitle] = numDIDRequiredToAddTaskParameter;
         parameterTitles.push(numDIDRequiredToAddTaskParameterTitle);

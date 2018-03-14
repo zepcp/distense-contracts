@@ -61,7 +61,7 @@ contract('Distense contract', function(accounts) {
 
   const votingPowerLimitParameter = {
     title: 'votingPowerLimit',
-    value: 2500
+    value: 2000
   }
 
   it('should have the correct pctDIDToDetermineTaskRewardParameter title and value', async () => {
@@ -164,6 +164,21 @@ contract('Distense contract', function(accounts) {
       param[1].toNumber(),
       minNumberOfTaskRewardVotersParameter.value,
       'minNumberOfTaskRewardVotersParameter value incorrect'
+    )
+  })
+
+  it('should have the correct votingPowerLimit title and value', async () => {
+    let param = await distense.getParameterByTitle(
+      votingPowerLimitParameter.title
+    )
+    assert.equal(
+      utils.stripHexStringOfZeroes(param[0]),
+      votingPowerLimitParameter.title
+    )
+    assert.equal(
+      param[1].toNumber(),
+      votingPowerLimitParameter.value,
+      'votingPowerLimitParameter value incorrect'
     )
   })
 

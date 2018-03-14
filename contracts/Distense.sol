@@ -184,8 +184,8 @@ contract Distense is Debuggable {
         votingPowerLimitParameter = Parameter({
             title: votingPowerLimitParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
-            //     25.00%
-            value: 2500
+            //     20.00%
+            value: 2000
         });
         parameters[votingPowerLimitParameterTitle] = votingPowerLimitParameter;
         parameterTitles.push(votingPowerLimitParameterTitle);

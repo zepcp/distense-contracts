@@ -62,7 +62,17 @@ We have four primary contracts:
 - DIDToken.sol
   - This contract contains the important DID balances and functions that pertain to exchanging and investing ether for DID and vice versa.
 - Tasks.sol
-  - This contract contains the important `addTask` and `taskRewardVote` functions.  `taskRewardVote` is so long because we effectively house the modifiers in this function within it to minimize the size of the call stack which would reach the limits if we didn't.
+  - This contract contains the important `addTask` and `taskRewardVote` functions.  
+    - `taskRewardVote` is so long because we effectively house the modifiers in this function within it to minimize the size of the call stack which would reach the limits if we didn't.
+  - This contract queries Distense.sol like `distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle()));` quite a few times.    
+- PullRequests.sol
+  - This contract has quite the same functionality as Tasks.sol as far as adding and approving pullRequests
+  - PullRequests.sol is where DID are issued once pullRequests reach an approval threshold.
+  
+  
+ 
+  
+      
 
 ## Contribute
 

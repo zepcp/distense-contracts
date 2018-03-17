@@ -1,14 +1,11 @@
 pragma solidity ^0.4.17;
 
-
 import './lib/Approvable.sol';
 import './DIDToken.sol';
 import './Distense.sol';
 import './Tasks.sol';
 
-
-contract PullRequests is Approvable, Debuggable {
-
+contract PullRequests is Approvable {
 
     address public DIDTokenAddress;
     address public DistenseAddress;
@@ -40,7 +37,6 @@ contract PullRequests is Approvable, Debuggable {
         TasksAddress = _TasksAddress;
     }
 
-
     function addPullRequest(bytes32 _prId, bytes32 _taskId, uint128 _prNum) external returns (bool) {
         pullRequests[_prId].contributor = msg.sender;
         pullRequests[_prId].taskId = _taskId;
@@ -52,17 +48,14 @@ contract PullRequests is Approvable, Debuggable {
         return true;
     }
 
-
     function getPullRequestById(bytes32 _prId) external view returns (address, bytes32, uint128, uint256) {
         PullRequest memory pr = pullRequests[_prId];
         return (pr.contributor, pr.taskId, pr.prNum, pr.pctDIDApproved);
     }
 
-
     function getNumPullRequests() external view returns (uint256) {
         return pullRequestIds.length;
     }
-
 
     function approvePullRequest(bytes32 _prId)
         hasntVoted(_prId)
@@ -90,11 +83,10 @@ contract PullRequests is Approvable, Debuggable {
         ) {
             Tasks tasks = Tasks(TasksAddress);
             var (reward, rewardStatus) = tasks.getTaskRewardAndStatus(_pr.taskId);
-            LogString('reward');
-            LogUInt256(reward);
+
             require(rewardStatus != Tasks.RewardStatus.PAID);
-            //  Only issueDID after we confirm taskRewardPaid
             Tasks.RewardStatus updatedRewardStatus = tasks.setTaskRewardPaid(_pr.taskId);
+            //  Only issueDID after we confirm taskRewardPaid
             require(updatedRewardStatus == Tasks.RewardStatus.PAID);
             didToken.issueDID(_pr.contributor, reward);
             LogRewardPullRequest(_prId, _pr.taskId, _pr.prNum);
@@ -102,7 +94,6 @@ contract PullRequests is Approvable, Debuggable {
 
         LogPullRequestApprovalVote(_prId, _pr.pctDIDApproved);
         return _pr.pctDIDApproved;
-
     }
 
     modifier hasntVoted(bytes32 _prId) {

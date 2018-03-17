@@ -92,8 +92,8 @@ contract('Tasks', function(accounts) {
   })
 
   it('should return true or otherwise modify the task with taskRewardVote() when the voter hasDID', async function() {
-    await didToken.issueDID(accounts[0], convertIntToSolidityInt(1000))
-    await didToken.issueDID(accounts[1], convertIntToSolidityInt(1000))
+    await didToken.issueDID(accounts[0], 100000)
+    await didToken.issueDID(accounts[1], 100000)
 
     await tasks.addTask(task.taskId, task.title)
     const taskExists = await tasks.taskExists.call(task.taskId)

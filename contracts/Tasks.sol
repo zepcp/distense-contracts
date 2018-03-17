@@ -99,6 +99,7 @@ contract Tasks is Approvable, Debuggable {
         //  Essentially refund the remaining gas if user's vote will have no effect
         require(task.reward != _reward);
 
+        // Don't let the voter vote if the reward has already been determined
         require(task.rewardStatus != RewardStatus.DETERMINED);
 
         //  Has the voter already voted on this task?

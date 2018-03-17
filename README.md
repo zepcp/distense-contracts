@@ -50,6 +50,20 @@ Once you get past the initial code->testing phase and want to view your changes 
 - You can interact with your version of the contracts at this point and modify the distense-ui if you want
 
 
+## Contract Overview
+
+The following is an overview of how Distense's smart contracts are structured.  
+
+We have four primary contracts:
+
+- Distense.sol
+  - This contract is almost solely about Distense's governance parameters.  The original values are hardcoded in this file and the titles are also here.  When another contract checks the current value of a smart contract, it will query this smart contract.
+  - This contract contains the DIDToken contract's address so it can query the percent of DID owned a voter has
+- DIDToken.sol
+  - This contract contains the important DID balances and functions that pertain to exchanging and investing ether for DID and vice versa.
+- Tasks.sol
+  - This contract contains the important `addTask` and `taskRewardVote` functions.  `taskRewardVote` is so long because we effectively house the modifiers in this function within it to minimize the size of the call stack which would reach the limits if we didn't.
+
 ## Contribute
 
 - By contributing to this repo you will earn DID an Ethereum token that gives you governance and economic rights to Distense

@@ -10,6 +10,7 @@
 - [What is Distense?](#what-is-distense?)
 - [Install](#install)
 - [Usage](#usage)
+- [Contract Overview](#contract-overview)
 - [Contribute](#contribute)
 - [License](#license)
 
@@ -69,10 +70,7 @@ We have four primary contracts:
   - This contract has quite the same functionality as Tasks.sol as far as adding and approving pullRequests
   - PullRequests.sol is where DID are issued once pullRequests reach an approval threshold.
   
-  
  
-  
-      
 
 ## Contribute
 

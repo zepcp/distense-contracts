@@ -65,12 +65,14 @@ We have four primary contracts:
 - Tasks.sol
   - This contract contains the important `addTask` and `taskRewardVote` functions.  
     - `taskRewardVote` is so long because we effectively house the modifiers in this function within it to minimize the size of the call stack which would reach the limits if we didn't.
-  - This contract queries Distense.sol like `distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle()));` quite a few times.    
+  - This contract queries Distense.sol like `distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle()));` quite a few times.
+  - tasks have three stages: `TENTATIVE`, `DETERMINED`, and `PAID`. Each task at the time of creation will be `TENTATIVE`. We default the reward to 100 initially, because we can't loop really in Solidity. Tasks become `DETERMINED` when enough holders of DID vote on the task reward. Tasks are `PAID` after a pullRequest is submitted and enough DID holders vote to approve them.  
 - PullRequests.sol
   - This contract has quite the same functionality as Tasks.sol as far as adding and approving pullRequests
   - PullRequests.sol is where DID are issued once pullRequests reach an approval threshold.
+  - We actually call `issueDID` to pay most tasks from PullRequests.sol once the pullRequest approval threshold has been reached.
   
- 
+ In both PullRequests.sol and Tasks.sol, we have lists of the tasks ids and pullRequest ids.  This is so we can loop through the mappings that hold them client-side. We get query in order of indexes the ids from the mappings.
 
 ## Contribute
 

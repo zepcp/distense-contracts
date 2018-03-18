@@ -67,9 +67,8 @@ The following is an overview of how Distense's smart contracts are structured.
   - This contract queries Distense.sol like `distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle()));` quite a few times.
   - Tasks have three stages: `TENTATIVE`, `DETERMINED`, and `PAID`. Each task at the time of creation will be `TENTATIVE`. We default the reward to 100 initially, because we can't loop really in Solidity. Tasks become `DETERMINED` when enough holders of DID vote on the task reward. Tasks are `PAID` after a pullRequest is submitted and enough DID holders vote to approve them. 
 - PullRequests.sol
-  - This contract has quite the same functionality as Tasks.sol as far as adding and approving pullRequests
-  - PullRequests.sol is where DID are issued once pullRequests reach an approval threshold.
-  - We actually call `issueDID` to pay most tasks from PullRequests.sol once the pullRequest approval threshold has been reached.
+  - The primary functions of submitting pull requests and approving are found in this contract with: `addPullRequest` and `approvePullRequest`
+  - [DID are issued](https://github.com/Distense/distense-contracts/blob/91eb111a51fb0286d71c17961dffdf5e526abc8b/contracts/PullRequests.sol#L91) once a threshold has been reached in `approvePullRequest` -- in other words when enough DID holders have voted to approve a pull request. There are no votes against pull requests, at least not now
 - Distense.sol
   - This contract is almost solely about Distense's governance parameters.  The original values are hardcoded in this file and the titles are also here.  When another contract checks the current value of a smart contract, it will query this smart contract.
   - This contract contains the DIDToken contract's address so it can query the percent of DID owned a voter has

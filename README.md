@@ -10,7 +10,7 @@
 - [What is Distense?](#what-is-distense?)
 - [Install](#install)
 - [Usage](#usage)
-- [Contract Overview](#contract-overview)
+- [Contract and Dapp Structure](#contract-and-dapp-structure)
 - [Contribute](#contribute)
 - [License](#license)
 
@@ -19,14 +19,13 @@
 Distense is a decentralized code cooperative: a company without executives, offices, meetings and bosses.  Every contributor to Distense earns DID, an Ethereum token.  There's no ICO, but code contributors may invest small amounts, initially.  Hodlers of DID govern Distense on a one-vote-per-DID basis.
 
 - Follow us on [Twitter](https://twitter.com/distenseorg)
-- Join our [Slack](https://join.slack.com/t/distense/shared_invite/enQtMzA4ODM5MzI5NzY2LWFmZDBhYTJjYzkzYmZjMjg0Y2I1YWZkYmU3NGIwYjE5NjA1Y2I0MDEzYjcyYjRmNGQzZmRhZjM1YmY0ZmY0OWY)
 - Star this repo
-- If you're interested in Solidity development, see our [frontend repo](https://github.com/Distense/distense-ui)
+- If you want to contribute and are a frontend developer, see our [frontend repo](https://github.com/Distense/distense-ui)
 
 ## Install
 
 - clone this repo
-- install npm if you don't have it
+- [install npm](https://docs.npmjs.com/getting-started/installing-node) if necessary
 - `npm i`
 
 ## Usage
@@ -51,26 +50,31 @@ Once you get past the initial code->testing phase and want to view your changes 
 - You can interact with your version of the contracts at this point and modify the distense-ui if you want
 
 
-## Contract Overview
+## Contract and Dapp Structure
 
 The following is an overview of how Distense's smart contracts are structured.  
 
-We have four primary contracts:
 
+- There are four primary functions of the Distense workflow:
+  1. [Proposing tasks](https://disten.se/tasks/add) with `addTask` (Tasks.sol)
+  2. Voting on task rewards by clicking a single task [here](https://disten.se/tasks) to see) `taskRewardVote` (Tasks.sol)
+  3. [Submitting](https://disten.se/pullrequests/add) pull requests (PullRequests.sol)
+  4. Approving pull requests by clicking Approve [here](https://disten.se/pullrequests) (PullRequests.sol)
+  
+- Tasks.sol
+  - The first two primary functions, `addTask` and `taskRewardVote` are found here.  
+    - `taskRewardVote` is so long because we effectively house the modifiers in this function within it to minimize the size of the call stack which would exceed the limits if we didn't use require statements [here](https://github.com/Distense/distense-contracts/blob/91eb111a51fb0286d71c17961dffdf5e526abc8b/contracts/Tasks.sol#L97).
+  - This contract queries Distense.sol like `distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle()));` quite a few times.
+  - Tasks have three stages: `TENTATIVE`, `DETERMINED`, and `PAID`. Each task at the time of creation will be `TENTATIVE`. We default the reward to 100 initially, because we can't loop really in Solidity. Tasks become `DETERMINED` when enough holders of DID vote on the task reward. Tasks are `PAID` after a pullRequest is submitted and enough DID holders vote to approve them. 
+- PullRequests.sol
+  - This contract has quite the same functionality as Tasks.sol as far as adding and approving pullRequests
+  - PullRequests.sol is where DID are issued once pullRequests reach an approval threshold.
+  - We actually call `issueDID` to pay most tasks from PullRequests.sol once the pullRequest approval threshold has been reached.
 - Distense.sol
   - This contract is almost solely about Distense's governance parameters.  The original values are hardcoded in this file and the titles are also here.  When another contract checks the current value of a smart contract, it will query this smart contract.
   - This contract contains the DIDToken contract's address so it can query the percent of DID owned a voter has
 - DIDToken.sol
   - This contract contains the important DID balances and functions that pertain to exchanging and investing ether for DID and vice versa.
-- Tasks.sol
-  - This contract contains the important `addTask` and `taskRewardVote` functions.  
-    - `taskRewardVote` is so long because we effectively house the modifiers in this function within it to minimize the size of the call stack which would reach the limits if we didn't.
-  - This contract queries Distense.sol like `distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle()));` quite a few times.
-  - tasks have three stages: `TENTATIVE`, `DETERMINED`, and `PAID`. Each task at the time of creation will be `TENTATIVE`. We default the reward to 100 initially, because we can't loop really in Solidity. Tasks become `DETERMINED` when enough holders of DID vote on the task reward. Tasks are `PAID` after a pullRequest is submitted and enough DID holders vote to approve them.  
-- PullRequests.sol
-  - This contract has quite the same functionality as Tasks.sol as far as adding and approving pullRequests
-  - PullRequests.sol is where DID are issued once pullRequests reach an approval threshold.
-  - We actually call `issueDID` to pay most tasks from PullRequests.sol once the pullRequest approval threshold has been reached.
   
  In both PullRequests.sol and Tasks.sol, we have lists of the tasks ids and pullRequest ids.  This is so we can loop through the mappings that hold them client-side. We get query in order of indexes the ids from the mappings.
 

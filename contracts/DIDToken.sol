@@ -45,6 +45,7 @@ contract DIDToken is Token, Approvable {
         require(_address != address(0));
         require(_numDID > 0);
         require(SafeMath.sub(balances[_address], _numDID) >= 0);
+        require(SafeMath.sub(totalSupply, _numDID) >= 0);
 
         totalSupply = SafeMath.sub(totalSupply, _numDID);
         balances[_address] = SafeMath.sub(balances[_address], _numDID);

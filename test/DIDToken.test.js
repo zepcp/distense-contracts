@@ -174,6 +174,33 @@ contract('DIDToken', function(accounts) {
     )
   })
 
+  it('should decrement the number of DID', async function() {
+    await didToken.issueDID(accounts[0], 20000)
+    await didToken.decrementDID(accounts[0], 10001)
+    const DIDBalance = await didToken.balances.call(accounts[0])
+
+    assert.equal(
+      DIDBalance.toNumber(),
+      9999,
+      'accounts[0] DID balance should be 9999'
+    )
+  })
+
+  it('should reject decrementing too many DID', async function() {
+    let error
+    try {
+      await didToken.issueDID(accounts[0], 20000)
+      await didToken.decrementDID(accounts[0], 20001)
+    } catch (e) {
+      error = e
+    }
+    assert.notEqual(
+      error,
+      undefined,
+      'should have thrown an error decrementing too many DID'
+    )
+  })
+
   it('should not increment the number of DID for those who invest too much ether', async function() {
     let etherForDIDExchangeError
     await didToken.issueDID(accounts[0], 20000)

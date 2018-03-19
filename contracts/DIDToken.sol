@@ -12,6 +12,7 @@ contract DIDToken is Token, Approvable {
     using SafeMath for uint256;
 
     event LogIssueDID(address indexed to, uint256 numDID);
+    event LogDecrementDID(address indexed to, uint256 numDID);
     event LogExchangeDIDForEther(address indexed to, uint256 numDID);
     event LogInvestEtherForDID(address indexed to, uint256 numWei);
 
@@ -38,6 +39,18 @@ contract DIDToken is Token, Approvable {
         LogIssueDID(_recipient, _numDID);
 
         return balances[_recipient];
+    }
+
+    function decrementDID(address _address, uint256 _numDID) external onlyApproved returns (uint256) {
+        require(_address != address(0));
+        require(_numDID > 0);
+        require(SafeMath.sub(balances[_address], _numDID) >= 0);
+
+        totalSupply = SafeMath.sub(totalSupply, _numDID);
+        balances[_address] = SafeMath.sub(balances[_address], _numDID);
+        LogDecrementDID(_address, _numDID);
+
+        return balances[_address];
     }
 
     function pctDIDOwned(address _person) external view returns (uint256) {

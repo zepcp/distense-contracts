@@ -74,7 +74,13 @@ contract PullRequests is Approvable {
 
         //  Record approval vote to prevent multiple voting
         _pr.voted[msg.sender] = true;
-        _pr.pctDIDApproved += didToken.pctDIDOwned(msg.sender);
+
+        //  This is not very gas efficient at all but the stack was too deep.  Need to refactor/research ways to improve
+        _pr.pctDIDApproved += didToken.pctDIDOwned(msg.sender) > distense.getParameterValueByTitle(
+            distense.votingPowerLimitParameterTitle()
+        ) ? distense.getParameterValueByTitle(
+            distense.votingPowerLimitParameterTitle()
+        ) : didToken.pctDIDOwned(msg.sender);
 
         if (
             _pr.pctDIDApproved > distense.getParameterValueByTitle(

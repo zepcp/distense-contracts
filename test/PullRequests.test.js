@@ -261,7 +261,7 @@ contract('PullRequests', function(accounts) {
     const votedOnPR = await pullRequests.getPullRequestById.call(pullRequest.id)
     assert.equal(
       votedOnPR[3].toNumber(),
-      3333,
+      2000,
       'pctDIDVoted of the votedOnPullRequest should be greater than zero'
     )
   })
@@ -334,7 +334,7 @@ contract('PullRequests', function(accounts) {
     assert.equal(approvePullRequestLog.length, 1, 'should be 1 event')
     let eventArgs = approvePullRequestLog[0].args
     assert.equal(eventArgs._prId, pullRequest.id)
-    assert.equal(eventArgs.pctDIDApproved.toString(), 5000, 'pctDIDApproved')
+    assert.equal(eventArgs.pctDIDApproved.toString(), '2000', 'pctDIDApproved')
   })
 
   it('should fire event "LogRewardPullRequest" when addPullRequest is appropriately called', async function() {

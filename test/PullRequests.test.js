@@ -16,7 +16,7 @@ contract('PullRequests', function(accounts) {
   let pullRequests
   beforeEach(async function() {
     didToken = await DIDToken.new()
-    distense = await Distense.new()
+    distense = await Distense.new(didToken.address)
     tasks = await Tasks.new(didToken.address, distense.address)
     pullRequests = await PullRequests.new(
       didToken.address,

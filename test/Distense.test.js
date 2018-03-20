@@ -337,7 +337,7 @@ contract('Distense contract', function(accounts) {
     const userBalance = await didToken.balances.call(accounts[0])
     assert.isAbove(
       userBalance.toNumber(),
-      convertSolidityIntToInt(2000),
+      200,
       'user should have DID here to vote'
     )
 
@@ -349,9 +349,114 @@ contract('Distense contract', function(accounts) {
 
     assert.equal(
       newValue.toNumber(),
-      votingIntervalParameter.value * 1.25, // limited to 25% increase
+      votingIntervalParameter.value * 1.2, // limited to 25% increase
       'updated value should be twice the original value as the voter owns 100% of the DID'
     )
+  })
+
+  it(`should properly update the votingInterval parameter value when voted upon`, async function() {
+    const userBalance = await didToken.balances.call(accounts[0])
+    assert.isAbove(
+      userBalance.toNumber(),
+      200,
+      'user should have DID here to vote'
+    )
+
+    await distense.voteOnParameter(votingIntervalParameter.title, 1)
+
+    const newValue = await distense.getParameterValueByTitle.call(
+      votingIntervalParameter.title
+    )
+
+    assert.equal(
+      newValue.toNumber(),
+      votingIntervalParameter.value * 1.2, // limited to 25% increase
+      'updated value should be twice the original value as the voter owns 100% of the DID'
+    )
+  })
+
+  it(`should properly update the votingInterval parameter value when voted upon with 40%`, async function() {
+    await didToken.issueDID(accounts[0], 20000)
+    await didToken.issueDID(accounts[1], 20000)
+
+    await distense.voteOnParameter(votingIntervalParameter.title, 40)
+
+    const newValue = await distense.getParameterValueByTitle.call(
+      votingIntervalParameter.title
+    )
+
+    assert.equal(
+      newValue.toNumber(),
+      votingIntervalParameter.value * 1.2,
+      'updated value should be 20% higher limited by the votingLimitParameter'
+    )
+  })
+
+  it(`should properly update the votingInterval parameter value when voted upon with -40%`, async function() {
+    await didToken.issueDID(accounts[0], 20000)
+    await didToken.issueDID(accounts[1], 20000)
+
+    await distense.voteOnParameter(votingIntervalParameter.title, -40)
+
+    const newValue = await distense.getParameterValueByTitle.call(
+      votingIntervalParameter.title
+    )
+
+    assert.equal(
+      newValue.toNumber(),
+      1036800,
+      'updated value should be 20% lower limited by the votingLimitParameter'
+    )
+  })
+
+  it(`should properly update the votingInterval parameter value when voted upon with -5%`, async function() {
+    await didToken.issueDID(accounts[0], 20000)
+    await didToken.issueDID(accounts[1], 20000)
+
+    await distense.voteOnParameter(votingIntervalParameter.title, -5)
+
+    const newValue = await distense.getParameterValueByTitle.call(
+      votingIntervalParameter.title
+    )
+
+    assert.equal(
+      newValue.toNumber(),
+      1231200,
+      'updated value should be 5% lower'
+    )
+  })
+
+  it(`should properly update the numDIDRequiredToTaskRewardVoteParameterTitle parameter value when voted upon with -21%`, async function() {
+    await didToken.issueDID(accounts[0], 1000)
+    await didToken.issueDID(accounts[1], 20000)
+
+    //  accounts[0] owns 3000 of 23000 total DID -- 13% here
+    await distense.voteOnParameter(
+      numDIDRequiredToTaskRewardVoteParameter.title,
+      -21
+    )
+
+    const newValue = await distense.getParameterValueByTitle.call(
+      numDIDRequiredToTaskRewardVoteParameter.title
+    )
+
+    //  accounts[0] owns 3000 of 23000 total DID -- 13% here
+    assert.equal(newValue.toNumber(), 87, 'updated value should be 13% lower')
+  })
+
+  it(`should reject parameter votes for more than 100`, async function() {
+    await didToken.issueDID(accounts[0], 20000)
+    await didToken.issueDID(accounts[1], 20000)
+
+    let someError
+    try {
+      await distense.voteOnParameter(votingIntervalParameter.title, 101)
+    } catch (e) {
+      someError = e
+      console.log(`${someError}`)
+    }
+
+    assert.notEqual(someError, undefined, 'should throw an error here')
   })
 
   it(`should properly update the pctDIDRequiredToMergePullRequest value when upvoted with the proper requirements`, async function() {
@@ -370,13 +475,13 @@ contract('Distense contract', function(accounts) {
 
     assert.equal(
       newValue.toNumber(),
-      pctDIDRequiredToMergePullRequest.value * 0.75,
+      pctDIDRequiredToMergePullRequest.value * 0.8,
       'updated value should be 25% less than the original value'
     )
   })
 
   function calcCorrectUpdatedParameterValue(pctDIDOwned, originalValue, vote) {
-    const limitTo25PercentIfHigher = (pctDIDOwned > 25 ? 25 : pctDIDOwned) / 100
+    const limitTo25PercentIfHigher = (pctDIDOwned > 20 ? 20 : pctDIDOwned) / 100
 
     const update = originalValue * limitTo25PercentIfHigher
     if (vote === 1) originalValue += update
@@ -393,7 +498,7 @@ contract('Distense contract', function(accounts) {
     let vote
     let pctDIDOwned
 
-    //  Downvote by 50% owner -- should be limited to 25% down from original value of 25%
+    //  Downvote by 50% owner -- should be limited to 20% down from original value of 25%
     pctDIDOwned = convertSolidityIntToInt(
       await didToken.pctDIDOwned(accounts[0])
     )
@@ -413,7 +518,7 @@ contract('Distense contract', function(accounts) {
     )
 
     assert.equal(
-      newContractValue,
+      newContractValue.toString(),
       correctValue,
       'updated value should be lower by the percentage of DID ownership of the voter'
     )
@@ -424,8 +529,6 @@ contract('Distense contract', function(accounts) {
     await didToken.issueDID(accounts[2], 2000)
 
     let vote = -1
-    //  total DID at this point is 2000 + 2000 + 4321 == 8321 DID
-    //  so accounts[0], the voter owns 24%
     await distense.voteOnParameter(
       pctDIDToDetermineTaskRewardParameter.title,
       vote
@@ -435,8 +538,8 @@ contract('Distense contract', function(accounts) {
       pctDIDToDetermineTaskRewardParameter.title
     )
     assert.equal(
-      newContractValue,
-      1875,
+      newContractValue.toString(),
+      2000,
       'updated value should be lower by the percentage of DID ownership of the voter'
     )
 
@@ -456,8 +559,8 @@ contract('Distense contract', function(accounts) {
       pctDIDToDetermineTaskRewardParameter.title
     )
     assert.equal(
-      newContractValue,
-      2343,
+      newContractValue.toString(),
+      2400,
       'updated value should be higher by the percentage of DID ownership of the voter'
     )
 
@@ -476,8 +579,8 @@ contract('Distense contract', function(accounts) {
       pctDIDToDetermineTaskRewardParameter.title
     )
     assert.equal(
-      newContractValue,
-      2928,
+      newContractValue.toString(),
+      2880,
       'updated value should be higher by the percentage of DID ownership of the voter'
     )
   })

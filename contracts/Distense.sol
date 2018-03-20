@@ -78,7 +78,7 @@ contract Distense is Debuggable {
 
         // Percentage of DID that must vote on a proposal for it to be approved and payable
         pctDIDToDetermineTaskRewardParameter = Parameter({
-            title: pctDIDToDetermineTaskRewardParameterTitle,
+            title : pctDIDToDetermineTaskRewardParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 25.00%
             value: 2500
@@ -88,7 +88,7 @@ contract Distense is Debuggable {
 
 
         pctDIDRequiredToMergePullRequest = Parameter({
-            title: pctDIDRequiredToMergePullRequestTitle,
+            title : pctDIDRequiredToMergePullRequestTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 10.00
             value: 1000
@@ -98,7 +98,7 @@ contract Distense is Debuggable {
 
 
         votingIntervalParameter = Parameter({
-            title: votingIntervalParameterTitle,
+            title : votingIntervalParameterTitle,
             value: 1296000 // 15 * 86400 = 1.296e+6
         });
         parameters[votingIntervalParameterTitle] = votingIntervalParameter;
@@ -106,7 +106,7 @@ contract Distense is Debuggable {
 
 
         maxRewardParameter = Parameter({
-            title: maxRewardParameterTitle,
+            title : maxRewardParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 5000.0
             value: 5000
@@ -116,7 +116,7 @@ contract Distense is Debuggable {
 
 
         numDIDRequiredToApproveVotePullRequestParameter = Parameter({
-            title: numDIDRequiredToApproveVotePullRequestParameterTitle,
+            title : numDIDRequiredToApproveVotePullRequestParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     200.00
             value: 200
@@ -133,7 +133,7 @@ contract Distense is Debuggable {
 
         // This parameter also limits attacks by noobs that want to mess with Distense.
         numDIDRequiredToTaskRewardVoteParameter = Parameter({
-            title: numDIDRequiredToTaskRewardVoteParameterTitle,
+            title : numDIDRequiredToTaskRewardVoteParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             // 100.00
             value: 100
@@ -143,7 +143,7 @@ contract Distense is Debuggable {
 
 
         minNumberOfTaskRewardVotersParameter = Parameter({
-            title: minNumberOfTaskRewardVotersParameterTitle,
+            title : minNumberOfTaskRewardVotersParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 7.00
             value: 7
@@ -153,7 +153,7 @@ contract Distense is Debuggable {
 
 
         numDIDRequiredToAddTaskParameter = Parameter({
-            title: numDIDRequiredToAddTaskParameterTitle,
+            title : numDIDRequiredToAddTaskParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 100.00
             value: 100
@@ -163,7 +163,7 @@ contract Distense is Debuggable {
 
 
         defaultRewardParameter = Parameter({
-            title: defaultRewardParameterTitle,
+            title : defaultRewardParameterTitle,
             //     Every hard-coded int EXCEPT for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     100.00
             value: 100
@@ -173,7 +173,7 @@ contract Distense is Debuggable {
 
 
         didPerEtherParameter = Parameter({
-            title: didPerEtherParameterTitle,
+            title : didPerEtherParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     1000.00
             value: 1000
@@ -182,7 +182,7 @@ contract Distense is Debuggable {
         parameterTitles.push(didPerEtherParameterTitle);
 
         votingPowerLimitParameter = Parameter({
-            title: votingPowerLimitParameterTitle,
+            title : votingPowerLimitParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     20.00%
             value: 2000
@@ -196,11 +196,27 @@ contract Distense is Debuggable {
         return parameters[_title].value;
     }
 
+    /**
+        Function called when contributors vote on parameters at /parameters url
+        In the client there are: max and min buttons and a text input
+
+        @param _title name of parameter title the DID holder is voting on.  This must be one of the hardcoded titles in this file.
+        @param _voteValue integer in percentage effect.  For example if the current value of a parameter is 20, and the voter votes 24, _voteValue
+        would be 20, for a 20% increase.
+
+        If _voteValue is 1 it's a max upvote, if -1 max downvote. Maximum votes, as just mentioned, affect parameter values by the
+        maximum of the percentage of DID owned by the voter, or the value of the votingLimit parameter.
+        If _voteValue has a higher absolute value than 1, the user has voted a specific value.  In that case we update the value to the voted value
+        if the value would affect the parameter value less than their percentage DID ownership.  If they voted a value that would affect the
+        parameter's value by more than their percentage DID ownership we affect the value by their percentage DID ownership.
+    */
     function voteOnParameter(bytes32 _title, int256 _voteValue)
         public
         votingIntervalReached(msg.sender, _title)
-    returns
+        returns
     (uint256) {
+
+        require(_voteValue <= 100);
 
         DIDToken didToken = DIDToken(DIDTokenAddress);
         uint256 votersDIDPercent = didToken.pctDIDOwned(msg.sender);
@@ -208,11 +224,28 @@ contract Distense is Debuggable {
 
         uint256 currentValue = getParameterValueByTitle(_title);
 
-        votersDIDPercent = votersDIDPercent > 250 ? 250 : votersDIDPercent;
+        //  For voting power purposes, limit the pctDIDOwned to the maximum of the Voting Power Limit parameter or the voter's percentage ownership
+        //  of DID
+        uint256 votingPowerLimit = getParameterValueByTitle(votingPowerLimitParameterTitle);
+        uint256 limitedVotingPower = votersDIDPercent > votingPowerLimit ? votingPowerLimit : votersDIDPercent;
 
-        uint256 update = (votersDIDPercent * currentValue) / 1000;
+        uint256 update;
+        if (
+            _voteValue == 1 ||
+            _voteValue == - 1 ||
+            _voteValue * 100 > int(limitedVotingPower) ||
+            _voteValue * - 100 > int(limitedVotingPower)
+        ) {
 
-        if (_voteValue == 1)
+            update = (limitedVotingPower * currentValue) / 10000;
+        } else if (_voteValue > 0) {
+            update = (uint(_voteValue) * currentValue) / 10000;
+        } else if (_voteValue < 0) {
+            int256 adjustedVoteValue = (-_voteValue) * 100; // make the voteValue positive and convert to on-chain decimals
+            update = uint((adjustedVoteValue * int(currentValue)) / 10000);
+        } else revert(); //  If _voteValue is 0
+
+        if (_voteValue > 0)
             currentValue = SafeMath.add(currentValue, update);
         else
             currentValue = SafeMath.sub(currentValue, update);

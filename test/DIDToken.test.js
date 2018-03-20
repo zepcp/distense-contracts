@@ -11,8 +11,8 @@ contract('DIDToken', function(accounts) {
   let distense
 
   beforeEach(async function() {
-    distense = await Distense.new()
     didToken = await DIDToken.new()
+    distense = await Distense.new(didToken.address)
     await didToken.setDistenseAddress(distense.address)
   })
 

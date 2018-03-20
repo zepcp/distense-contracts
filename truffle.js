@@ -28,15 +28,15 @@ module.exports = {
       gas: 6719227,
       gasPrice: 50000000000
     },
-    rinkebyRemote: {
+    ropstenFast: {
       host: '159.89.135.56',
-      network_id: '4',
-      port: 4000,
-      from: '0x0de5be0e82493accb8e83d2af99e72458249bbf9',
-      gas: 6719227,
+      network_id: '3',
+      port: 5000, 
+      from: '0x80e774718b3781d4527f0ecb0751074778870800',
+      gas: 4605201,
       gasPrice: 100000000000
     },
-    ropstenRemote2: {
+    ropstenRemote: {
       host: '138.68.51.255',
       network_id: '3',
       port: 5000,

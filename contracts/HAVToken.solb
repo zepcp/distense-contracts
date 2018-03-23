@@ -1,6 +1,6 @@
 // Distense is a decentralized, for-profit code cooperative
 
-pragma solidity ^0.4.17;
+pragma solidity ^0.4.21;
 
 import './lib/Approvable.sol';
 import './lib/SafeMath.sol';

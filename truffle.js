@@ -43,12 +43,7 @@ module.exports = {
       from: '0x0De5Be0E82493AcCb8E83d2aF99E72458249bBF9',
       gas: 4605201,
       gasPrice: 10000000000000
-    },
-    development: {
-      host: '127.0.0.1',
-      port: 8545,
-      network_id:"*"
-    },
+    }
   },
   solc: {
     optimizer: {

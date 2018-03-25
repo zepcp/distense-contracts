@@ -5,7 +5,7 @@ import './Distense.sol';
 import './lib/SafeMath.sol';
 
 
-contract Tasks is Approvable, Debuggable {
+contract Tasks is Approvable {
 
     using SafeMath for uint256;
 
@@ -51,7 +51,7 @@ contract Tasks is Approvable, Debuggable {
 
         taskIds.push(_taskId);
         tasks[_taskId].taskIdsIndex = taskIds.length - 1;
-        LogAddTask(_taskId, _title);
+        emit LogAddTask(_taskId, _title);
 
         return true;
 
@@ -146,7 +146,7 @@ contract Tasks is Approvable, Debuggable {
         );
 
         if (task.pctDIDVoted > pctDIDVotedThreshold || task.numVotes > minNumVoters) {
-            LogTaskRewardDetermined(_taskId, task.reward);
+            emit LogTaskRewardDetermined(_taskId, task.reward);
             task.rewardStatus = RewardStatus.DETERMINED;
         }
 

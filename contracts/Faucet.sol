@@ -20,7 +20,7 @@ contract Faucet {
             ) &&
             now > lastPaid + 10 seconds
         ) {
-            SendEther(msg.sender);
+            emit SendEther(msg.sender);
             msg.sender.transfer(10 ether);
             lastRequested[msg.sender] = now;
             lastPaid = now;

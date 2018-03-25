@@ -2,9 +2,8 @@ pragma solidity ^0.4.21;
 
 import './DIDToken.sol';
 import './lib/SafeMath.sol';
-import './Debuggable.sol';
 
-contract Distense is Debuggable {
+contract Distense {
     using SafeMath for uint256;
 
     address public DIDTokenAddress;
@@ -146,7 +145,7 @@ contract Distense is Debuggable {
             title : minNumberOfTaskRewardVotersParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 7.00
-            value: 7
+            value: 700
         });
         parameters[minNumberOfTaskRewardVotersParameterTitle] = minNumberOfTaskRewardVotersParameter;
         parameterTitles.push(minNumberOfTaskRewardVotersParameterTitle);
@@ -252,7 +251,7 @@ contract Distense is Debuggable {
 
         updateParameterValue(_title, currentValue);
         updateLastVotedOnParameter(_title, msg.sender);
-        LogParameterValueUpdate(_title, currentValue);
+        emit LogParameterValueUpdate(_title, currentValue);
 
         return currentValue;
     }

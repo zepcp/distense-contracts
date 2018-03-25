@@ -161,7 +161,7 @@ contract('Distense contract', function(accounts) {
       minNumberOfTaskRewardVotersParameter.title
     )
     assert.equal(
-      param[1].toNumber(),
+      convertSolidityIntToInt(param[1].toNumber()),
       minNumberOfTaskRewardVotersParameter.value,
       'minNumberOfTaskRewardVotersParameter value incorrect'
     )

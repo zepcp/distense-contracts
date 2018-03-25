@@ -62,7 +62,7 @@ module.exports = (deployer, network, accounts) => {
     .then(() => {
       const network = web3.version.network
       console.log(`Using network: ${network}`)
-      if (network === '3' || network === '5777' || network > '100000000') {
+      if (network === 3) {
         console.log(`Deploying Ropsten faucet`)
         return deployer.deploy(Faucet)
       } else {
@@ -73,11 +73,11 @@ module.exports = (deployer, network, accounts) => {
     })
     .then(async () => {
       //  Ropsten faucet
-      if (network === '3' || network === '5777' || network > '100000000') {
+      if (network === 3) {
         const faucet = await Faucet.deployed()
         const network = web3.version.network
         console.log(`Using network: ${network}`)
-        const numEtherToSendToFaucet = network === '3' ? '1000' : '5'
+        const numEtherToSendToFaucet = network === 3 ? 1000 : 5
         console.log(`Sending ${numEtherToSendToFaucet} ether to faucet`)
         await web3.eth.sendTransaction({
           from: accounts[0],

@@ -43,7 +43,7 @@ contract PullRequests is Approvable {
         pullRequests[_prId].prNum = _prNum;
         pullRequestIds.push(_prId);
 
-        LogAddPullRequest(_prId, _taskId, _prNum);
+        emit LogAddPullRequest(_prId, _taskId, _prNum);
 
         return true;
     }
@@ -88,17 +88,19 @@ contract PullRequests is Approvable {
             )
         ) {
             Tasks tasks = Tasks(TasksAddress);
-            var (reward, rewardStatus) = tasks.getTaskRewardAndStatus(_pr.taskId);
+            uint256 reward;
+            Tasks.RewardStatus rewardStatus;
+            (reward , rewardStatus) = tasks.getTaskRewardAndStatus(_pr.taskId);
 
             require(rewardStatus != Tasks.RewardStatus.PAID);
             Tasks.RewardStatus updatedRewardStatus = tasks.setTaskRewardPaid(_pr.taskId);
             //  Only issueDID after we confirm taskRewardPaid
             require(updatedRewardStatus == Tasks.RewardStatus.PAID);
             didToken.issueDID(_pr.contributor, reward);
-            LogRewardPullRequest(_prId, _pr.taskId, _pr.prNum);
+            emit LogRewardPullRequest(_prId, _pr.taskId, _pr.prNum);
         }
 
-        LogPullRequestApprovalVote(_prId, _pr.pctDIDApproved);
+        emit LogPullRequestApprovalVote(_prId, _pr.pctDIDApproved);
         return _pr.pctDIDApproved;
     }
 

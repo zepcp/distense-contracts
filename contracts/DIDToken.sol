@@ -4,8 +4,6 @@ import './lib/Approvable.sol';
 import './Distense.sol';
 import './lib/SafeMath.sol';
 import './lib/Token.sol';
-import './Debuggable.sol';
-
 
 contract DIDToken is Token, Approvable {
 
@@ -20,7 +18,7 @@ contract DIDToken is Token, Approvable {
     address public DistenseAddress;
 
     uint256 public investmentLimitAggregate  = 10000 ether;  // This is the max DID all addresses can receive from depositing ether
-    uint256 public investmentLimitAddress = 500 ether;  // This is the max DID any address can receive from Ether deposit
+    uint256 public investmentLimitAddress = 100 ether;  // This is the max DID any address can receive from Ether deposit
     uint256 public investedAggregate = 0 ether;
 
     mapping(address => uint256) public investedAddress;  // keep track of how much contributors have deposited to prevent over depositing
@@ -36,7 +34,7 @@ contract DIDToken is Token, Approvable {
 
         totalSupply = SafeMath.add(totalSupply, _numDID);
         balances[_recipient] = SafeMath.add(balances[_recipient], _numDID);
-        LogIssueDID(_recipient, _numDID);
+        emit LogIssueDID(_recipient, _numDID);
 
         return balances[_recipient];
     }
@@ -49,7 +47,7 @@ contract DIDToken is Token, Approvable {
 
         totalSupply = SafeMath.sub(totalSupply, _numDID);
         balances[_address] = SafeMath.sub(balances[_address], _numDID);
-        LogDecrementDID(_address, _numDID);
+        emit LogDecrementDID(_address, _numDID);
 
         return balances[_address];
     }
@@ -68,14 +66,16 @@ contract DIDToken is Token, Approvable {
         uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
 
         uint256 numEtherToIssue = SafeMath.div(_numDIDToExchange, DIDPerEther);
-        require(this.balance > numEtherToIssue);
+
+        address contractAddress = this;
+        require(contractAddress.balance > numEtherToIssue);
 
         //  Adjust number of DID owned first
         balances[msg.sender] = SafeMath.sub(balances[msg.sender], _numDIDToExchange);
         totalSupply = SafeMath.sub(totalSupply, _numDIDToExchange);
 
         msg.sender.transfer(numEtherToIssue);
-        LogExchangeDIDForEther(msg.sender, _numDIDToExchange);
+        emit LogExchangeDIDForEther(msg.sender, _numDIDToExchange);
 
         return balances[msg.sender];
     }
@@ -85,7 +85,7 @@ contract DIDToken is Token, Approvable {
         Distense distense = Distense(DistenseAddress);
         uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
 
-        uint256 numEtherInvested = SafeMath.div(msg.value, 1000000000000000000);
+        uint256 numEtherInvested = SafeMath.div(msg.value, 1 ether);
 
         uint256 numDIDToIssue = SafeMath.mul(DIDPerEther, numEtherInvested);
 
@@ -95,18 +95,18 @@ contract DIDToken is Token, Approvable {
         investedAddress[msg.sender] += msg.value;
         investedAggregate += msg.value;
 
-        LogIssueDID(msg.sender, numDIDToIssue);
-        LogInvestEtherForDID(msg.sender, msg.value);
+        emit LogIssueDID(msg.sender, numDIDToIssue);
+        emit LogInvestEtherForDID(msg.sender, msg.value);
 
         return balances[msg.sender];
     }
 
     function getNumWeiAddressMayInvest(address contributor) public view returns (uint256) {
-        return investmentLimitAddress - investedAddress[contributor];
+        return SafeMath.sub(investmentLimitAddress, investedAddress[contributor]);
     }
 
     function getWeiAggregateMayInvest() public view returns (uint256) {
-        return investmentLimitAggregate - investedAggregate;
+        return SafeMath.sub(investmentLimitAggregate, investedAggregate);
     }
 
     function setDistenseAddress(address _distenseAddress) public onlyApproved {

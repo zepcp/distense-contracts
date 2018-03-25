@@ -20,7 +20,7 @@ contract('Faucet', async function(accounts) {
     web3.eth.sendTransaction({
       from: accounts[0],
       to: faucet.address,
-      value: web3.toWei('85.933', 'ether')
+      value: web3.toWei('83.933', 'ether')
     })
     const beginBalance = await web3.eth.getBalance(accounts[0])
 

@@ -203,7 +203,7 @@
                   "overloadedDeclarations": [
                     null
                   ],
-                  "referencedDeclaration": 2646,
+                  "referencedDeclaration": 2581,
                   "type": "uint256",
                   "value": "now"
                 },
@@ -411,7 +411,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 2644,
+                                              "referencedDeclaration": 2579,
                                               "type": "msg",
                                               "value": "msg"
                                             },
@@ -498,7 +498,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 2646,
+                                              "referencedDeclaration": 2581,
                                               "type": "uint256",
                                               "value": "now"
                                             },
@@ -574,7 +574,7 @@
                                                               "overloadedDeclarations": [
                                                                 null
                                                               ],
-                                                              "referencedDeclaration": 2644,
+                                                              "referencedDeclaration": 2579,
                                                               "type": "msg",
                                                               "value": "msg"
                                                             },
@@ -681,7 +681,7 @@
                                                       "overloadedDeclarations": [
                                                         null
                                                       ],
-                                                      "referencedDeclaration": 2644,
+                                                      "referencedDeclaration": 2579,
                                                       "type": "msg",
                                                       "value": "msg"
                                                     },
@@ -757,7 +757,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 2646,
+                                  "referencedDeclaration": 2581,
                                   "type": "uint256",
                                   "value": "now"
                                 },
@@ -882,7 +882,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 2644,
+                                          "referencedDeclaration": 2579,
                                           "type": "msg",
                                           "value": "msg"
                                         },
@@ -957,7 +957,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 2644,
+                                              "referencedDeclaration": 2579,
                                               "type": "msg",
                                               "value": "msg"
                                             },
@@ -1057,7 +1057,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 2644,
+                                              "referencedDeclaration": 2579,
                                               "type": "msg",
                                               "value": "msg"
                                             },
@@ -1081,7 +1081,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2646,
+                                      "referencedDeclaration": 2581,
                                       "type": "uint256",
                                       "value": "now"
                                     },
@@ -1132,7 +1132,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 2646,
+                                      "referencedDeclaration": 2581,
                                       "type": "uint256",
                                       "value": "now"
                                     },
@@ -1295,5 +1295,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-03-23T22:04:42.866Z"
+  "updatedAt": "2018-03-25T15:59:46.639Z"
 }

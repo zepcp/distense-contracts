@@ -92,11 +92,11 @@
       "type": "event"
     }
   ],
-  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a72305820a1cd6b2176bab9231a074ee7e1982d41641fa6c8d6516140cc51984fa033cc440029",
-  "deployedBytecode": "0x6060604052600080fd00a165627a7a72305820a1cd6b2176bab9231a074ee7e1982d41641fa6c8d6516140cc51984fa033cc440029",
-  "sourceMap": "26:334:1:-;;;320:37;;;;;;;;26:334;;;;;;",
-  "deployedSourceMap": "26:334:1:-;;;;;",
-  "source": "pragma solidity ^0.4.0;\n\n\ncontract Debuggable {\n\n    event LogAddress(address someAddress);\n    event LogBool(bool boolean);\n    event LogBytes(bytes someBytes);\n    event LogBytes32(bytes32 aBytes32);\n    event LogString(string aString);\n    event LogUInt256(uint256 someInt);\n    event LogInt256(int256 someInt);\n\n    function Debuggable() public {\n\n    }\n\n}\n",
+  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a723058201414e593a8037e12ed15fe9852bcb55a489ffbd163e9a557f73b339f1a4d2ebf0029",
+  "deployedBytecode": "0x6060604052600080fd00a165627a7a723058201414e593a8037e12ed15fe9852bcb55a489ffbd163e9a557f73b339f1a4d2ebf0029",
+  "sourceMap": "27:334:1:-;;;321:37;;;;;;;;27:334;;;;;;",
+  "deployedSourceMap": "27:334:1:-;;;;;",
+  "source": "pragma solidity ^0.4.21;\n\n\ncontract Debuggable {\n\n    event LogAddress(address someAddress);\n    event LogBool(bool boolean);\n    event LogBytes(bytes someBytes);\n    event LogBytes32(bytes32 aBytes32);\n    event LogString(string aString);\n    event LogUInt256(uint256 someInt);\n    event LogInt256(int256 someInt);\n\n    function Debuggable() public {\n\n    }\n\n}\n",
   "sourcePath": "/Users/john/distense-contracts/contracts/Debuggable.sol",
   "ast": {
     "attributes": {
@@ -114,12 +114,12 @@
             "solidity",
             "^",
             "0.4",
-            ".0"
+            ".21"
           ]
         },
         "id": 486,
         "name": "PragmaDirective",
-        "src": "0:23:1"
+        "src": "0:24:1"
       },
       {
         "attributes": {
@@ -168,22 +168,22 @@
                         },
                         "id": 487,
                         "name": "ElementaryTypeName",
-                        "src": "70:7:1"
+                        "src": "71:7:1"
                       }
                     ],
                     "id": 488,
                     "name": "VariableDeclaration",
-                    "src": "70:19:1"
+                    "src": "71:19:1"
                   }
                 ],
                 "id": 489,
                 "name": "ParameterList",
-                "src": "69:21:1"
+                "src": "70:21:1"
               }
             ],
             "id": 490,
             "name": "EventDefinition",
-            "src": "53:38:1"
+            "src": "54:38:1"
           },
           {
             "attributes": {
@@ -214,22 +214,22 @@
                         },
                         "id": 491,
                         "name": "ElementaryTypeName",
-                        "src": "110:4:1"
+                        "src": "111:4:1"
                       }
                     ],
                     "id": 492,
                     "name": "VariableDeclaration",
-                    "src": "110:12:1"
+                    "src": "111:12:1"
                   }
                 ],
                 "id": 493,
                 "name": "ParameterList",
-                "src": "109:14:1"
+                "src": "110:14:1"
               }
             ],
             "id": 494,
             "name": "EventDefinition",
-            "src": "96:28:1"
+            "src": "97:28:1"
           },
           {
             "attributes": {
@@ -260,22 +260,22 @@
                         },
                         "id": 495,
                         "name": "ElementaryTypeName",
-                        "src": "144:5:1"
+                        "src": "145:5:1"
                       }
                     ],
                     "id": 496,
                     "name": "VariableDeclaration",
-                    "src": "144:15:1"
+                    "src": "145:15:1"
                   }
                 ],
                 "id": 497,
                 "name": "ParameterList",
-                "src": "143:17:1"
+                "src": "144:17:1"
               }
             ],
             "id": 498,
             "name": "EventDefinition",
-            "src": "129:32:1"
+            "src": "130:32:1"
           },
           {
             "attributes": {
@@ -306,22 +306,22 @@
                         },
                         "id": 499,
                         "name": "ElementaryTypeName",
-                        "src": "183:7:1"
+                        "src": "184:7:1"
                       }
                     ],
                     "id": 500,
                     "name": "VariableDeclaration",
-                    "src": "183:16:1"
+                    "src": "184:16:1"
                   }
                 ],
                 "id": 501,
                 "name": "ParameterList",
-                "src": "182:18:1"
+                "src": "183:18:1"
               }
             ],
             "id": 502,
             "name": "EventDefinition",
-            "src": "166:35:1"
+            "src": "167:35:1"
           },
           {
             "attributes": {
@@ -352,22 +352,22 @@
                         },
                         "id": 503,
                         "name": "ElementaryTypeName",
-                        "src": "222:6:1"
+                        "src": "223:6:1"
                       }
                     ],
                     "id": 504,
                     "name": "VariableDeclaration",
-                    "src": "222:14:1"
+                    "src": "223:14:1"
                   }
                 ],
                 "id": 505,
                 "name": "ParameterList",
-                "src": "221:16:1"
+                "src": "222:16:1"
               }
             ],
             "id": 506,
             "name": "EventDefinition",
-            "src": "206:32:1"
+            "src": "207:32:1"
           },
           {
             "attributes": {
@@ -398,22 +398,22 @@
                         },
                         "id": 507,
                         "name": "ElementaryTypeName",
-                        "src": "260:7:1"
+                        "src": "261:7:1"
                       }
                     ],
                     "id": 508,
                     "name": "VariableDeclaration",
-                    "src": "260:15:1"
+                    "src": "261:15:1"
                   }
                 ],
                 "id": 509,
                 "name": "ParameterList",
-                "src": "259:17:1"
+                "src": "260:17:1"
               }
             ],
             "id": 510,
             "name": "EventDefinition",
-            "src": "243:34:1"
+            "src": "244:34:1"
           },
           {
             "attributes": {
@@ -444,22 +444,22 @@
                         },
                         "id": 511,
                         "name": "ElementaryTypeName",
-                        "src": "298:6:1"
+                        "src": "299:6:1"
                       }
                     ],
                     "id": 512,
                     "name": "VariableDeclaration",
-                    "src": "298:14:1"
+                    "src": "299:14:1"
                   }
                 ],
                 "id": 513,
                 "name": "ParameterList",
-                "src": "297:16:1"
+                "src": "298:16:1"
               }
             ],
             "id": 514,
             "name": "EventDefinition",
-            "src": "282:32:1"
+            "src": "283:32:1"
           },
           {
             "attributes": {
@@ -487,7 +487,7 @@
                 "children": [],
                 "id": 515,
                 "name": "ParameterList",
-                "src": "339:2:1"
+                "src": "340:2:1"
               },
               {
                 "attributes": {
@@ -498,7 +498,7 @@
                 "children": [],
                 "id": 516,
                 "name": "ParameterList",
-                "src": "349:0:1"
+                "src": "350:0:1"
               },
               {
                 "attributes": {
@@ -509,22 +509,22 @@
                 "children": [],
                 "id": 517,
                 "name": "Block",
-                "src": "349:8:1"
+                "src": "350:8:1"
               }
             ],
             "id": 518,
             "name": "FunctionDefinition",
-            "src": "320:37:1"
+            "src": "321:37:1"
           }
         ],
         "id": 519,
         "name": "ContractDefinition",
-        "src": "26:334:1"
+        "src": "27:334:1"
       }
     ],
     "id": 520,
     "name": "SourceUnit",
-    "src": "0:361:1"
+    "src": "0:362:1"
   },
   "compiler": {
     "name": "solc",
@@ -532,5 +532,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-03-23T22:04:42.865Z"
+  "updatedAt": "2018-03-25T15:59:46.639Z"
 }

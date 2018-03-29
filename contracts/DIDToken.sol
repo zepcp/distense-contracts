@@ -3,9 +3,8 @@ pragma solidity ^0.4.21;
 import './lib/Approvable.sol';
 import './Distense.sol';
 import './lib/SafeMath.sol';
-import './lib/Token.sol';
 
-contract DIDToken is Token, Approvable {
+contract DIDToken is Approvable {
 
     using SafeMath for uint256;
 
@@ -14,6 +13,8 @@ contract DIDToken is Token, Approvable {
     event LogExchangeDIDForEther(address indexed to, uint256 numDID);
     event LogInvestEtherForDID(address indexed to, uint256 numWei);
 
+    address[] public DIDHoldersArray;
+
     address public PullRequestsAddress;
     address public DistenseAddress;
 
@@ -21,11 +22,23 @@ contract DIDToken is Token, Approvable {
     uint256 public investmentLimitAddress = 100 ether;  // This is the max DID any address can receive from Ether deposit
     uint256 public investedAggregate = 0 ether;
 
-    mapping(address => uint256) public investedAddress;  // keep track of how much contributors have deposited to prevent over depositing
+    string public name;
+    string public symbol;
+    uint8 public decimals;
+    uint256 public totalSupply;
+
+    struct DIDHolder {
+        uint256 balance;
+        uint256 DIDHoldersIndex;
+        uint256 weiInvested;
+    }
+    mapping (address => DIDHolder) public DIDHolders;
 
     function DIDToken() public {
         name = "Distense DID";
         symbol = "DID";
+        totalSupply = 0;
+        decimals = 18;
     }
 
     function issueDID(address _recipient, uint256 _numDID) external onlyApproved returns (uint256) {
@@ -33,28 +46,42 @@ contract DIDToken is Token, Approvable {
         require(_numDID > 0);
 
         totalSupply = SafeMath.add(totalSupply, _numDID);
-        balances[_recipient] = SafeMath.add(balances[_recipient], _numDID);
+        uint256 balance = DIDHolders[_recipient].balance;
+        DIDHolders[_recipient].balance = SafeMath.add(balance, _numDID);
+
+        if (DIDHolders[_recipient].DIDHoldersIndex == 0)
+            DIDHolders[_recipient].DIDHoldersIndex = DIDHoldersArray.push(_recipient) - 1;
+
         emit LogIssueDID(_recipient, _numDID);
 
-        return balances[_recipient];
+        return DIDHolders[_recipient].balance;
     }
 
     function decrementDID(address _address, uint256 _numDID) external onlyApproved returns (uint256) {
         require(_address != address(0));
         require(_numDID > 0);
-        require(SafeMath.sub(balances[_address], _numDID) >= 0);
+        require(SafeMath.sub(DIDHolders[_address].balance, _numDID) >= 0);
         require(SafeMath.sub(totalSupply, _numDID) >= 0);
 
         totalSupply = SafeMath.sub(totalSupply, _numDID);
-        balances[_address] = SafeMath.sub(balances[_address], _numDID);
+        DIDHolders[_address].balance = SafeMath.sub(DIDHolders[_address].balance, _numDID);
+        //  If DIDHolder has exchanged all of their DID remove from DIDHoldersArray
+        if (DIDHolders[_address].balance == 0) {
+            if (DIDHoldersArray.length > 1) {
+                address lastElement = DIDHoldersArray[DIDHoldersArray.length - 1];
+                DIDHoldersArray[DIDHolders[_address].DIDHoldersIndex] = lastElement;
+                DIDHoldersArray.length--;
+                delete DIDHolders[msg.sender];
+            }
+        }
+
         emit LogDecrementDID(_address, _numDID);
 
-        return balances[_address];
+        return DIDHolders[_address].balance;
     }
 
-    function pctDIDOwned(address _person) external view returns (uint256) {
-        uint owned = balances[_person];
-        return SafeMath.percent(owned, totalSupply, 4);
+    function pctDIDOwned(address _address) external view returns (uint256) {
+        return SafeMath.percent(DIDHolders[_address].balance, totalSupply, 4);
     }
 
     function exchangeDIDForEther(uint256 _numDIDToExchange)
@@ -71,13 +98,22 @@ contract DIDToken is Token, Approvable {
         require(contractAddress.balance > numEtherToIssue);
 
         //  Adjust number of DID owned first
-        balances[msg.sender] = SafeMath.sub(balances[msg.sender], _numDIDToExchange);
+        DIDHolders[msg.sender].balance = SafeMath.sub(DIDHolders[msg.sender].balance, _numDIDToExchange);
         totalSupply = SafeMath.sub(totalSupply, _numDIDToExchange);
 
         msg.sender.transfer(numEtherToIssue);
+
+        if (DIDHolders[msg.sender].balance == 0) {
+            if (DIDHoldersArray.length > 1) {
+                address lastElement = DIDHoldersArray[DIDHoldersArray.length - 1];
+                DIDHoldersArray[DIDHolders[msg.sender].DIDHoldersIndex] = lastElement;
+                DIDHoldersArray.length--;
+                delete DIDHolders[msg.sender];
+            }
+        }
         emit LogExchangeDIDForEther(msg.sender, _numDIDToExchange);
 
-        return balances[msg.sender];
+        return DIDHolders[msg.sender].balance;
     }
 
     function investEtherForDID() canDepositThisManyEtherForDID() external payable returns (uint256) {
@@ -90,32 +126,39 @@ contract DIDToken is Token, Approvable {
         uint256 numDIDToIssue = SafeMath.mul(DIDPerEther, numEtherInvested);
 
         totalSupply = SafeMath.add(totalSupply, numDIDToIssue);
-        balances[msg.sender] = SafeMath.add(balances[msg.sender], numDIDToIssue);
+        DIDHolders[msg.sender].balance = SafeMath.add(DIDHolders[msg.sender].balance, numDIDToIssue);
 
-        investedAddress[msg.sender] += msg.value;
+        DIDHolders[msg.sender].weiInvested += msg.value;
         investedAggregate += msg.value;
 
         emit LogIssueDID(msg.sender, numDIDToIssue);
         emit LogInvestEtherForDID(msg.sender, msg.value);
 
-        return balances[msg.sender];
+        return DIDHolders[msg.sender].balance;
     }
 
     function getNumWeiAddressMayInvest(address contributor) public view returns (uint256) {
-        return SafeMath.sub(investmentLimitAddress, investedAddress[contributor]);
+        return SafeMath.sub(investmentLimitAddress, DIDHolders[contributor].weiInvested);
     }
 
     function getWeiAggregateMayInvest() public view returns (uint256) {
         return SafeMath.sub(investmentLimitAggregate, investedAggregate);
     }
 
+    function getNumDIDHolders() external view returns (uint256) {
+        return DIDHoldersArray.length;
+    }
+
+    function getAddressBalance(address _address) public view returns (uint256) {
+        return DIDHolders[_address].balance;
+    }
+
     function setDistenseAddress(address _distenseAddress) public onlyApproved {
         DistenseAddress = _distenseAddress;
     }
 
-    modifier hasEnoughDID(address _contributor, uint256 _num) {
-        uint256 balance = balances[_contributor];
-        require(balance >= _num);
+    modifier hasEnoughDID(address _address, uint256 _num) {
+        require(DIDHolders[_address].balance >= _num);
         _;
     }
 

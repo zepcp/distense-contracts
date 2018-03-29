@@ -66,7 +66,7 @@ contract PullRequests is Approvable {
         Distense distense = Distense(DistenseAddress);
         DIDToken didToken = DIDToken(DIDTokenAddress);
 
-        require(didToken.balances(msg.sender) >= distense.getParameterValueByTitle(
+        require(didToken.getAddressBalance(msg.sender) >= distense.getParameterValueByTitle(
             distense.numDIDRequiredToApproveVotePullRequestParameterTitle()
         ));
 
@@ -119,8 +119,19 @@ contract PullRequests is Approvable {
 
         DIDToken didToken = DIDToken(DIDTokenAddress);
 
-        require(didToken.balances(msg.sender) > threshold);
+        require(didToken.getAddressBalance(msg.sender) > threshold);
         _;
     }
 
+    function setDIDTokenAddress(address _DIDTokenAddress) public onlyApproved {
+        DIDTokenAddress = _DIDTokenAddress;
+    }
+
+    function setDistenseAddress(address _DistenseAddress) public onlyApproved {
+        DistenseAddress = _DistenseAddress;
+    }
+
+    function setTasksAddress(address _TasksAddress) public onlyApproved {
+        TasksAddress = _TasksAddress;
+    }
 }

@@ -403,4 +403,37 @@ contract('DIDToken', function(accounts) {
     assert.equal(eventArgs.to, accounts[0])
     assert.isAbove(web3.toWei(eventArgs.numWei), web3.toWei(2))
   })
+
+  it('should delete DIDHolders from the DIDHoldersArray who own 0 DID', async function() {
+    //  make sure the contract has ether to return for the DID or this will fail
+    await didToken.issueDID(accounts[5], 101)
+    await didToken.issueDID(accounts[4], 100)
+    await didToken.issueDID(accounts[3], 102)
+
+    await didToken.investEtherForDID({
+      from: accounts[0],
+      value: web3.toWei(2)
+    })
+    await didToken.exchangeDIDForEther(100, {
+      from: accounts[4]
+    })
+
+    //  Verify decrementation
+    const numDIDHolders = await didToken.getNumDIDHolders.call()
+    assert.equal(
+      numDIDHolders.toString(),
+      2,
+      'should only be 1 DID holder here'
+    )
+
+    //  Verify correct address was deleted
+    const balance5 = await didToken.getAddressBalance.call(accounts[5])
+    assert.equal(balance5, 101, 'accounts[5] should still own 101 DID')
+
+    const balance4 = await didToken.getAddressBalance.call(accounts[4])
+    assert.equal(balance4, 0, 'accounts[4] should own 0 DID')
+
+    const balance3 = await didToken.getAddressBalance.call(accounts[3])
+    assert.equal(balance3, 102, 'accounts[4] should own 0 DID')
+  })
 })

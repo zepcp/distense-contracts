@@ -4,14 +4,12 @@ import './DIDToken.sol';
 import './Distense.sol';
 import './lib/SafeMath.sol';
 
-
 contract Tasks is Approvable {
 
     using SafeMath for uint256;
 
     address public DIDTokenAddress;
     address public DistenseAddress;
-    address public PullRequestsAddress;
 
     bytes32[] public taskIds;
 
@@ -89,7 +87,7 @@ contract Tasks is Approvable {
     function taskRewardVote(bytes32 _taskId, uint256 _reward) external returns (bool) {
 
         DIDToken didToken = DIDToken(DIDTokenAddress);
-        uint256 balance = didToken.balances(msg.sender);
+        uint256 balance = didToken.getAddressBalance(msg.sender);
         Distense distense = Distense(DistenseAddress);
 
         Task storage task = tasks[_taskId];
@@ -196,7 +194,7 @@ contract Tasks is Approvable {
 
     modifier hasEnoughDIDToAddTask() {
         DIDToken didToken = DIDToken(DIDTokenAddress);
-        uint256 balance = didToken.balances(msg.sender);
+        uint256 balance = didToken.getAddressBalance(msg.sender);
 
         Distense distense = Distense(DistenseAddress);
         uint256 numDIDRequiredToAddTask = distense.getParameterValueByTitle(
@@ -206,5 +204,12 @@ contract Tasks is Approvable {
         _;
     }
 
+    function setDIDTokenAddress(address _DIDTokenAddress) public onlyApproved {
+        DIDTokenAddress = _DIDTokenAddress;
+    }
+
+    function setDistenseAddress(address _DistenseAddress) public onlyApproved {
+        DistenseAddress = _DistenseAddress;
+    }
 
 }

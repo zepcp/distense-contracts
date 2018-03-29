@@ -1,9 +1,10 @@
 pragma solidity ^0.4.21;
 
+import './lib/Approvable.sol';
 import './DIDToken.sol';
 import './lib/SafeMath.sol';
 
-contract Distense {
+contract Distense is Approvable {
     using SafeMath for uint256;
 
     address public DIDTokenAddress;
@@ -281,6 +282,10 @@ contract Distense {
         uint256 lastVotedOnParameter = parameter.votes[_voter].lastVoted;
         require(now >= lastVotedOnParameter + getParameterValueByTitle(votingIntervalParameterTitle));
         _;
+    }
+
+    function setDIDTokenAddress(address _didTokenAddress) public onlyApproved {
+        DIDTokenAddress = _didTokenAddress;
     }
 
 }

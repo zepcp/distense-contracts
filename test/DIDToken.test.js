@@ -62,7 +62,7 @@ contract('DIDToken', function(accounts) {
       addError = error
     }
     assert.equal(addError, undefined, 'Error must not be thrown')
-    assert.equal(await didToken.balances.call(accounts[5]), 9100)
+    assert.equal(await didToken.getAddressBalance.call(accounts[5]), 9100)
   })
 
   it('should disallow an issueDID call for === 0', async function() {
@@ -103,7 +103,7 @@ contract('DIDToken', function(accounts) {
     try {
       //  accounts[1] has no DID so this should fail/throw an error
       assert.equal(
-        await didToken.balances.call(accounts[1]),
+        await didToken.getAddressBalance.call(accounts[1]),
         0,
         'accounts[1] must own 0 DID for this test to properly fail'
       )
@@ -146,7 +146,9 @@ contract('DIDToken', function(accounts) {
   it('should increment the number of DID for those who invest ether', async function() {
     let etherForDIDExchangeError
     await didToken.issueDID(accounts[0], 20000)
-    const preInvestDIDBalance = await didToken.balances.call(accounts[0])
+    const preInvestDIDBalance = await didToken.getAddressBalance.call(
+      accounts[0]
+    )
     const etherToInvest = 2
 
     try {
@@ -162,7 +164,9 @@ contract('DIDToken', function(accounts) {
       console.error(`etherForDIDExchangeError: ${etherForDIDExchangeError}`)
     }
 
-    const postInvestDIDBalance = await didToken.balances.call(accounts[0])
+    const postInvestDIDBalance = await didToken.getAddressBalance.call(
+      accounts[0]
+    )
 
     const didPerEther = await distense.getParameterValueByTitle('didPerEther')
     assert.equal(didPerEther, 1000, 'make sure didPerEther is still 1000')
@@ -177,7 +181,7 @@ contract('DIDToken', function(accounts) {
   it('should decrement the number of DID', async function() {
     await didToken.issueDID(accounts[0], 20000)
     await didToken.decrementDID(accounts[0], 10001)
-    const DIDBalance = await didToken.balances.call(accounts[0])
+    const DIDBalance = await didToken.getAddressBalance.call(accounts[0])
 
     assert.equal(
       DIDBalance.toNumber(),
@@ -204,7 +208,9 @@ contract('DIDToken', function(accounts) {
   it('should not increment the number of DID for those who invest too much ether', async function() {
     let etherForDIDExchangeError
     await didToken.issueDID(accounts[0], 20000)
-    const preInvestDIDBalance = await didToken.balances.call(accounts[0])
+    const preInvestDIDBalance = await didToken.getAddressBalance.call(
+      accounts[0]
+    )
     const etherToInvest = 1001
 
     try {
@@ -219,7 +225,9 @@ contract('DIDToken', function(accounts) {
       etherForDIDExchangeError = error
     }
 
-    const postInvestDIDBalance = await didToken.balances.call(accounts[0])
+    const postInvestDIDBalance = await didToken.getAddressBalance.call(
+      accounts[0]
+    )
 
     assert.notEqual(
       etherForDIDExchangeError,
@@ -241,7 +249,7 @@ contract('DIDToken', function(accounts) {
     })
 
     const numDIDToExchange = 123
-    let beginBalance = await didToken.balances.call(accounts[1])
+    let beginBalance = await didToken.getAddressBalance.call(accounts[1])
 
     assert.isAbove(
       beginBalance.toString(),
@@ -253,7 +261,7 @@ contract('DIDToken', function(accounts) {
       from: accounts[1]
     })
 
-    const updatedBalance = await didToken.balances.call(accounts[1])
+    const updatedBalance = await didToken.getAddressBalance.call(accounts[1])
     assert.equal(
       updatedBalance,
       beginBalance - numDIDToExchange,
@@ -270,7 +278,7 @@ contract('DIDToken', function(accounts) {
       value: web3.toWei(2)
     })
 
-    let weiInvested = await didToken.investedAddress.call(accounts[1])
+    let weiInvested = await didToken.getWeiInvested.call(accounts[1])
 
     assert.equal(
       weiInvested,
@@ -283,7 +291,7 @@ contract('DIDToken', function(accounts) {
       value: web3.toWei(3.3)
     })
 
-    weiInvested = await didToken.investedAddress.call(accounts[1])
+    weiInvested = await didToken.getWeiInvested.call(accounts[1])
 
     assert.equal(
       weiInvested.toString(),

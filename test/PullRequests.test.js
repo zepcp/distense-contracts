@@ -153,7 +153,7 @@ contract('PullRequests', function(accounts) {
 
       await didToken.issueDID(accounts[0], numDIDRequired - 1)
       assert.equal(
-        await didToken.balances.call(accounts[0]),
+        await didToken.getAddressBalance.call(accounts[0]),
         numDIDRequired - 1,
         'balance should be 100 or less than threshold here'
       )
@@ -175,7 +175,7 @@ contract('PullRequests', function(accounts) {
     try {
       await didToken.issueDID(accounts[0], 1230000)
       assert.equal(
-        await didToken.balances.call(accounts[0]),
+        await didToken.getAddressBalance.call(accounts[0]),
         1230000,
         'balance should be sufficient to vote -- above threshold'
       )

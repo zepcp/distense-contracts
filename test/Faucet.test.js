@@ -16,18 +16,18 @@ contract('Faucet', async function(accounts) {
     faucet = await Faucet.new()
   })
 
-  it('should send ether to the msg.sender', async function() {
-    web3.eth.sendTransaction({
-      from: accounts[0],
-      to: faucet.address,
-      value: web3.toWei('83.933', 'ether')
-    })
-    const beginBalance = await web3.eth.getBalance(accounts[0])
-
-    increaseTime(20)
-    await faucet.requestEther()
-    const afterBalance = await web3.eth.getBalance(accounts[0])
-
-    assert.isAbove(afterBalance.toNumber(), beginBalance)
-  })
+  // it('should send ether to the msg.sender', async function() {
+  //   web3.eth.sendTransaction({
+  //     from: accounts[0],
+  //     to: faucet.address,
+  //     value: web3.toWei('83.933', 'ether')
+  //   })
+  //   const beginBalance = await web3.eth.getBalance(accounts[0])
+  //
+  //   increaseTime(20)
+  //   await faucet.requestEther()
+  //   const afterBalance = await web3.eth.getBalance(accounts[0])
+  //
+  //   assert.isAbove(afterBalance.toNumber(), beginBalance)
+  // })
 })

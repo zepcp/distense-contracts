@@ -153,6 +153,10 @@ contract DIDToken is Approvable {
         return DIDHolders[_address].balance;
     }
 
+    function getWeiInvested(address _address) public view returns (uint256) {
+        return DIDHolders[_address].weiInvested;
+    }
+
     function setDistenseAddress(address _distenseAddress) public onlyApproved {
         DistenseAddress = _distenseAddress;
     }

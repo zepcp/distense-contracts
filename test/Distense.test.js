@@ -283,7 +283,7 @@ contract('Distense contract', function(accounts) {
     let contractError
 
     try {
-      const userBalance = await didToken.balances.call(accounts[0])
+      const userBalance = await didToken.getAddressBalance.call(accounts[0])
       assert.isAbove(userBalance, 0, 'user should have DID here to vote')
 
       await distense.voteOnParameter(
@@ -308,7 +308,7 @@ contract('Distense contract', function(accounts) {
   })
 
   it(`should allow voting only after the votingInterval has passed`, async function() {
-    const userBalance = await didToken.balances.call(accounts[0])
+    const userBalance = await didToken.getAddressBalance(accounts[0])
     assert.isAbove(userBalance, 0, 'user should have DID here to vote')
 
     let contractError
@@ -334,7 +334,7 @@ contract('Distense contract', function(accounts) {
   })
 
   it(`should properly update the votingInterval parameter value when voted upon with the proper requirements`, async function() {
-    const userBalance = await didToken.balances.call(accounts[0])
+    const userBalance = await didToken.getAddressBalance.call(accounts[0])
     assert.isAbove(
       userBalance.toNumber(),
       200,
@@ -355,7 +355,7 @@ contract('Distense contract', function(accounts) {
   })
 
   it(`should properly update the votingInterval parameter value when voted upon`, async function() {
-    const userBalance = await didToken.balances.call(accounts[0])
+    const userBalance = await didToken.getAddressBalance.call(accounts[0])
     assert.isAbove(
       userBalance.toNumber(),
       200,
@@ -460,7 +460,7 @@ contract('Distense contract', function(accounts) {
   })
 
   it(`should properly update the pctDIDRequiredToMergePullRequest value when upvoted with the proper requirements`, async function() {
-    const userBalance = await didToken.balances.call(accounts[0])
+    const userBalance = await didToken.getAddressBalance.call(accounts[0])
     assert.equal(
       userBalance.toNumber(),
       2000,

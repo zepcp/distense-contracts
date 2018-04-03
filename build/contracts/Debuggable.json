@@ -103,7 +103,7 @@
       "absolutePath": "/Users/john/distense-contracts/contracts/Debuggable.sol",
       "exportedSymbols": {
         "Debuggable": [
-          697
+          717
         ]
       }
     },
@@ -117,7 +117,7 @@
             ".21"
           ]
         },
-        "id": 664,
+        "id": 684,
         "name": "PragmaDirective",
         "src": "0:24:1"
       },
@@ -133,10 +133,10 @@
           "documentation": null,
           "fullyImplemented": true,
           "linearizedBaseContracts": [
-            697
+            717
           ],
           "name": "Debuggable",
-          "scope": 698
+          "scope": 718
         },
         "children": [
           {
@@ -153,7 +153,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "someAddress",
-                      "scope": 668,
+                      "scope": 688,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "address",
@@ -166,22 +166,22 @@
                           "name": "address",
                           "type": "address"
                         },
-                        "id": 665,
+                        "id": 685,
                         "name": "ElementaryTypeName",
                         "src": "71:7:1"
                       }
                     ],
-                    "id": 666,
+                    "id": 686,
                     "name": "VariableDeclaration",
                     "src": "71:19:1"
                   }
                 ],
-                "id": 667,
+                "id": 687,
                 "name": "ParameterList",
                 "src": "70:21:1"
               }
             ],
-            "id": 668,
+            "id": 688,
             "name": "EventDefinition",
             "src": "54:38:1"
           },
@@ -199,7 +199,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "boolean",
-                      "scope": 672,
+                      "scope": 692,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bool",
@@ -212,22 +212,22 @@
                           "name": "bool",
                           "type": "bool"
                         },
-                        "id": 669,
+                        "id": 689,
                         "name": "ElementaryTypeName",
                         "src": "111:4:1"
                       }
                     ],
-                    "id": 670,
+                    "id": 690,
                     "name": "VariableDeclaration",
                     "src": "111:12:1"
                   }
                 ],
-                "id": 671,
+                "id": 691,
                 "name": "ParameterList",
                 "src": "110:14:1"
               }
             ],
-            "id": 672,
+            "id": 692,
             "name": "EventDefinition",
             "src": "97:28:1"
           },
@@ -245,7 +245,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "someBytes",
-                      "scope": 676,
+                      "scope": 696,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bytes memory",
@@ -258,22 +258,22 @@
                           "name": "bytes",
                           "type": "bytes storage pointer"
                         },
-                        "id": 673,
+                        "id": 693,
                         "name": "ElementaryTypeName",
                         "src": "145:5:1"
                       }
                     ],
-                    "id": 674,
+                    "id": 694,
                     "name": "VariableDeclaration",
                     "src": "145:15:1"
                   }
                 ],
-                "id": 675,
+                "id": 695,
                 "name": "ParameterList",
                 "src": "144:17:1"
               }
             ],
-            "id": 676,
+            "id": 696,
             "name": "EventDefinition",
             "src": "130:32:1"
           },
@@ -291,7 +291,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "aBytes32",
-                      "scope": 680,
+                      "scope": 700,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "bytes32",
@@ -304,22 +304,22 @@
                           "name": "bytes32",
                           "type": "bytes32"
                         },
-                        "id": 677,
+                        "id": 697,
                         "name": "ElementaryTypeName",
                         "src": "184:7:1"
                       }
                     ],
-                    "id": 678,
+                    "id": 698,
                     "name": "VariableDeclaration",
                     "src": "184:16:1"
                   }
                 ],
-                "id": 679,
+                "id": 699,
                 "name": "ParameterList",
                 "src": "183:18:1"
               }
             ],
-            "id": 680,
+            "id": 700,
             "name": "EventDefinition",
             "src": "167:35:1"
           },
@@ -337,7 +337,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "aString",
-                      "scope": 684,
+                      "scope": 704,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "string memory",
@@ -350,22 +350,22 @@
                           "name": "string",
                           "type": "string storage pointer"
                         },
-                        "id": 681,
+                        "id": 701,
                         "name": "ElementaryTypeName",
                         "src": "223:6:1"
                       }
                     ],
-                    "id": 682,
+                    "id": 702,
                     "name": "VariableDeclaration",
                     "src": "223:14:1"
                   }
                 ],
-                "id": 683,
+                "id": 703,
                 "name": "ParameterList",
                 "src": "222:16:1"
               }
             ],
-            "id": 684,
+            "id": 704,
             "name": "EventDefinition",
             "src": "207:32:1"
           },
@@ -383,7 +383,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "someInt",
-                      "scope": 688,
+                      "scope": 708,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "uint256",
@@ -396,22 +396,22 @@
                           "name": "uint256",
                           "type": "uint256"
                         },
-                        "id": 685,
+                        "id": 705,
                         "name": "ElementaryTypeName",
                         "src": "261:7:1"
                       }
                     ],
-                    "id": 686,
+                    "id": 706,
                     "name": "VariableDeclaration",
                     "src": "261:15:1"
                   }
                 ],
-                "id": 687,
+                "id": 707,
                 "name": "ParameterList",
                 "src": "260:17:1"
               }
             ],
-            "id": 688,
+            "id": 708,
             "name": "EventDefinition",
             "src": "244:34:1"
           },
@@ -429,7 +429,7 @@
                       "constant": false,
                       "indexed": false,
                       "name": "someInt",
-                      "scope": 692,
+                      "scope": 712,
                       "stateVariable": false,
                       "storageLocation": "default",
                       "type": "int256",
@@ -442,22 +442,22 @@
                           "name": "int256",
                           "type": "int256"
                         },
-                        "id": 689,
+                        "id": 709,
                         "name": "ElementaryTypeName",
                         "src": "299:6:1"
                       }
                     ],
-                    "id": 690,
+                    "id": 710,
                     "name": "VariableDeclaration",
                     "src": "299:14:1"
                   }
                 ],
-                "id": 691,
+                "id": 711,
                 "name": "ParameterList",
                 "src": "298:16:1"
               }
             ],
-            "id": 692,
+            "id": 712,
             "name": "EventDefinition",
             "src": "283:32:1"
           },
@@ -472,7 +472,7 @@
               ],
               "name": "Debuggable",
               "payable": false,
-              "scope": 697,
+              "scope": 717,
               "stateMutability": "nonpayable",
               "superFunction": null,
               "visibility": "public"
@@ -485,7 +485,7 @@
                   ]
                 },
                 "children": [],
-                "id": 693,
+                "id": 713,
                 "name": "ParameterList",
                 "src": "340:2:1"
               },
@@ -496,7 +496,7 @@
                   ]
                 },
                 "children": [],
-                "id": 694,
+                "id": 714,
                 "name": "ParameterList",
                 "src": "350:0:1"
               },
@@ -507,22 +507,22 @@
                   ]
                 },
                 "children": [],
-                "id": 695,
+                "id": 715,
                 "name": "Block",
                 "src": "350:8:1"
               }
             ],
-            "id": 696,
+            "id": 716,
             "name": "FunctionDefinition",
             "src": "321:37:1"
           }
         ],
-        "id": 697,
+        "id": 717,
         "name": "ContractDefinition",
         "src": "27:334:1"
       }
     ],
-    "id": 698,
+    "id": 718,
     "name": "SourceUnit",
     "src": "0:362:1"
   },
@@ -532,5 +532,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-03-30T21:10:21.032Z"
+  "updatedAt": "2018-04-03T21:49:50.117Z"
 }

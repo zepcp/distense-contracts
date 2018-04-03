@@ -31,6 +31,7 @@ contract DIDToken is Approvable {
         uint256 balance;
         uint256 DIDHoldersIndex;
         uint256 weiInvested;
+        uint256 tasksCompleted;
     }
     mapping (address => DIDHolder) public DIDHolders;
 
@@ -135,6 +136,11 @@ contract DIDToken is Approvable {
         emit LogInvestEtherForDID(msg.sender, msg.value);
 
         return DIDHolders[msg.sender].balance;
+    }
+
+    function incrementTasksCompleted(address _contributor) onlyApproved public returns (bool) {
+        DIDHolders[_contributor].tasksCompleted++;
+        return true;
     }
 
     function getNumWeiAddressMayInvest(address contributor) public view returns (uint256) {

@@ -8,60 +8,60 @@ import { convertSolidityIntToInt } from './helpers/utils'
 contract('Distense contract', function(accounts) {
   const pctDIDToDetermineTaskRewardParameter = {
     title: 'pctDIDToDetermineTaskReward',
-    value: 2500
+    value: 25000000000
   }
 
   const pctDIDRequiredToMergePullRequest = {
     title: 'pctDIDRequiredToMergePullRequest',
     // Hard coded in constructor function in contract
     // CLIENT VALUE (not multiplied by 10)
-    value: 1000
+    value: 10000000000
   }
 
   const votingIntervalParameter = {
     title: 'votingInterval',
     // Equal to 15 days in Solidity
-    value: 1296000
+    value: 1296000000000000
   }
 
   const maxRewardParameter = {
     title: 'maxReward',
-    value: 5000
+    value: 5000000000000
   }
 
   const numDIDRequiredToApproveVotePullRequestParameter = {
     title: 'numDIDReqApproveVotePullRequest',
-    value: 200
+    value: 200000000000
   }
 
   const numDIDRequiredToTaskRewardVoteParameter = {
     title: 'numDIDRequiredToTaskRewardVote',
-    value: 100
+    value: 100000000000
   }
 
   const minNumberOfTaskRewardVotersParameter = {
     title: 'minNumberOfTaskRewardVoters',
-    value: 7
+    value: 7000000000
   }
 
   const numDIDRequiredToAddTaskParameter = {
     title: 'numDIDRequiredToAddTask',
-    value: 100
+    value: 100000000000
   }
 
   const defaultRewardParameter = {
     title: 'defaultReward',
-    value: 100
+    value: 100000000000
   }
 
   const didPerEtherParameter = {
     title: 'didPerEther',
-    value: 1000
+    value: 1000000000000
   }
 
   const votingPowerLimitParameter = {
     title: 'votingPowerLimit',
-    value: 2000
+    value: 20000000000
   }
 
   it('should have the correct pctDIDToDetermineTaskRewardParameter title and value', async () => {
@@ -161,7 +161,7 @@ contract('Distense contract', function(accounts) {
       minNumberOfTaskRewardVotersParameter.title
     )
     assert.equal(
-      convertSolidityIntToInt(param[1].toNumber()),
+      param[1].toString(),
       minNumberOfTaskRewardVotersParameter.value,
       'minNumberOfTaskRewardVotersParameter value incorrect'
     )
@@ -349,8 +349,8 @@ contract('Distense contract', function(accounts) {
 
     assert.equal(
       newValue.toNumber(),
-      votingIntervalParameter.value * 1.2, // limited to 25% increase
-      'updated value should be twice the original value as the voter owns 100% of the DID'
+      votingIntervalParameter.value * 1.2, // limited to 20% increase
+      'updated value should be 1.2 times original value'
     )
   })
 
@@ -370,7 +370,7 @@ contract('Distense contract', function(accounts) {
 
     assert.equal(
       newValue.toNumber(),
-      votingIntervalParameter.value * 1.2, // limited to 25% increase
+      votingIntervalParameter.value * 1.2, // limited to 20% increase
       'updated value should be twice the original value as the voter owns 100% of the DID'
     )
   })
@@ -392,6 +392,23 @@ contract('Distense contract', function(accounts) {
     )
   })
 
+  it(`should properly update the votingInterval parameter value when voted upon with 5%`, async function() {
+    await didToken.issueDID(accounts[0], 20000)
+    await didToken.issueDID(accounts[1], 20000)
+
+    await distense.voteOnParameter(votingIntervalParameter.title, 5)
+
+    const newValue = await distense.getParameterValueByTitle.call(
+      votingIntervalParameter.title
+    )
+
+    assert.equal(
+      newValue.toNumber(),
+      votingIntervalParameter.value * 1.05,
+      'updated value should be 20% higher limited by the votingLimitParameter'
+    )
+  })
+
   it(`should properly update the votingInterval parameter value when voted upon with -40%`, async function() {
     await didToken.issueDID(accounts[0], 20000)
     await didToken.issueDID(accounts[1], 20000)
@@ -404,7 +421,7 @@ contract('Distense contract', function(accounts) {
 
     assert.equal(
       newValue.toNumber(),
-      1036800,
+      1036800000000000,
       'updated value should be 20% lower limited by the votingLimitParameter'
     )
   })
@@ -420,8 +437,8 @@ contract('Distense contract', function(accounts) {
     )
 
     assert.equal(
-      newValue.toNumber(),
-      1231200,
+      newValue.toString(),
+      1231200000000000,
       'updated value should be 5% lower'
     )
   })
@@ -441,7 +458,11 @@ contract('Distense contract', function(accounts) {
     )
 
     //  accounts[0] owns 3000 of 23000 total DID -- 13% here
-    assert.equal(newValue.toNumber(), 87, 'updated value should be 13% lower')
+    assert.equal(
+      newValue.toNumber(),
+      86956521739,
+      'updated value should be 13% lower'
+    )
   })
 
   it(`should reject parameter votes for more than 100`, async function() {
@@ -476,14 +497,14 @@ contract('Distense contract', function(accounts) {
     assert.equal(
       newValue.toNumber(),
       pctDIDRequiredToMergePullRequest.value * 0.8,
-      'updated value should be 25% less than the original value'
+      'updated value should be 20% less than the original value'
     )
   })
 
   function calcCorrectUpdatedParameterValue(pctDIDOwned, originalValue, vote) {
-    const limitTo25PercentIfHigher = (pctDIDOwned > 20 ? 20 : pctDIDOwned) / 100
+    const limitTo20PercentIfHigher = (pctDIDOwned > 20 ? 20 : pctDIDOwned) / 100
 
-    const update = originalValue * limitTo25PercentIfHigher
+    const update = originalValue * limitTo20PercentIfHigher
     if (vote === 1) originalValue += update
     else originalValue -= update
 
@@ -539,14 +560,14 @@ contract('Distense contract', function(accounts) {
     )
     assert.equal(
       newContractValue.toString(),
-      2000,
+      20000000000,
       'updated value should be lower by the percentage of DID ownership of the voter'
     )
 
     await didToken.issueDID(accounts[3], 2000)
 
     vote = 1
-    // //  total DID at this point is 2000 + 2000 + 4321 == 8321 DID
+    // //  total DID at this point is 8000
     // //  so accounts[0], the voter owns 24%
     await distense.voteOnParameter(
       pctDIDToDetermineTaskRewardParameter.title,
@@ -560,7 +581,7 @@ contract('Distense contract', function(accounts) {
     )
     assert.equal(
       newContractValue.toString(),
-      2400,
+      24000000000,
       'updated value should be higher by the percentage of DID ownership of the voter'
     )
 
@@ -580,7 +601,7 @@ contract('Distense contract', function(accounts) {
     )
     assert.equal(
       newContractValue.toString(),
-      2880,
+      28800000000,
       'updated value should be higher by the percentage of DID ownership of the voter'
     )
   })

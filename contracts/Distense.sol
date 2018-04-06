@@ -3,8 +3,9 @@ pragma solidity ^0.4.21;
 import './lib/Approvable.sol';
 import './DIDToken.sol';
 import './lib/SafeMath.sol';
+import './Debuggable.sol';
 
-contract Distense is Approvable {
+contract Distense is Approvable, Debuggable {
     using SafeMath for uint256;
 
     address public DIDTokenAddress;
@@ -64,9 +65,7 @@ contract Distense is Approvable {
     Parameter public votingPowerLimitParameter;
     bytes32 public votingPowerLimitParameterTitle = 'votingPowerLimit';
 
-
     event LogParameterValueUpdate(bytes32 title, uint256 value);
-
 
     function Distense(address _DIDTokenAddress) public {
 
@@ -81,7 +80,7 @@ contract Distense is Approvable {
             title : pctDIDToDetermineTaskRewardParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 25.00%
-            value: 2500
+            value: 25000000000
         });
         parameters[pctDIDToDetermineTaskRewardParameterTitle] = pctDIDToDetermineTaskRewardParameter;
         parameterTitles.push(pctDIDToDetermineTaskRewardParameterTitle);
@@ -91,7 +90,7 @@ contract Distense is Approvable {
             title : pctDIDRequiredToMergePullRequestTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 10.00
-            value: 1000
+            value: 10000000000
         });
         parameters[pctDIDRequiredToMergePullRequestTitle] = pctDIDRequiredToMergePullRequest;
         parameterTitles.push(pctDIDRequiredToMergePullRequestTitle);
@@ -99,7 +98,7 @@ contract Distense is Approvable {
 
         votingIntervalParameter = Parameter({
             title : votingIntervalParameterTitle,
-            value: 1296000 // 15 * 86400 = 1.296e+6
+            value: 1296000000000000 // 15 * 86400 = 1.296e+6
         });
         parameters[votingIntervalParameterTitle] = votingIntervalParameter;
         parameterTitles.push(votingIntervalParameterTitle);
@@ -109,7 +108,7 @@ contract Distense is Approvable {
             title : maxRewardParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 5000.0
-            value: 5000
+            value: 5000000000000
         });
         parameters[maxRewardParameterTitle] = maxRewardParameter;
         parameterTitles.push(maxRewardParameterTitle);
@@ -119,7 +118,7 @@ contract Distense is Approvable {
             title : numDIDRequiredToApproveVotePullRequestParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     200.00
-            value: 200
+            value: 200000000000
         });
         parameters[numDIDRequiredToApproveVotePullRequestParameterTitle] = numDIDRequiredToApproveVotePullRequestParameter;
         parameterTitles.push(numDIDRequiredToApproveVotePullRequestParameterTitle);
@@ -134,9 +133,8 @@ contract Distense is Approvable {
         // This parameter also limits attacks by noobs that want to mess with Distense.
         numDIDRequiredToTaskRewardVoteParameter = Parameter({
             title : numDIDRequiredToTaskRewardVoteParameterTitle,
-            //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             // 100.00
-            value: 100
+            value: 100000000000
         });
         parameters[numDIDRequiredToTaskRewardVoteParameterTitle] = numDIDRequiredToTaskRewardVoteParameter;
         parameterTitles.push(numDIDRequiredToTaskRewardVoteParameterTitle);
@@ -144,9 +142,8 @@ contract Distense is Approvable {
 
         minNumberOfTaskRewardVotersParameter = Parameter({
             title : minNumberOfTaskRewardVotersParameterTitle,
-            //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 7.00
-            value: 700
+            value: 7000000000
         });
         parameters[minNumberOfTaskRewardVotersParameterTitle] = minNumberOfTaskRewardVotersParameter;
         parameterTitles.push(minNumberOfTaskRewardVotersParameterTitle);
@@ -154,9 +151,8 @@ contract Distense is Approvable {
 
         numDIDRequiredToAddTaskParameter = Parameter({
             title : numDIDRequiredToAddTaskParameterTitle,
-            //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 100.00
-            value: 100
+            value: 100000000000
         });
         parameters[numDIDRequiredToAddTaskParameterTitle] = numDIDRequiredToAddTaskParameter;
         parameterTitles.push(numDIDRequiredToAddTaskParameterTitle);
@@ -164,9 +160,8 @@ contract Distense is Approvable {
 
         defaultRewardParameter = Parameter({
             title : defaultRewardParameterTitle,
-            //     Every hard-coded int EXCEPT for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     100.00
-            value: 100
+            value: 100000000000
         });
         parameters[defaultRewardParameterTitle] = defaultRewardParameter;
         parameterTitles.push(defaultRewardParameterTitle);
@@ -174,18 +169,16 @@ contract Distense is Approvable {
 
         didPerEtherParameter = Parameter({
             title : didPerEtherParameterTitle,
-            //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     1000.00
-            value: 1000
+            value: 1000000000000
         });
         parameters[didPerEtherParameterTitle] = didPerEtherParameter;
         parameterTitles.push(didPerEtherParameterTitle);
 
         votingPowerLimitParameter = Parameter({
             title : votingPowerLimitParameterTitle,
-            //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     20.00%
-            value: 2000
+            value: 20000000000
         });
         parameters[votingPowerLimitParameterTitle] = votingPowerLimitParameter;
         parameterTitles.push(votingPowerLimitParameterTitle);
@@ -204,11 +197,11 @@ contract Distense is Approvable {
         @param _voteValue integer in percentage effect.  For example if the current value of a parameter is 20, and the voter votes 24, _voteValue
         would be 20, for a 20% increase.
 
-        If _voteValue is 1 it's a max upvote, if -1 max downvote. Maximum votes, as just mentioned, affect parameter values by the
-        maximum of the percentage of DID owned by the voter, or the value of the votingLimit parameter.
-        If _voteValue has a higher absolute value than 1, the user has voted a specific value.  In that case we update the value to the voted value
-        if the value would affect the parameter value less than their percentage DID ownership.  If they voted a value that would affect the
-        parameter's value by more than their percentage DID ownership we affect the value by their percentage DID ownership.
+        If _voteValue is 1 it's a max upvote, if -1 max downvote. Maximum votes, as just mentioned, affect parameter values by
+        max(percentage of DID owned by the voter, value of the votingLimit parameter).
+        If _voteValue has a higher absolute value than 1, the user has voted a specific value not maximum up or downvote.
+        In that case we update the value to the voted value if the value would affect the parameter value less than their percentage DID ownership.
+          If they voted a value that would affect the parameter's value by more than their percentage DID ownership we affect the value by their percentage DID ownership.
     */
     function voteOnParameter(bytes32 _title, int256 _voteValue)
         public
@@ -223,27 +216,26 @@ contract Distense is Approvable {
         require(votersDIDPercent > 0);
 
         uint256 currentValue = getParameterValueByTitle(_title);
-
-        //  For voting power purposes, limit the pctDIDOwned to the maximum of the Voting Power Limit parameter or the voter's percentage ownership
-        //  of DID
+//          For voting power purposes, limit the pctDIDOwned to the maximum of the Voting Power Limit parameter or the voter's percentage ownership
+//          of DID
         uint256 votingPowerLimit = getParameterValueByTitle(votingPowerLimitParameterTitle);
+
         uint256 limitedVotingPower = votersDIDPercent > votingPowerLimit ? votingPowerLimit : votersDIDPercent;
 
         uint256 update;
         if (
-            _voteValue == 1 ||
-            _voteValue == - 1 ||
-            _voteValue * 100 > int(limitedVotingPower) ||
-            _voteValue * - 100 > int(limitedVotingPower)
+            _voteValue == 1 ||  // maximum upvote
+            _voteValue == - 1 || // minimum downvote
+            _voteValue * 1000000000 > int(limitedVotingPower) ||
+            _voteValue * - 1000000000 > int(limitedVotingPower)
         ) {
-
-            update = (limitedVotingPower * currentValue) / 10000;
+            update = (limitedVotingPower * currentValue) / 100000000000;
         } else if (_voteValue > 0) {
-            update = (uint(_voteValue) * currentValue) / 10000;
+            update = (uint(_voteValue) * currentValue) / 100;
         } else if (_voteValue < 0) {
-            int256 adjustedVoteValue = (-_voteValue) * 100; // make the voteValue positive and convert to on-chain decimals
-            update = uint((adjustedVoteValue * int(currentValue)) / 10000);
-        } else revert(); //  If _voteValue is 0
+            int256 adjustedVoteValue = (-_voteValue) * 1000000000; // make the voteValue positive and convert to on-chain decimals
+            update = uint((adjustedVoteValue * int(currentValue)) / 100000000000);
+        } else revert(); //  If _voteValue is 0 refund gas to voter
 
         if (_voteValue > 0)
             currentValue = SafeMath.add(currentValue, update);
@@ -280,7 +272,7 @@ contract Distense is Approvable {
     modifier votingIntervalReached(address _voter, bytes32 _title) {
         Parameter storage parameter = parameters[_title];
         uint256 lastVotedOnParameter = parameter.votes[_voter].lastVoted;
-        require(now >= lastVotedOnParameter + getParameterValueByTitle(votingIntervalParameterTitle));
+        require(now * 1000000000 >= lastVotedOnParameter + getParameterValueByTitle(votingIntervalParameterTitle));
         _;
     }
 

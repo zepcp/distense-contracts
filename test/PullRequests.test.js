@@ -63,7 +63,6 @@ contract('PullRequests', function(accounts) {
   it('should issueDID correctly after a pull request reaches the required approvals', async function() {
     await didToken.issueDID(accounts[0], 1000000)
 
-    //  got to have a task to interact with
     await tasks.addTask(pullRequest.taskId, 'some title')
     const taskExists = await tasks.taskExists.call(pullRequest.taskId)
     assert.equal(
@@ -153,7 +152,7 @@ contract('PullRequests', function(accounts) {
 
       await didToken.issueDID(accounts[0], numDIDRequired - 1)
       assert.equal(
-        await didToken.getAddressBalance.call(accounts[0]),
+        await didToken.balances.call(accounts[0]),
         numDIDRequired - 1,
         'balance should be 100 or less than threshold here'
       )
@@ -175,7 +174,7 @@ contract('PullRequests', function(accounts) {
     try {
       await didToken.issueDID(accounts[0], 1230000)
       assert.equal(
-        await didToken.getAddressBalance.call(accounts[0]),
+        await didToken.balances.call(accounts[0]),
         1230000,
         'balance should be sufficient to vote -- above threshold'
       )
@@ -259,11 +258,7 @@ contract('PullRequests', function(accounts) {
     })
 
     const votedOnPR = await pullRequests.getPullRequestById.call(pullRequest.id)
-    assert.equal(
-      votedOnPR[3].toNumber(),
-      2000,
-      'pctDIDVoted of the votedOnPullRequest should be greater than zero'
-    )
+    assert.equal(votedOnPR[3].toNumber(), 20000000000, '')
   })
 
   it('should fire event "LogAddPullRequest" when addPullRequest is appropriately called', async function() {
@@ -334,7 +329,11 @@ contract('PullRequests', function(accounts) {
     assert.equal(approvePullRequestLog.length, 1, 'should be 1 event')
     let eventArgs = approvePullRequestLog[0].args
     assert.equal(eventArgs._prId, pullRequest.id)
-    assert.equal(eventArgs.pctDIDApproved.toString(), '2000', 'pctDIDApproved')
+    assert.equal(
+      eventArgs.pctDIDApproved.toString(),
+      '20000000000',
+      'pctDIDApproved'
+    )
   })
 
   it('should fire event "LogRewardPullRequest" when addPullRequest is appropriately called', async function() {

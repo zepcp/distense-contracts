@@ -66,10 +66,6 @@ contract PullRequests is Approvable {
         Distense distense = Distense(DistenseAddress);
         DIDToken didToken = DIDToken(DIDTokenAddress);
 
-        require(didToken.getAddressBalance(msg.sender) >= distense.getParameterValueByTitle(
-            distense.numDIDRequiredToApproveVotePullRequestParameterTitle()
-        ));
-
         PullRequest storage _pr = pullRequests[_prId];
 
         //  Record approval vote to prevent multiple voting
@@ -120,7 +116,7 @@ contract PullRequests is Approvable {
 
         DIDToken didToken = DIDToken(DIDTokenAddress);
 
-        require(didToken.getAddressBalance(msg.sender) > threshold);
+        require(didToken.getAddressBalance(msg.sender) > SafeMath.div(threshold, 1000000000));
         _;
     }
 

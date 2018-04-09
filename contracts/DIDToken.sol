@@ -3,6 +3,7 @@ pragma solidity ^0.4.21;
 import './lib/Approvable.sol';
 import './Distense.sol';
 import './lib/SafeMath.sol';
+//import './Debuggable.sol';
 
 contract DIDToken is Approvable {
 
@@ -82,7 +83,7 @@ contract DIDToken is Approvable {
     }
 
     function pctDIDOwned(address _address) external view returns (uint256) {
-        return SafeMath.percent(DIDHolders[_address].balance, totalSupply, 4);
+        return SafeMath.percent(DIDHolders[_address].balance, totalSupply, 11);
     }
 
     function exchangeDIDForEther(uint256 _numDIDToExchange)
@@ -117,14 +118,16 @@ contract DIDToken is Approvable {
         return DIDHolders[msg.sender].balance;
     }
 
-    function investEtherForDID() canDepositThisManyEtherForDID() external payable returns (uint256) {
+    function investEtherForDID() canDepositThisManyEtherForDID external payable returns (uint256) {
 
         Distense distense = Distense(DistenseAddress);
         uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
 
-        uint256 numEtherInvested = SafeMath.div(msg.value, 1 ether);
+        require(investedOneDIDWorth(msg.value, DIDPerEther));
 
-        uint256 numDIDToIssue = SafeMath.mul(DIDPerEther, numEtherInvested);
+        // require ether investment to be worth at least 1 DID
+        DIDPerEther = SafeMath.div(DIDPerEther, 1000000000);
+        uint256 numDIDToIssue = calculateNumDIDToIssue(msg.value, DIDPerEther);
 
         totalSupply = SafeMath.add(totalSupply, numDIDToIssue);
         DIDHolders[msg.sender].balance = SafeMath.add(DIDHolders[msg.sender].balance, numDIDToIssue);
@@ -167,6 +170,17 @@ contract DIDToken is Approvable {
         DistenseAddress = _distenseAddress;
     }
 
+    function calculateNumDIDToIssue(uint256 msgValue, uint256 DIDPerEther) public pure returns (uint256) {
+        uint256 numDIDToIssueNum = SafeMath.mul(msgValue, DIDPerEther);
+        uint256 numDIDToIssue = SafeMath.div(numDIDToIssueNum, 1 ether);
+        return numDIDToIssue;
+    }
+
+    function investedOneDIDWorth(uint256 msgValue, uint256 DIDPerEther) public view returns (bool) {
+        require(msgValue > SafeMath.div(1 ether, DIDPerEther));
+        return true;
+    }
+
     modifier hasEnoughDID(address _address, uint256 _num) {
         require(DIDHolders[_address].balance >= _num);
         _;
@@ -178,7 +192,4 @@ contract DIDToken is Approvable {
         require(investedAggregate < investmentLimitAggregate);
         _;
     }
-
-
-
 }

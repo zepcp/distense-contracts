@@ -32,6 +32,8 @@ contract Tasks is Approvable {
     event LogTaskRewardVote(bytes32 taskId, uint256 reward, uint256 pctDIDVoted);
     event LogTaskRewardDetermined(bytes32 taskId, uint256 reward);
 
+    uint256 FLOAT_CONSTANT = 1000000000;
+
     function Tasks(address _DIDTokenAddress, address _DistenseAddress) public {
         DIDTokenAddress = _DIDTokenAddress;
         DistenseAddress = _DistenseAddress;
@@ -95,7 +97,7 @@ contract Tasks is Approvable {
         require(_reward >= 0);
 
         //  Essentially refund the remaining gas if user's vote will have no effect
-        require(task.reward != _reward);
+        require(task.reward != (_reward * FLOAT_CONSTANT));
 
         // Don't let the voter vote if the reward has already been determined
         require(task.rewardStatus != RewardStatus.DETERMINED);
@@ -105,11 +107,11 @@ contract Tasks is Approvable {
 
         //  Does the voter own at least as many DID as the reward their voting for?
         //  This ensures new contributors don't have too much sway over the issuance of new DID.
-        require(balance > distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle()));
+        require(balance > SafeMath.div(distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle()), 1000000000));
 
         //  Require the reward to be less than or equal to the maximum reward parameter,
         //  which basically is a hard, floating limit on the number of DID that can be issued for any single task
-        require(_reward <= distense.getParameterValueByTitle(distense.maxRewardParameterTitle()));
+        require(_reward <= SafeMath.div(distense.getParameterValueByTitle(distense.maxRewardParameterTitle()), 1000000000));
 
         task.rewardVotes[msg.sender] = true;
 
@@ -123,13 +125,14 @@ contract Tasks is Approvable {
 
         uint256 difference;
         uint256 update;
-        if (_reward > task.reward) {
-            difference = SafeMath.sub(_reward, task.reward);
-            update = (limitedVotingPower * difference) / 10000;
+
+    if ((_reward * FLOAT_CONSTANT) > task.reward) {
+            difference = SafeMath.sub((_reward * FLOAT_CONSTANT), task.reward);
+            update = (limitedVotingPower * difference) / 100000000000;
             task.reward += update;
         } else {
-            difference = SafeMath.sub(task.reward, _reward);
-            update = (limitedVotingPower * difference) / 10000;
+            difference = SafeMath.sub(task.reward, (_reward * FLOAT_CONSTANT));
+            update = (limitedVotingPower * difference) / 100000000000;
             task.reward -= update;
         }
 
@@ -143,7 +146,7 @@ contract Tasks is Approvable {
             distense.minNumberOfTaskRewardVotersParameterTitle()
         );
 
-        if (task.pctDIDVoted > pctDIDVotedThreshold || task.numVotes > minNumVoters) {
+        if (task.pctDIDVoted > pctDIDVotedThreshold || task.numVotes > SafeMath.div(minNumVoters, 1000000000)) {
             emit LogTaskRewardDetermined(_taskId, task.reward);
             task.rewardStatus = RewardStatus.DETERMINED;
         }
@@ -200,7 +203,7 @@ contract Tasks is Approvable {
         uint256 numDIDRequiredToAddTask = distense.getParameterValueByTitle(
             distense.numDIDRequiredToAddTaskParameterTitle()
         );
-        require(balance >= numDIDRequiredToAddTask);
+        require(balance >= SafeMath.div(numDIDRequiredToAddTask, 1000000000));
         _;
     }
 

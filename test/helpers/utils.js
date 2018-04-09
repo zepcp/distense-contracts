@@ -5,9 +5,9 @@ module.exports.stripHexStringOfZeroes = function(stg) {
 }
 
 module.exports.convertIntToSolidityInt = function(integer) {
-  return new BigNumber(integer).times(100)
+  return new BigNumber(integer).times(1000000000)
 }
 
 module.exports.convertSolidityIntToInt = function(integer) {
-  return new BigNumber(integer).div(100)
+  return new BigNumber(integer).div(1000000000)
 }

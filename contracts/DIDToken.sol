@@ -3,7 +3,6 @@ pragma solidity ^0.4.21;
 import './lib/Approvable.sol';
 import './Distense.sol';
 import './lib/SafeMath.sol';
-//import './Debuggable.sol';
 
 contract DIDToken is Approvable {
 
@@ -30,6 +29,7 @@ contract DIDToken is Approvable {
 
     struct DIDHolder {
         uint256 balance;
+        uint256 netContributionsDID;    // essentially the number of DID remaining for calculating how much ether an account may invest
         uint256 DIDHoldersIndex;
         uint256 weiInvested;
         uint256 tasksCompleted;
@@ -121,16 +121,17 @@ contract DIDToken is Approvable {
     function investEtherForDID() canDepositThisManyEtherForDID external payable returns (uint256) {
 
         Distense distense = Distense(DistenseAddress);
-        uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
+        uint256 DIDPerEther = SafeMath.div(distense.getParameterValueByTitle(distense.didPerEtherParameterTitle()), 1000000000);
 
         require(investedOneDIDWorth(msg.value, DIDPerEther));
-
-        // require ether investment to be worth at least 1 DID
-        DIDPerEther = SafeMath.div(DIDPerEther, 1000000000);
+//
+//        // require ether investment to be worth at least 1 DID
         uint256 numDIDToIssue = calculateNumDIDToIssue(msg.value, DIDPerEther);
+        require(DIDHolders[msg.sender].netContributionsDID >= numDIDToIssue);
 
         totalSupply = SafeMath.add(totalSupply, numDIDToIssue);
         DIDHolders[msg.sender].balance = SafeMath.add(DIDHolders[msg.sender].balance, numDIDToIssue);
+        decrementDIDFromContributions(msg.sender, numDIDToIssue);
 
         DIDHolders[msg.sender].weiInvested += msg.value;
         investedAggregate += msg.value;
@@ -162,6 +163,10 @@ contract DIDToken is Approvable {
         return DIDHolders[_address].balance;
     }
 
+    function getNetNumContributionsDID(address _address) public view returns (uint256) {
+        return DIDHolders[_address].netContributionsDID;
+    }
+
     function getWeiInvested(address _address) public view returns (uint256) {
         return DIDHolders[_address].weiInvested;
     }
@@ -176,9 +181,17 @@ contract DIDToken is Approvable {
         return numDIDToIssue;
     }
 
-    function investedOneDIDWorth(uint256 msgValue, uint256 DIDPerEther) public view returns (bool) {
+    function investedOneDIDWorth(uint256 msgValue, uint256 DIDPerEther) public pure returns (bool) {
         require(msgValue > SafeMath.div(1 ether, DIDPerEther));
         return true;
+    }
+
+    function incrementDIDFromContributions(address _contributor, uint256 _reward) public {
+        DIDHolders[_contributor].netContributionsDID += _reward;
+    }
+
+    function decrementDIDFromContributions(address _contributor, uint256 _num) public {
+        DIDHolders[_contributor].netContributionsDID -= _num;
     }
 
     modifier hasEnoughDID(address _address, uint256 _num) {

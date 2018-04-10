@@ -4,6 +4,15 @@ const Distense = artifacts.require('./Distense.sol')
 const web3Utils = require('web3-utils')
 const didPerEtherParameter = require('./Distense.test')
 
+const increaseTime = addSeconds => {
+  web3.currentProvider.send({
+    jsonrpc: '2.0',
+    method: 'evm_increaseTime',
+    params: [addSeconds],
+    id: 0
+  })
+}
+
 const utils = require('./helpers/utils')
 
 contract('DIDToken', function(accounts) {
@@ -119,6 +128,7 @@ contract('DIDToken', function(accounts) {
   it('should allow an address that owns sufficient DID to exchange 2 ether for DID', async function() {
     let etherForDIDInvestError
     await didToken.issueDID(accounts[0], 20000000)
+    await didToken.incrementDIDFromContributions(accounts[0], 2000000)
 
     try {
       await didToken.investEtherForDID({
@@ -146,6 +156,8 @@ contract('DIDToken', function(accounts) {
   it('should increment the number of DID for those who invest ether', async function() {
     let etherForDIDExchangeError
     await didToken.issueDID(accounts[0], 20000)
+    await didToken.incrementDIDFromContributions(accounts[0], 2000000)
+
     const preInvestDIDBalance = await didToken.getAddressBalance.call(
       accounts[0]
     )
@@ -247,6 +259,9 @@ contract('DIDToken', function(accounts) {
 
   it('should decrement the balance of DID of the DID exchanger', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
+    await didToken.issueDID(accounts[1], 2000000)
+    await didToken.incrementDIDFromContributions(accounts[1], 2000000)
+
     await didToken.investEtherForDID({
       from: accounts[1],
       value: web3.toWei(2)
@@ -275,7 +290,8 @@ contract('DIDToken', function(accounts) {
 
   it('should increment the investedAddress of an address', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
-    await didToken.issueDID(accounts[5], 1000000)
+    await didToken.issueDID(accounts[1], 1000000)
+    await didToken.incrementDIDFromContributions(accounts[1], 1000000)
 
     await didToken.investEtherForDID({
       from: accounts[1],
@@ -307,6 +323,7 @@ contract('DIDToken', function(accounts) {
   it('should increment investedAggregate', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
     await didToken.issueDID(accounts[1], 1000000)
+    await didToken.incrementDIDFromContributions(accounts[1], 1000000)
 
     await didToken.investEtherForDID(
       {},
@@ -328,6 +345,7 @@ contract('DIDToken', function(accounts) {
   it('remainingWeiAggregateMayInvest should return correct values', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
     await didToken.issueDID(accounts[1], 1000000)
+    await didToken.incrementDIDFromContributions(accounts[1], 1000000)
 
     const aggregateWeiCanInvest = await didToken.investmentLimitAggregate.call()
 
@@ -353,6 +371,7 @@ contract('DIDToken', function(accounts) {
   it('numWeiAddressMayInvest should return correct values', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
     await didToken.issueDID(accounts[0], 1000000)
+    await didToken.incrementDIDFromContributions(accounts[0], 1000000)
 
     const numWeiAddressMayInvest = await didToken.getNumWeiAddressMayInvest(
       accounts[0]
@@ -381,7 +400,8 @@ contract('DIDToken', function(accounts) {
   })
 
   it('should fire event "LogIssueDID" and "LogInvestEtherForDID investEtherForDID is called', async function() {
-    await didToken.issueDID(accounts[5], 1200000)
+    await didToken.issueDID(accounts[0], 1200000)
+    await didToken.incrementDIDFromContributions(accounts[0], 1200000)
 
     await didToken.investEtherForDID(
       {},
@@ -421,6 +441,7 @@ contract('DIDToken', function(accounts) {
     await didToken.issueDID(accounts[5], 101)
     await didToken.issueDID(accounts[4], 100)
     await didToken.issueDID(accounts[3], 102)
+    await didToken.incrementDIDFromContributions(accounts[0], 20000)
 
     await didToken.investEtherForDID({
       from: accounts[0],
@@ -449,9 +470,30 @@ contract('DIDToken', function(accounts) {
     assert.equal(balance3, 102, 'accounts[4] should own 0 DID')
   })
 
-  it('should limit the number of DID for those who invest ether to the amount they have earned from contributions', async function() {
+  it('should limit investing ether to the amount they have earned from contributions', async function() {
     let etherForDIDExchangeError
     await didToken.issueDID(accounts[0], 2000)
+    await didToken.incrementDIDFromContributions(accounts[0], 2000)
+
+    try {
+      await didToken.investEtherForDID(
+        {},
+        {
+          from: accounts[0],
+          value: web3.toWei(50, 'ether') // too much ether!
+        }
+      )
+    } catch (error) {
+      etherForDIDExchangeError = error
+      console.error(`etherForDIDExchangeError: ${etherForDIDExchangeError}`)
+    }
+    assert.notEqual(etherForDIDExchangeError, undefined)
+  })
+
+  it('should allow someone to invest ether if they have enough contributions DID', async function() {
+    let etherForDIDExchangeError
+    await didToken.issueDID(accounts[0], 20000)
+    await didToken.incrementDIDFromContributions(accounts[0], 20000)
 
     try {
       await didToken.investEtherForDID(
@@ -465,6 +507,7 @@ contract('DIDToken', function(accounts) {
       etherForDIDExchangeError = error
       console.error(`etherForDIDExchangeError: ${etherForDIDExchangeError}`)
     }
+    assert.equal(etherForDIDExchangeError, undefined)
   })
 
   it('calculateNumDIDToIssue', async function() {
@@ -515,4 +558,45 @@ contract('DIDToken', function(accounts) {
     }
     assert.notEqual(etherForDIDExchangeError, undefined)
   })
+
+  it('investEtherForDID should decrement the ContributionsDID of an address', async function() {
+    //  make sure the contract has ether to return for the DID or this will fail
+    await didToken.issueDID(accounts[1], 10000)
+    await didToken.incrementDIDFromContributions(accounts[1], 10000)
+
+    await didToken.investEtherForDID({
+      from: accounts[1],
+      value: web3.toWei(3)
+    })
+
+    const netContributionsDID = await didToken.getNetNumContributionsDID.call(
+      accounts[1]
+    )
+    assert.isBelow(netContributionsDID, 10000, '')
+  })
+
+  // TODO increase default balance of accounts
+  // it('should allow investing ether up to investmentLimitAddress', async function() {
+  //   let etherForDIDExchangeError
+  //   await didToken.issueDID(accounts[0], 10000000)
+  //   await didToken.incrementDIDFromContributions(accounts[0], 10000000)
+  //
+  //   try {
+  //     await didToken.investEtherForDID(
+  //       {},
+  //       {
+  //         from: accounts[0],
+  //         value: web3.toWei(90, 'ether')
+  //       }
+  //     )
+  //   } catch (error) {
+  //     etherForDIDExchangeError = error
+  //     console.error(`etherForDIDExchangeError: ${etherForDIDExchangeError}`)
+  //   }
+  //   assert.notEqual(
+  //     etherForDIDExchangeError,
+  //     undefined,
+  //     'too many ether invested'
+  //   )
+  // })
 })

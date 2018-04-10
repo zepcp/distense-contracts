@@ -94,6 +94,7 @@ contract PullRequests is Approvable {
             require(updatedRewardStatus == Tasks.RewardStatus.PAID);
             didToken.issueDID(_pr.contributor, reward);
             didToken.incrementTasksCompleted(_pr.contributor);
+            didToken.incrementDIDFromContributions(_pr.contributor, reward);
             emit LogRewardPullRequest(_prId, _pr.taskId, _pr.prNum);
         }
 

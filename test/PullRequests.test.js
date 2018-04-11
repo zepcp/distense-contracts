@@ -60,10 +60,9 @@ contract('PullRequests', function(accounts) {
     assert.equal(numPRs.toNumber(), 0, 'numPRs should be 0')
   })
 
-  it('should issueDID correctly after a pull request reaches the required approvals', async function() {
+  it('should increment totalSupply of DID after a pull request reaches the required approvals', async function() {
     await didToken.issueDID(accounts[0], 1000000)
 
-    //  got to have a task to interact with
     await tasks.addTask(pullRequest.taskId, 'some title')
     const taskExists = await tasks.taskExists.call(pullRequest.taskId)
     assert.equal(
@@ -153,7 +152,7 @@ contract('PullRequests', function(accounts) {
 
       await didToken.issueDID(accounts[0], numDIDRequired - 1)
       assert.equal(
-        await didToken.getAddressBalance.call(accounts[0]),
+        await didToken.balances.call(accounts[0]),
         numDIDRequired - 1,
         'balance should be 100 or less than threshold here'
       )
@@ -175,7 +174,7 @@ contract('PullRequests', function(accounts) {
     try {
       await didToken.issueDID(accounts[0], 1230000)
       assert.equal(
-        await didToken.getAddressBalance.call(accounts[0]),
+        await didToken.balances.call(accounts[0]),
         1230000,
         'balance should be sufficient to vote -- above threshold'
       )
@@ -259,11 +258,7 @@ contract('PullRequests', function(accounts) {
     })
 
     const votedOnPR = await pullRequests.getPullRequestById.call(pullRequest.id)
-    assert.equal(
-      votedOnPR[3].toNumber(),
-      2000,
-      'pctDIDVoted of the votedOnPullRequest should be greater than zero'
-    )
+    assert.equal(votedOnPR[3].toNumber(), 20000000000, '')
   })
 
   it('should fire event "LogAddPullRequest" when addPullRequest is appropriately called', async function() {
@@ -334,7 +329,11 @@ contract('PullRequests', function(accounts) {
     assert.equal(approvePullRequestLog.length, 1, 'should be 1 event')
     let eventArgs = approvePullRequestLog[0].args
     assert.equal(eventArgs._prId, pullRequest.id)
-    assert.equal(eventArgs.pctDIDApproved.toString(), '2000', 'pctDIDApproved')
+    assert.equal(
+      eventArgs.pctDIDApproved.toString(),
+      '20000000000',
+      'pctDIDApproved'
+    )
   })
 
   it('should fire event "LogRewardPullRequest" when addPullRequest is appropriately called', async function() {
@@ -385,6 +384,54 @@ contract('PullRequests', function(accounts) {
     let eventArgs = LogRewardPullRequestLog[0].args
     assert.equal(eventArgs._prId, pullRequest.id)
     assert.equal(eventArgs.taskId, pullRequest.taskId)
+  })
+
+  it("should increment a contributor's Contributions DID correctly after a pull request reaches the required approvals", async function() {
+    await didToken.issueDID(accounts[0], 1000000)
+    await didToken.incrementDIDFromContributions(accounts[0], 1000000)
+
+    await tasks.addTask(pullRequest.taskId, 'some title')
+    const taskExists = await tasks.taskExists.call(pullRequest.taskId)
+    assert.equal(
+      taskExists,
+      true,
+      'task must exist to vote and approve a related pr later'
+    )
+
+    await tasks.taskRewardVote(pullRequest.taskId, 1000)
+
+    await tasks.approve(pullRequests.address)
+    const pullRequestsAddressApprovedForTasks = await tasks.approved.call(
+      pullRequests.address
+    )
+    assert.equal(
+      pullRequestsAddressApprovedForTasks,
+      true,
+      'PullRequests needs to be approved to call a function within approvePullRequest()'
+    )
+
+    await didToken.approve(pullRequests.address)
+    const pullRequestsApprovedForTasksForDIDToken = await didToken.approved(
+      pullRequests.address
+    )
+    assert.equal(
+      pullRequestsApprovedForTasksForDIDToken,
+      true,
+      'pullRequests.address needs to be approved to call a function within approvePullRequest()'
+    )
+
+    await pullRequests.addPullRequest(
+      pullRequest.id,
+      pullRequest.taskId,
+      pullRequest.prNum
+    )
+
+    await pullRequests.approvePullRequest(pullRequest.id)
+    let contributionsDID = await didToken.getNetNumContributionsDID.call(
+      accounts[0]
+    )
+
+    assert.isAbove(contributionsDID, 1000000)
   })
 
   it('should set the prNum correctly when adding pullRequests', async function() {

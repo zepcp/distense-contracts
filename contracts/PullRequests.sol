@@ -78,6 +78,7 @@ contract PullRequests is Approvable {
             distense.votingPowerLimitParameterTitle()
         ) : didToken.pctDIDOwned(msg.sender);
 
+        //  where the magic happens
         if (
             _pr.pctDIDApproved > distense.getParameterValueByTitle(
                 distense.pctDIDRequiredToMergePullRequestTitle()
@@ -92,9 +93,7 @@ contract PullRequests is Approvable {
             Tasks.RewardStatus updatedRewardStatus = tasks.setTaskRewardPaid(_pr.taskId);
             //  Only issueDID after we confirm taskRewardPaid
             require(updatedRewardStatus == Tasks.RewardStatus.PAID);
-            didToken.issueDID(_pr.contributor, reward);
-            didToken.incrementTasksCompleted(_pr.contributor);
-            didToken.incrementDIDFromContributions(_pr.contributor, reward);
+            didToken.rewardContributor(_pr.contributor, reward);
             emit LogRewardPullRequest(_prId, _pr.taskId, _pr.prNum);
         }
 

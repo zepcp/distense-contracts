@@ -386,7 +386,7 @@ contract('PullRequests', function(accounts) {
     assert.equal(eventArgs.taskId, pullRequest.taskId)
   })
 
-  it("should increment a contributor's Contributions DID correctly after a pull request reaches the required approvals", async function() {
+  it.only("should increment a contributor's Contributions DID correctly after a pull request reaches the required approvals", async function() {
     await didToken.issueDID(accounts[0], 1000000)
     await didToken.incrementDIDFromContributions(accounts[0], 1000000)
 
@@ -427,10 +427,13 @@ contract('PullRequests', function(accounts) {
     )
 
     await pullRequests.approvePullRequest(pullRequest.id)
-    let contributionsDID = await didToken.getNetNumContributionsDID.call(
+
+    const contributionsDID = await didToken.getNetNumContributionsDID.call(
       accounts[0]
     )
+    const DID = await didToken.getAddressBalance.call(accounts[0])
 
+    assert.isAbove(DID, 1000000)
     assert.isAbove(contributionsDID, 1000000)
   })
 

@@ -2,9 +2,10 @@ pragma solidity ^0.4.21;
 
 import './lib/Approvable.sol';
 import './Distense.sol';
+import './Debuggable.sol';
 import './lib/SafeMath.sol';
 
-contract DIDToken is Approvable {
+contract DIDToken is Approvable, Debuggable {
 
     using SafeMath for uint256;
 
@@ -43,7 +44,7 @@ contract DIDToken is Approvable {
         decimals = 18;
     }
 
-    function issueDID(address _recipient, uint256 _numDID) external onlyApproved returns (uint256) {
+    function issueDID(address _recipient, uint256 _numDID) public onlyApproved returns (uint256) {
         require(_recipient != address(0));
         require(_numDID > 0);
 
@@ -123,11 +124,12 @@ contract DIDToken is Approvable {
         Distense distense = Distense(DistenseAddress);
         uint256 DIDPerEther = SafeMath.div(distense.getParameterValueByTitle(distense.didPerEtherParameterTitle()), 1000000000);
 
+        // require ether investment to be worth at least 1 DID
         require(investedOneDIDWorth(msg.value, DIDPerEther));
-//
-//        // require ether investment to be worth at least 1 DID
+        require(getNumWeiAddressMayInvest(msg.sender) >= msg.value);
+
         uint256 numDIDToIssue = calculateNumDIDToIssue(msg.value, DIDPerEther);
-        require(DIDHolders[msg.sender].netContributionsDID >= numDIDToIssue);
+//        require(DIDHolders[msg.sender].netContributionsDID >= numDIDToIssue);
 
         totalSupply = SafeMath.add(totalSupply, numDIDToIssue);
         DIDHolders[msg.sender].balance = SafeMath.add(DIDHolders[msg.sender].balance, numDIDToIssue);
@@ -147,8 +149,24 @@ contract DIDToken is Approvable {
         return true;
     }
 
-    function getNumWeiAddressMayInvest(address contributor) public view returns (uint256) {
-        return SafeMath.sub(investmentLimitAddress, DIDHolders[contributor].weiInvested);
+    function getNumWeiAddressMayInvest(address _contributor) public returns (uint256) {
+
+        uint256 DIDFromContributions = DIDHolders[_contributor].netContributionsDID;
+        require(DIDFromContributions > 0);
+        uint256 netUninvestedEther = SafeMath.sub(investmentLimitAddress, DIDHolders[_contributor].weiInvested);
+        require(netUninvestedEther > 0);
+
+        Distense distense = Distense(DistenseAddress);
+        uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
+        require(SafeMath.div((DIDFromContributions * DIDPerEther), DIDPerEther) >= DIDFromContributions);
+
+        return DIDFromContributions * DIDPerEther * 1000;
+    }
+
+    function rewardContributor(address _contributor, uint256 _reward) external returns (bool) {
+        issueDID(_contributor, _reward);
+        incrementTasksCompleted(_contributor);
+        incrementDIDFromContributions(_contributor, _reward);
     }
 
     function getWeiAggregateMayInvest() public view returns (uint256) {
@@ -177,8 +195,7 @@ contract DIDToken is Approvable {
 
     function calculateNumDIDToIssue(uint256 msgValue, uint256 DIDPerEther) public pure returns (uint256) {
         uint256 numDIDToIssueNum = SafeMath.mul(msgValue, DIDPerEther);
-        uint256 numDIDToIssue = SafeMath.div(numDIDToIssueNum, 1 ether);
-        return numDIDToIssue;
+        return SafeMath.div(numDIDToIssueNum, 1 ether);
     }
 
     function investedOneDIDWorth(uint256 msgValue, uint256 DIDPerEther) public pure returns (bool) {

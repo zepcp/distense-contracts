@@ -541,47 +541,25 @@ contract('DIDToken', function(accounts) {
       web3.toWei(0.1, 'ether'),
       1000
     )
-    assert.equal(DID, 100)
+    assert.equal(DID, 100000000000000000000)
 
     DID = await didToken.calculateNumDIDToIssue.call(
       web3.toWei(0.5, 'ether'),
       1000
     )
-    assert.equal(DID.toString(), 500)
+    assert.equal(DID.toString(), 500000000000000000000)
 
     DID = await didToken.calculateNumDIDToIssue.call(
       web3.toWei(1.1, 'ether'),
       1100
     )
-    assert.equal(DID.toString(), 1210)
+    assert.equal(DID.toString(), 1210000000000000000000)
 
     DID = await didToken.calculateNumDIDToIssue.call(
       web3.toWei(3.3333, 'ether'),
       1100
     )
-    assert.equal(DID.toString(), 3666)
-  })
-
-  it('investedOneDIDWorth', async function() {
-    let etherForDIDExchangeError
-    let returnValue = await didToken.investedOneDIDWorth(
-      web3.toWei(0.2, 'ether'),
-      1000
-    )
-    assert.equal(returnValue, true)
-
-    returnValue = await didToken.investedOneDIDWorth(
-      web3.toWei(0.1, 'ether'),
-      100
-    )
-    assert.equal(returnValue, true)
-
-    try {
-      await didToken.investedOneDIDWorth(web3.toWei(0.001, 'ether'), 1000)
-    } catch (error) {
-      etherForDIDExchangeError = error
-    }
-    assert.notEqual(etherForDIDExchangeError, undefined)
+    assert.equal(DID.toString(), 3666000000000000000000)
   })
 
   it('investEtherForDID should decrement the ContributionsDID of an address', async function() {

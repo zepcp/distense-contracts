@@ -386,7 +386,7 @@ contract('PullRequests', function(accounts) {
     assert.equal(eventArgs.taskId, pullRequest.taskId)
   })
 
-  it.only("should increment a contributor's Contributions DID correctly after a pull request reaches the required approvals", async function() {
+  it("should increment a contributor's Contributions DID correctly after a pull request reaches the required approvals", async function() {
     await didToken.issueDID(accounts[0], 1000000)
     await didToken.incrementDIDFromContributions(accounts[0], 1000000)
 

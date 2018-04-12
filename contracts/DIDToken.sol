@@ -125,7 +125,6 @@ contract DIDToken is Approvable, Debuggable {
         uint256 DIDPerEther = SafeMath.div(distense.getParameterValueByTitle(distense.didPerEtherParameterTitle()), 1000000000);
 
         // require ether investment to be worth at least 1 DID
-        require(investedOneDIDWorth(msg.value, DIDPerEther));
         require(getNumWeiAddressMayInvest(msg.sender) >= msg.value);
 
         uint256 numDIDToIssue = calculateNumDIDToIssue(msg.value, DIDPerEther);
@@ -194,13 +193,7 @@ contract DIDToken is Approvable, Debuggable {
     }
 
     function calculateNumDIDToIssue(uint256 msgValue, uint256 DIDPerEther) public pure returns (uint256) {
-        uint256 numDIDToIssueNum = SafeMath.mul(msgValue, DIDPerEther);
-        return SafeMath.div(numDIDToIssueNum, 1 ether);
-    }
-
-    function investedOneDIDWorth(uint256 msgValue, uint256 DIDPerEther) public pure returns (bool) {
-        require(msgValue > SafeMath.div(1 ether, DIDPerEther));
-        return true;
+        return SafeMath.mul(msgValue, DIDPerEther);
     }
 
     function incrementDIDFromContributions(address _contributor, uint256 _reward) public {

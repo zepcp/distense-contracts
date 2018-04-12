@@ -368,35 +368,60 @@ contract('DIDToken', function(accounts) {
     )
   })
 
-  it('numWeiAddressMayInvest should return correct values', async function() {
+  it('numWeiAddressMayInvest should prevent those with 0 DID from contributions from contributing', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
-    await didToken.issueDID(accounts[0], 1000000)
-    await didToken.incrementDIDFromContributions(accounts[0], 1000000)
+    await didToken.issueDID(accounts[0], 1000000) // DID but no DID from contributions
+    let someError
 
-    const numWeiAddressMayInvest = await didToken.getNumWeiAddressMayInvest(
+    try {
+      await didToken.getNumWeiAddressMayInvest(accounts[0])
+    } catch (error) {
+      someError = error
+    }
+    assert.notEqual(someError, undefined)
+  })
+
+  it('numWeiAddressMayInvest should allow those who have DID from contributions to invest', async function() {
+    //  make sure the contract has ether to return for the DID or this will fail
+    await didToken.incrementDIDFromContributions(accounts[0], 10000)
+
+    let numWeiAddressMayInvest = await didToken.getNumWeiAddressMayInvest.call(
       accounts[0]
     )
+    assert.equal(numWeiAddressMayInvest.toString(), web3.toWei(10, 'ether'))
 
-    const etherToInvest = web3.toWei(10.543)
-    const expected = web3.toWei(numWeiAddressMayInvest - etherToInvest)
-
-    await didToken.investEtherForDID(
-      {},
-      {
-        from: accounts[0],
-        value: etherToInvest,
-        gas: 3000000
-      }
-    )
-
-    const remainingWei = await didToken.getNumWeiAddressMayInvest.call(
+    //  second test
+    await didToken.incrementDIDFromContributions(accounts[0], 5)
+    numWeiAddressMayInvest = await didToken.getNumWeiAddressMayInvest.call(
       accounts[0]
     )
-    assert.equal(
-      web3.toWei(remainingWei.toString()),
-      expected,
-      'should have reduced remainingWeiAggregateMayInvest by amount of wei invested'
+    assert.equal(numWeiAddressMayInvest.toString(), web3.toWei(10.005, 'ether'))
+
+    //  third
+    await didToken.incrementDIDFromContributions(accounts[0], 501)
+    numWeiAddressMayInvest = await didToken.getNumWeiAddressMayInvest.call(
+      accounts[0]
     )
+    assert.equal(numWeiAddressMayInvest.toString(), web3.toWei(10.506, 'ether'))
+
+    //  fourth
+    await didToken.incrementDIDFromContributions(accounts[1], 101)
+    numWeiAddressMayInvest = await didToken.getNumWeiAddressMayInvest.call(
+      accounts[1]
+    )
+    assert.equal(numWeiAddressMayInvest.toString(), web3.toWei(0.101, 'ether'))
+
+    await didToken.incrementDIDFromContributions(accounts[1], 88701)
+    numWeiAddressMayInvest = await didToken.getNumWeiAddressMayInvest.call(
+      accounts[1]
+    )
+    assert.equal(numWeiAddressMayInvest.toString(), web3.toWei(88.802, 'ether'))
+
+    await didToken.incrementDIDFromContributions(accounts[1], 55308)
+    numWeiAddressMayInvest = await didToken.getNumWeiAddressMayInvest.call(
+      accounts[1]
+    )
+    assert.equal(numWeiAddressMayInvest.toString(), web3.toWei(144.11, 'ether'))
   })
 
   it('should fire event "LogIssueDID" and "LogInvestEtherForDID investEtherForDID is called', async function() {
@@ -574,29 +599,4 @@ contract('DIDToken', function(accounts) {
     )
     assert.isBelow(netContributionsDID, 10000, '')
   })
-
-  // TODO increase default balance of accounts
-  // it('should allow investing ether up to investmentLimitAddress', async function() {
-  //   let etherForDIDExchangeError
-  //   await didToken.issueDID(accounts[0], 10000000)
-  //   await didToken.incrementDIDFromContributions(accounts[0], 10000000)
-  //
-  //   try {
-  //     await didToken.investEtherForDID(
-  //       {},
-  //       {
-  //         from: accounts[0],
-  //         value: web3.toWei(90, 'ether')
-  //       }
-  //     )
-  //   } catch (error) {
-  //     etherForDIDExchangeError = error
-  //     console.error(`etherForDIDExchangeError: ${etherForDIDExchangeError}`)
-  //   }
-  //   assert.notEqual(
-  //     etherForDIDExchangeError,
-  //     undefined,
-  //     'too many ether invested'
-  //   )
-  // })
 })

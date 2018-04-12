@@ -427,10 +427,13 @@ contract('PullRequests', function(accounts) {
     )
 
     await pullRequests.approvePullRequest(pullRequest.id)
-    let contributionsDID = await didToken.getNetNumContributionsDID.call(
+
+    const contributionsDID = await didToken.getNetNumContributionsDID.call(
       accounts[0]
     )
+    const DID = await didToken.getAddressBalance.call(accounts[0])
 
+    assert.isAbove(DID, 1000000)
     assert.isAbove(contributionsDID, 1000000)
   })
 

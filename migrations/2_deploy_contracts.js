@@ -4,7 +4,6 @@ const PullRequests = artifacts.require('./PullRequests.sol')
 const Tasks = artifacts.require('./Tasks.sol')
 const SafeMath = artifacts.require('./SafeMath.sol')
 const SafeMathMock = artifacts.require('./SafeMathMock')
-const Faucet = artifacts.require('./Faucet')
 
 const safeMathAddress = '0xec9D002F3c724A44038981cb0CD967b008681b64'
 const tasksAddress = '0x79df04e7cfa3d710dcec830d7fa0d78b6e3977ee'
@@ -56,33 +55,6 @@ module.exports = (deployer, network, accounts) => {
       await didToken.approve(pullRequests.address)
       await didToken.approved.call(pullRequests.address)
       await didToken.setDistenseAddress(Distense.address)
-    })
-    .then(() => {
-      const network = web3.version.network
-      console.log(`Using network: ${network}`)
-      if (network === 3) {
-        console.log(`Deploying Ropsten faucet`)
-        return deployer.deploy(Faucet)
-      } else {
-        console.log(
-          `won't deploy Ropsten faucet because not on correct network`
-        )
-      }
-    })
-    .then(async () => {
-      //  Ropsten faucet
-      if (network === 3) {
-        const faucet = await Faucet.deployed()
-        const network = web3.version.network
-        console.log(`Using network: ${network}`)
-        const numEtherToSendToFaucet = network === 3 ? 1000 : 5
-        console.log(`Sending ${numEtherToSendToFaucet} ether to faucet`)
-        await web3.eth.sendTransaction({
-          from: accounts[0],
-          to: faucet.address,
-          value: web3.toWei(numEtherToSendToFaucet, 'ether')
-        })
-      }
     })
     .catch(err => {
       console.log(`error: ${err}`)

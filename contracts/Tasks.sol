@@ -107,7 +107,7 @@ contract Tasks is Approvable {
 
         //  Does the voter own at least as many DID as the reward their voting for?
         //  This ensures new contributors don't have too much sway over the issuance of new DID.
-        require(balance > SafeMath.div(distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle()), 1000000000));
+        require(balance > distense.getParameterValueByTitle(distense.numDIDRequiredToTaskRewardVoteParameterTitle()));
 
         //  Require the reward to be less than or equal to the maximum reward parameter,
         //  which basically is a hard, floating limit on the number of DID that can be issued for any single task
@@ -203,7 +203,7 @@ contract Tasks is Approvable {
         uint256 numDIDRequiredToAddTask = distense.getParameterValueByTitle(
             distense.numDIDRequiredToAddTaskParameterTitle()
         );
-        require(balance >= SafeMath.div(numDIDRequiredToAddTask, 1000000000));
+        require(balance >= numDIDRequiredToAddTask);
         _;
     }
 

@@ -122,7 +122,7 @@ contract DIDToken is Approvable, Debuggable {
     function investEtherForDID() canDepositThisManyEtherForDID external payable returns (uint256) {
 
         Distense distense = Distense(DistenseAddress);
-        uint256 DIDPerEther = SafeMath.div(distense.getParameterValueByTitle(distense.didPerEtherParameterTitle()), 1000000000);
+        uint256 DIDPerEther = SafeMath.div(distense.getParameterValueByTitle(distense.didPerEtherParameterTitle()), 1 ether);
 
         // require ether investment to be worth at least 1 DID
         require(getNumWeiAddressMayInvest(msg.sender) >= msg.value);
@@ -155,10 +155,9 @@ contract DIDToken is Approvable, Debuggable {
 		require(investmentLimitAddress > DIDHolders[_contributor].weiInvested);
 
         Distense distense = Distense(DistenseAddress);
-        uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());
-        require(SafeMath.div((DIDFromContributions * DIDPerEther), DIDPerEther) >= DIDFromContributions);
+        uint256 DIDPerEther = SafeMath.div(distense.getParameterValueByTitle(distense.didPerEtherParameterTitle()), 1 ether);
 
-        return DIDFromContributions * DIDPerEther * 1000;
+        return SafeMath.div(DIDFromContributions, DIDPerEther);
     }
 
     function rewardContributor(address _contributor, uint256 _reward) external returns (bool) {

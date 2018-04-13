@@ -116,7 +116,7 @@ contract PullRequests is Approvable {
 
         DIDToken didToken = DIDToken(DIDTokenAddress);
 
-        require(didToken.getAddressBalance(msg.sender) > SafeMath.div(threshold, 1000000000));
+        require(didToken.getAddressBalance(msg.sender) > threshold);
         _;
     }
 

@@ -31,12 +31,12 @@ contract('Distense contract', function(accounts) {
 
   const numDIDRequiredToApproveVotePullRequestParameter = {
     title: 'numDIDReqApproveVotePullRequest',
-    value: 200000000000
+    value: 200000000000000000000
   }
 
   const numDIDRequiredToTaskRewardVoteParameter = {
     title: 'numDIDRequiredToTaskRewardVote',
-    value: 100000000000
+    value: 100000000000000000000
   }
 
   const minNumberOfTaskRewardVotersParameter = {
@@ -46,17 +46,17 @@ contract('Distense contract', function(accounts) {
 
   const numDIDRequiredToAddTaskParameter = {
     title: 'numDIDRequiredToAddTask',
-    value: 100000000000
+    value: 100000000000000000000
   }
 
   const defaultRewardParameter = {
     title: 'defaultReward',
-    value: 100000000000
+    value: 100000000000000000000
   }
 
   const didPerEtherParameter = {
     title: 'didPerEther',
-    value: 1000000000000
+    value: 1000000000000000000000
   }
 
   const votingPowerLimitParameter = {
@@ -460,7 +460,7 @@ contract('Distense contract', function(accounts) {
     //  accounts[0] owns 3000 of 23000 total DID -- 13% here
     assert.equal(
       newValue.toNumber(),
-      86956521739,
+      86956521739000000000,
       'updated value should be 13% lower'
     )
   })

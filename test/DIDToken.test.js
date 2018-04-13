@@ -2,7 +2,7 @@ const web3 = global.web3
 const DIDToken = artifacts.require('DIDToken')
 const Distense = artifacts.require('./Distense.sol')
 const web3Utils = require('web3-utils')
-//const didPerEtherParameter = require('./Distense.test')
+const didPerEtherParameter = require('./Distense.test')
 
 const increaseTime = addSeconds => {
   web3.currentProvider.send({

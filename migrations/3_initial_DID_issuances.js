@@ -23,7 +23,7 @@ module.exports = (deployer, network, accounts) => {
         const numDID = initialDIDIssuances[account]
         console.log(`Issuing ${numDID} mock DID to contributor: ${account}`)
         await didToken.issueDID(account, numDID)
-        const balance = await didToken.balances.call(account)
+        const balance = await didToken.getAddressBalance(account)
         console.log(`Contributor's post-issuance balance: ${balance}`)
       })
     }

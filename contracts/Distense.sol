@@ -108,7 +108,7 @@ contract Distense is Approvable, Debuggable {
             title : maxRewardParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     So this is 5000.0
-            value: 5000000000000
+            value: 5000 * 1 ether
         });
         parameters[maxRewardParameterTitle] = maxRewardParameter;
         parameterTitles.push(maxRewardParameterTitle);
@@ -118,7 +118,7 @@ contract Distense is Approvable, Debuggable {
             title : numDIDRequiredToApproveVotePullRequestParameterTitle,
             //     Every hard-coded int except for dates and numbers (not percentages) pertaining to ether or DID are decimals to two decimal places
             //     200.00
-            value: 200000000000000000000
+            value: 200 * 1 ether
         });
         parameters[numDIDRequiredToApproveVotePullRequestParameterTitle] = numDIDRequiredToApproveVotePullRequestParameter;
         parameterTitles.push(numDIDRequiredToApproveVotePullRequestParameterTitle);
@@ -134,7 +134,7 @@ contract Distense is Approvable, Debuggable {
         numDIDRequiredToTaskRewardVoteParameter = Parameter({
             title : numDIDRequiredToTaskRewardVoteParameterTitle,
             // 100.00
-            value: 100000000000000000000
+            value: 100 * 1 ether
         });
         parameters[numDIDRequiredToTaskRewardVoteParameterTitle] = numDIDRequiredToTaskRewardVoteParameter;
         parameterTitles.push(numDIDRequiredToTaskRewardVoteParameterTitle);
@@ -152,7 +152,7 @@ contract Distense is Approvable, Debuggable {
         numDIDRequiredToAddTaskParameter = Parameter({
             title : numDIDRequiredToAddTaskParameterTitle,
             //     So this is 100.00
-            value: 100000000000000000000
+            value: 100 * 1 ether
         });
         parameters[numDIDRequiredToAddTaskParameterTitle] = numDIDRequiredToAddTaskParameter;
         parameterTitles.push(numDIDRequiredToAddTaskParameterTitle);
@@ -161,7 +161,7 @@ contract Distense is Approvable, Debuggable {
         defaultRewardParameter = Parameter({
             title : defaultRewardParameterTitle,
             //     100.00
-            value: 100000000000000000000
+            value: 100 * 1 ether
         });
         parameters[defaultRewardParameterTitle] = defaultRewardParameter;
         parameterTitles.push(defaultRewardParameterTitle);
@@ -170,7 +170,7 @@ contract Distense is Approvable, Debuggable {
         didPerEtherParameter = Parameter({
             title : didPerEtherParameterTitle,
             //     1000.00
-            value: 1000000000000000000000
+            value: 1000 * 1 ether
         });
         parameters[didPerEtherParameterTitle] = didPerEtherParameter;
         parameterTitles.push(didPerEtherParameterTitle);

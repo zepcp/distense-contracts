@@ -2,3 +2,16 @@
 node_modules
 coverage
 
+truffle.js
+*.json
+contracts/Debuggable.sol
+contracts/Distense.sol
+contracts/Faucet.sol
+contracts/HAVToken.solb
+contracts/lib/Approvable.sol
+contracts/lib/Ownable.sol
+contracts/lib/SafeMath.sol
+contracts/Migrations.sol
+contracts/PullRequests.sol
+contracts/SafeMathMock.sol
+contracts/Tasks.sol

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.19;
 
 import './lib/Approvable.sol';
 import './Distense.sol';
@@ -55,7 +55,7 @@ contract DIDToken is Approvable, Debuggable {
         if (DIDHolders[_recipient].DIDHoldersIndex == 0)
             DIDHolders[_recipient].DIDHoldersIndex = DIDHoldersArray.push(_recipient) - 1;
 
-        emit LogIssueDID(_recipient, _numDID);
+        LogIssueDID(_recipient, _numDID);
 
         return DIDHolders[_recipient].balance;
     }
@@ -78,7 +78,7 @@ contract DIDToken is Approvable, Debuggable {
             }
         }
 
-        emit LogDecrementDID(_address, _numDID);
+        LogDecrementDID(_address, _numDID);
 
         return DIDHolders[_address].balance;
     }
@@ -114,7 +114,7 @@ contract DIDToken is Approvable, Debuggable {
                 delete DIDHolders[msg.sender];
             }
         }
-        emit LogExchangeDIDForEther(msg.sender, _numDIDToExchange);
+        LogExchangeDIDForEther(msg.sender, _numDIDToExchange);
 
         return DIDHolders[msg.sender].balance;
     }
@@ -137,8 +137,8 @@ contract DIDToken is Approvable, Debuggable {
         DIDHolders[msg.sender].weiInvested += msg.value;
         investedAggregate += msg.value;
 
-        emit LogIssueDID(msg.sender, numDIDToIssue);
-        emit LogInvestEtherForDID(msg.sender, msg.value);
+        LogIssueDID(msg.sender, numDIDToIssue);
+        LogInvestEtherForDID(msg.sender, msg.value);
 
         return DIDHolders[msg.sender].balance;
     }
@@ -148,12 +148,11 @@ contract DIDToken is Approvable, Debuggable {
         return true;
     }
 
-    function getNumWeiAddressMayInvest(address _contributor) public returns (uint256) {
+    function getNumWeiAddressMayInvest(address _contributor) public view returns (uint256) {
 
         uint256 DIDFromContributions = DIDHolders[_contributor].netContributionsDID;
         require(DIDFromContributions > 0);
-        uint256 netUninvestedEther = SafeMath.sub(investmentLimitAddress, DIDHolders[_contributor].weiInvested);
-        require(netUninvestedEther > 0);
+		require(investmentLimitAddress > DIDHolders[_contributor].weiInvested);
 
         Distense distense = Distense(DistenseAddress);
         uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.19;
 
 import './lib/Approvable.sol';
 import './DIDToken.sol';
@@ -244,7 +244,7 @@ contract Distense is Approvable, Debuggable {
 
         updateParameterValue(_title, currentValue);
         updateLastVotedOnParameter(_title, msg.sender);
-        emit LogParameterValueUpdate(_title, currentValue);
+        LogParameterValueUpdate(_title, currentValue);
 
         return currentValue;
     }

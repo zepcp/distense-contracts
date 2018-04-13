@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.19;
 
 import './lib/Approvable.sol';
 import './DIDToken.sol';
@@ -43,7 +43,7 @@ contract PullRequests is Approvable {
         pullRequests[_prId].prNum = _prNum;
         pullRequestIds.push(_prId);
 
-        emit LogAddPullRequest(_prId, _taskId, _prNum);
+        LogAddPullRequest(_prId, _taskId, _prNum);
 
         return true;
     }
@@ -94,10 +94,10 @@ contract PullRequests is Approvable {
             //  Only issueDID after we confirm taskRewardPaid
             require(updatedRewardStatus == Tasks.RewardStatus.PAID);
             didToken.rewardContributor(_pr.contributor, reward);
-            emit LogRewardPullRequest(_prId, _pr.taskId, _pr.prNum);
+            LogRewardPullRequest(_prId, _pr.taskId, _pr.prNum);
         }
 
-        emit LogPullRequestApprovalVote(_prId, _pr.pctDIDApproved);
+        LogPullRequestApprovalVote(_prId, _pr.pctDIDApproved);
         return _pr.pctDIDApproved;
     }
 

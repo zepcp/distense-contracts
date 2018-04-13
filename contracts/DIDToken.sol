@@ -152,8 +152,7 @@ contract DIDToken is Approvable, Debuggable {
 
         uint256 DIDFromContributions = DIDHolders[_contributor].netContributionsDID;
         require(DIDFromContributions > 0);
-        uint256 netUninvestedEther = SafeMath.sub(investmentLimitAddress, DIDHolders[_contributor].weiInvested);
-        require(netUninvestedEther > 0);
+		require(investmentLimitAddress > DIDHolders[_contributor].weiInvested);
 
         Distense distense = Distense(DistenseAddress);
         uint256 DIDPerEther = distense.getParameterValueByTitle(distense.didPerEtherParameterTitle());

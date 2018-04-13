@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.21;
 
 import './DIDToken.sol';
 import './Distense.sol';
@@ -51,7 +51,7 @@ contract Tasks is Approvable {
 
         taskIds.push(_taskId);
         tasks[_taskId].taskIdsIndex = taskIds.length - 1;
-        LogAddTask(_taskId, _title);
+        emit LogAddTask(_taskId, _title);
 
         return true;
 
@@ -147,7 +147,7 @@ contract Tasks is Approvable {
         );
 
         if (task.pctDIDVoted > pctDIDVotedThreshold || task.numVotes > SafeMath.div(minNumVoters, 1000000000)) {
-            LogTaskRewardDetermined(_taskId, task.reward);
+            emit LogTaskRewardDetermined(_taskId, task.reward);
             task.rewardStatus = RewardStatus.DETERMINED;
         }
 

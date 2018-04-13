@@ -189,7 +189,7 @@ contract('DIDToken', function(accounts) {
 
     assert.equal(
       postInvestDIDBalance.toNumber(),
-      2000000000000000020000,
+      22000,
       'accounts[0] DID balance should be 22000'
     )
   })
@@ -290,8 +290,8 @@ contract('DIDToken', function(accounts) {
 
   it('should increment the investedAddress of an address', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
-    await didToken.issueDID(accounts[1], 1000000000000000000000000)
-    await didToken.incrementDIDFromContributions(accounts[1], 1000000000000000000000000)
+    await didToken.issueDID(accounts[1], 1000000)
+    await didToken.incrementDIDFromContributions(accounts[1], 1000000)
 
     await didToken.investEtherForDID({
       from: accounts[1],
@@ -316,7 +316,7 @@ contract('DIDToken', function(accounts) {
     assert.equal(
       weiInvested.toString(),
       web3.toWei(5.3),
-      'accounts[1] invested 5.3 ether at this point'
+      'accounts[1] invested 25 ether at this point'
     )
   })
 
@@ -559,13 +559,13 @@ contract('DIDToken', function(accounts) {
       web3.toWei(3.3333, 'ether'),
       1100
     )
-    assert.equal(DID.toString(), 3666630000000000000000)
+    assert.equal(DID.toString(), 3666000000000000000000)
   })
 
   it('investEtherForDID should decrement the ContributionsDID of an address', async function() {
     //  make sure the contract has ether to return for the DID or this will fail
-    await didToken.issueDID(accounts[1], 1000000000000000000000000)
-    await didToken.incrementDIDFromContributions(accounts[1], 1000000000000000000000000)
+    await didToken.issueDID(accounts[1], 10000)
+    await didToken.incrementDIDFromContributions(accounts[1], 10000)
 
     await didToken.investEtherForDID({
       from: accounts[1],
@@ -575,6 +575,6 @@ contract('DIDToken', function(accounts) {
     const netContributionsDID = await didToken.getNetNumContributionsDID.call(
       accounts[1]
     )
-    assert.isBelow(netContributionsDID, 1000000000000000000000000, '')
+    assert.isBelow(netContributionsDID, 10000, '')
   })
 })

@@ -26,17 +26,17 @@ contract('Distense contract', function(accounts) {
 
   const maxRewardParameter = {
     title: 'maxReward',
-    value: 5000000000000
+    value: web3.toWei(5000)
   }
 
   const numDIDRequiredToApproveVotePullRequestParameter = {
     title: 'numDIDReqApproveVotePullRequest',
-    value: 200000000000000000000
+    value: web3.toWei(200)
   }
 
   const numDIDRequiredToTaskRewardVoteParameter = {
     title: 'numDIDRequiredToTaskRewardVote',
-    value: 100000000000000000000
+    value: web3.toWei(100)
   }
 
   const minNumberOfTaskRewardVotersParameter = {
@@ -46,17 +46,17 @@ contract('Distense contract', function(accounts) {
 
   const numDIDRequiredToAddTaskParameter = {
     title: 'numDIDRequiredToAddTask',
-    value: 100000000000000000000
+    value: web3.toWei(100)
   }
 
   const defaultRewardParameter = {
     title: 'defaultReward',
-    value: 100000000000000000000
+    value: web3.toWei(100)
   }
 
   const didPerEtherParameter = {
     title: 'didPerEther',
-    value: 1000000000000000000000
+    value: web3.toWei(1000)
   }
 
   const votingPowerLimitParameter = {

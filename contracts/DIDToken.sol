@@ -148,7 +148,7 @@ contract DIDToken is Approvable, Debuggable {
         return true;
     }
 
-    function getNumWeiAddressMayInvest(address _contributor) public returns (uint256) {
+    function getNumWeiAddressMayInvest(address _contributor) public view returns (uint256) {
 
         uint256 DIDFromContributions = DIDHolders[_contributor].netContributionsDID;
         require(DIDFromContributions > 0);
